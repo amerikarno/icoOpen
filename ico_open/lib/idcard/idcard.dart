@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:ico_open/personal_info/personal_info.dart';
 import 'package:ico_open/preinfo/preinfo.dart';
 
 class IDCardPage extends StatefulWidget {
@@ -238,7 +239,7 @@ class _IDCardPageState extends State<IDCardPage> {
                   ),
                   Expanded(
                     flex: 3,
-                    child: TextField(
+                    child: TextFormField(
                       maxLength: 13,
                       controller: _idcard,
                       decoration: const InputDecoration(
@@ -251,6 +252,13 @@ class _IDCardPageState extends State<IDCardPage> {
                           ),
                         ),
                       ],
+                      validator: (value) {
+                        print(value);
+                        if (value!.length == 13 || value.isEmpty) {
+                          return 'กรุณาใส่เลขบัตรประชาชนให้ถูกต้อง';
+                        }
+                        return null;
+                      },
                     ),
                   ),
                   const Expanded(
@@ -371,11 +379,12 @@ class _IDCardPageState extends State<IDCardPage> {
                     child: FloatingActionButton(
                       backgroundColor: Colors.orange,
                       onPressed: () {
+                        print(_lasercodestr);
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) {
-                              return const IDCardPage();
+                              return const PersonalInformation();
                             },
                           ),
                         );
