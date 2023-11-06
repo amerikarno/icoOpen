@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:ico_open/config/config.dart';
 import 'package:ico_open/personal_info/advicer.dart';
+import 'package:ico_open/personal_info/api.dart';
 import 'package:ico_open/personal_info/bank_account.dart';
 import 'package:ico_open/personal_info/bottom.dart';
 import 'package:ico_open/personal_info/occupation.dart';
@@ -24,8 +25,15 @@ class _PersonalInformationState extends State<PersonalInformation> {
   // final TextEditingController _homeNumber = TextEditingController();
   // final TextEditingController _thsurname = TextEditingController();
 
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   getZipCode();
+  // }
+
   @override
   Widget build(BuildContext context) {
+    getZipCode();
     return const Scaffold(
       body: SingleChildScrollView(
         child: Center(

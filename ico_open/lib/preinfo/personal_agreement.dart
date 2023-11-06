@@ -23,7 +23,10 @@ class _CheckboxPersonalAggreementState
       return Colors.grey;
     }
 
-    return Checkbox(
+    return CheckboxListTile(
+      // title: const Text("""ข้าพเจ้าได้อ่านและตกลงตามข้อมกำหนดและเงื่อนไขและรับทราบนโยบายความเป็นส่วนตัว ซึ่งระบุวิธีการที่บริษัท ฟินันเซีย ดิจิตทัล แอสแซท จำกัด(
+      //   "บริษัท"
+      // )""", maxLines: 2,overflow: TextOverflow.ellipsis,),
       checkColor: Colors.white,
       fillColor: MaterialStateProperty.resolveWith(getColor),
       value: isPersonalAgreementChecked,

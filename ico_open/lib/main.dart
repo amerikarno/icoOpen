@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:ico_open/personal_info/page.dart';
 // import 'package:flutter/services.dart';
 
-import 'package:ico_open/preinfo/page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,8 +13,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      home: MyHomePage(),
-      // home: Verify()
+      // home: MyHomePage(),
+      home: PersonalInformation()
     );
   }
 }
