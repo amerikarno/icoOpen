@@ -30,7 +30,7 @@ class _CustomerAgreementState extends State<CustomerAgreement> {
       child: const  Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-         const Row(
+          Row(
             children: [
               Expanded(
                 flex: 1,
@@ -50,14 +50,14 @@ class _CustomerAgreementState extends State<CustomerAgreement> {
               ),
             ],
           ),
-       const   HighSpace(height: 20),
+          HighSpace(height: 20),
           Row(
             children: [
               AgreementCheckbox(),
-         const     SizedBox(
+              SizedBox(
                 width: 5,
               ),
-         const     Text(
+              Text(
                 'ข้าพเจ้ามีข้อใดข้อหนึ่งดังนี้',
                 style: TextStyle(
                   fontSize: 13,
