@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:ico_open/config/config.dart';
-import 'package:ico_open/personal_info/api.dart';
+import 'package:ico_open/personal_info/api.dart' as api;
+import 'package:ico_open/personal_info/page.dart';
 
 enum CurrentAddress { registered, others }
 
@@ -16,14 +17,39 @@ class PersonalInformationCurrentAddress extends StatefulWidget {
 class _PersonalInformationCurrentAddressState
     extends State<PersonalInformationCurrentAddress> {
   CurrentAddress? _currentAddress = CurrentAddress.registered;
-  final TextEditingController _homeNumber = TextEditingController();
-  // final List<String> provinceItems = [];
-  final districtItems = districts;
-  final provinceItems = provinces;
-  final thLable = 'จังหวัด';
+  final _homeNumber = TextEditingController();
+  final _zipCode = TextEditingController();
+  final _country = TextEditingController();
+  List<String> provinceItems = provinces;
+  final thProvinceLable = 'จังหวัด';
+  final thAmphureLable = 'เขตอำเภอ';
+  List<String> amphureItems = [];
+  final thTambonLable = 'แขวงตำบล';
+  List<String> tambonItems = [];
 
-  String? thValue;
+  // List<String>? amphureItems;
+  String? thProvinceValue;
+  String? thAmphureValue;
+  String? thTambonValue;
+  String? zipcode;
   // String? engValue;
+
+  void getCurrentAmphure() async {
+    amphureItems = await api.getAmphure(thProvinceValue);
+    _country.text = 'ประเทศไทย';
+    print('amphure items: $amphureItems');
+  }
+
+  void getCurrentTambon() async {
+    tambonItems = await api.getTambon(thAmphureValue);
+    print('tambon items: $tambonItems');
+  }
+
+  void getCurrentZipcode() async {
+    final zipname = thProvinceValue!+thAmphureValue!+thTambonValue!;
+    zipcode = await api.getZipCode(zipname);
+    _zipCode.text = zipcode!;
+  }
 
   Widget dropdownTHProvinceButtonBuilder(
       {required String? value,
@@ -188,23 +214,16 @@ class _PersonalInformationCurrentAddressState
                       children: [
                         Expanded(
                           flex: 3,
-                          child: TextField(
-                            controller: _homeNumber,
-                            decoration: const InputDecoration(
-                              hintText: 'แขวงตำบล',
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        Expanded(
-                          flex: 3,
-                          child: TextField(
-                            controller: _homeNumber,
-                            decoration: const InputDecoration(
-                              hintText: 'เขตอำเภอ',
-                            ),
+                          child: dropdownTHProvinceButtonBuilder(
+                            value: thTambonValue,
+                            label: thTambonLable,
+                            items: tambonItems,
+                            onChanged: (String? value) {
+                              setState(() {
+                                thTambonValue = value;
+                                getCurrentZipcode();
+                              });
+                            },
                           ),
                         ),
                         const SizedBox(
@@ -213,22 +232,37 @@ class _PersonalInformationCurrentAddressState
                         Expanded(
                           flex: 3,
                           child: dropdownTHProvinceButtonBuilder(
-                            value: thValue,
-                            label: thLable,
+                            value: thAmphureValue,
+                            label: thAmphureLable,
+                            items: amphureItems,
+                            onChanged: (String? value) {
+                              setState(() {
+                                thAmphureValue = value;
+                                getCurrentTambon();
+                                print('list: $amphureItems');
+                                print('amphure 2: $value');
+                              });
+                            },
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Expanded(
+                          flex: 3,
+                          child: dropdownTHProvinceButtonBuilder(
+                            value: thProvinceValue,
+                            label: thProvinceLable,
                             items: provinceItems,
                             onChanged: (String? value) {
                               setState(
                                 () {
-                                  getDistrict(value.toString());
+                                  thProvinceValue = value;
+                                  getCurrentAmphure();
                                 },
                               );
                             },
                           ),
-                          // controller: _homeNumber,
-                          // decoration: const InputDecoration(
-                          //   hintText: 'จังหวัด',
-                          // ),
-                          // ),
                         ),
                         const SizedBox(
                           width: 10,
@@ -236,7 +270,7 @@ class _PersonalInformationCurrentAddressState
                         Expanded(
                           flex: 3,
                           child: TextField(
-                            controller: _homeNumber,
+                            controller: _zipCode,
                             decoration: const InputDecoration(
                               hintText: 'รหัสไปรษณีย์',
                             ),
@@ -248,7 +282,7 @@ class _PersonalInformationCurrentAddressState
                         Expanded(
                           flex: 3,
                           child: TextField(
-                            controller: _homeNumber,
+                            controller: _country,
                             decoration: const InputDecoration(
                               hintText: 'ประเทศ',
                             ),

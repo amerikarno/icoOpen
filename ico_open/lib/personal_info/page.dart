@@ -19,7 +19,7 @@ class PersonalInformation extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => _PersonalInformationState();
 }
-
+ List<String> provinces = [];
 class _PersonalInformationState extends State<PersonalInformation> {
   // CurrentAddress? _currentAddress = CurrentAddress.registered;
   // final TextEditingController _homeNumber = TextEditingController();
@@ -30,10 +30,13 @@ class _PersonalInformationState extends State<PersonalInformation> {
   //   super.initState();
   //   getZipCode();
   // }
+  void getCurrentProvince() async {
+    provinces = await getProvince();
+  }
 
   @override
   Widget build(BuildContext context) {
-    getZipCode();
+    getCurrentProvince();
     return const Scaffold(
       body: SingleChildScrollView(
         child: Center(
