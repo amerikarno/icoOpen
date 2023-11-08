@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 
 class PersonalInformation {
+  PersonalInformation({
+    required this.registeredAddress,
+  });
+
   final Address registeredAddress;
   Address? currentAddress;
   Address? officeAddress;
+  BankAccount? bankAccount;
 }
 
 class Address {
@@ -29,5 +34,11 @@ class Address {
 }
 
 class BankAccount {
-  final String BankName;
+  BankAccount({
+    required this.bankName,
+    required this.bankAccountID,
+  });
+  final String bankName;
+  String? bankBranchName;
+  final String bankAccountID;
 }
