@@ -29,7 +29,10 @@ List<String> provinces = [];
   log('provinces: $provinces');
   log('end get provinces data, total: ${provinces.length} ');
 
-  return provinces;
+  // return provinces;
+  return Future.delayed(
+    const Duration(microseconds: 500),
+    () => provinces,);
 }
 
 Future<List<String>> getAmphure(String? province) async {

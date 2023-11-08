@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:ico_open/config/config.dart';
 import 'package:ico_open/personal_info/advicer.dart';
-import 'package:ico_open/personal_info/api.dart';
 import 'package:ico_open/personal_info/bank_account.dart';
 import 'package:ico_open/personal_info/bottom.dart';
 import 'package:ico_open/personal_info/occupation.dart';
@@ -30,13 +29,18 @@ class _PersonalInformationState extends State<PersonalInformation> {
   //   super.initState();
   //   getZipCode();
   // }
-  void getCurrentProvince() async {
-    provinces = await getProvince();
-  }
+  // bool _loadingProvince = true;
+  // void getCurrentProvince() async {
+  //   provinces = await getProvince();
+  //   setState(() {
+  //     _loadingProvince = false;
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
-    getCurrentProvince();
+  //   getCurrentProvince();
+  //   if (_loadingProvince) return const CircularProgressIndicator();
     return const Scaffold(
       body: SingleChildScrollView(
         child: Center(

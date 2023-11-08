@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 
 import 'package:ico_open/config/config.dart';
@@ -27,28 +29,51 @@ class _PersonalInformationCurrentAddressState
   final thTambonLable = 'แขวงตำบล';
   List<String> tambonItems = [];
 
-  // List<String>? amphureItems;
+  bool _loadingAmphure = true;
+  bool _loadingTambon = true;
+  bool _loadingZipcode = true;
+
   String? thProvinceValue;
   String? thAmphureValue;
   String? thTambonValue;
   String? zipcode;
-  // String? engValue;
 
   void getCurrentAmphure() async {
     amphureItems = await api.getAmphure(thProvinceValue);
-    _country.text = 'ประเทศไทย';
+    setState(() {
+      _loadingAmphure = false;
+      thAmphureValue = amphureItems.first;
+    });
     print('amphure items: $amphureItems');
   }
 
   void getCurrentTambon() async {
     tambonItems = await api.getTambon(thAmphureValue);
+    setState(() {
+      _loadingTambon = false;
+      thTambonValue = tambonItems.first;
+    });
     print('tambon items: $tambonItems');
   }
 
   void getCurrentZipcode() async {
-    final zipname = thProvinceValue!+thAmphureValue!+thTambonValue!;
+    final zipname = thProvinceValue! + thAmphureValue! + thTambonValue!;
     zipcode = await api.getZipCode(zipname);
     _zipCode.text = zipcode!;
+    setState(() {
+      _loadingZipcode = false;
+    });
+  }
+
+  // bool _loadingProvince = true;
+  void getCurrentProvince() async {
+    provinces = await api.getProvince();
+    _country.text = 'ไทย';
+    log('current provinces: $provinces');
+    setState(() {
+      provinceItems = provinces;
+      // thProvinceValue = provinceItems.first;
+    });
   }
 
   Widget dropdownTHProvinceButtonBuilder(
@@ -59,13 +84,15 @@ class _PersonalInformationCurrentAddressState
     return DropdownButtonFormField(
       value: value,
       decoration: InputDecoration(
-        label: Text(
-          label,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: Colors.black,
-            fontSize: 15,
-          ),
+        label: RichText(
+          text: TextSpan(text: label, children: const [
+            TextSpan(
+              text: '*',
+              style: TextStyle(
+                color: Colors.red,
+              ),
+            )
+          ]),
         ),
       ),
       onChanged: (String? value) {
@@ -133,7 +160,9 @@ class _PersonalInformationCurrentAddressState
                     onChanged: (CurrentAddress? value) {
                       setState(() {
                         _currentAddress = value;
+                        getCurrentProvince();
                       });
+                      // if (_loadingProvince) {return CircularProgressIndicator();}
                     },
                   ),
                 ),
@@ -152,9 +181,20 @@ class _PersonalInformationCurrentAddressState
                           flex: 3,
                           child: TextField(
                             controller: _homeNumber,
-                            decoration: const InputDecoration(
-                              hintText: 'เลขที่',
-                            ),
+                            decoration: InputDecoration(
+                                label: RichText(
+                              text: const TextSpan(
+                                text: 'เลขที่',
+                                children: [
+                                  TextSpan(
+                                    text: '*',
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),),
                           ),
                         ),
                         const SizedBox(
@@ -164,9 +204,12 @@ class _PersonalInformationCurrentAddressState
                           flex: 1,
                           child: TextField(
                             controller: _homeNumber,
-                            decoration: const InputDecoration(
-                              hintText: 'หมู่ที่',
-                            ),
+                            decoration: InputDecoration(
+                                label: RichText(
+                              text: const TextSpan(
+                                text: 'หมู่ที่',
+                              ),
+                            ),),
                           ),
                         ),
                         const SizedBox(
@@ -176,9 +219,12 @@ class _PersonalInformationCurrentAddressState
                           flex: 3,
                           child: TextField(
                             controller: _homeNumber,
-                            decoration: const InputDecoration(
-                              hintText: 'หมู่บ้าน',
-                            ),
+                            decoration: InputDecoration(
+                                label: RichText(
+                              text: const TextSpan(
+                                text: 'หมู่บ้าน',
+                              ),
+                            ),),
                           ),
                         ),
                         const SizedBox(
@@ -188,9 +234,12 @@ class _PersonalInformationCurrentAddressState
                           flex: 3,
                           child: TextField(
                             controller: _homeNumber,
-                            decoration: const InputDecoration(
-                              hintText: 'ซอย',
-                            ),
+                            decoration: InputDecoration(
+                                label: RichText(
+                              text: const TextSpan(
+                                text: 'ซอย',
+                              ),
+                            ),),
                           ),
                         ),
                         const SizedBox(
@@ -200,9 +249,12 @@ class _PersonalInformationCurrentAddressState
                           flex: 3,
                           child: TextField(
                             controller: _homeNumber,
-                            decoration: const InputDecoration(
-                              hintText: 'ถนน',
-                            ),
+                            decoration: InputDecoration(
+                                label: RichText(
+                              text: const TextSpan(
+                                text: 'ถนน',
+                              ),
+                            ),),
                           ),
                         ),
                       ],
@@ -223,6 +275,9 @@ class _PersonalInformationCurrentAddressState
                                 thTambonValue = value;
                                 getCurrentZipcode();
                               });
+                              if (_loadingZipcode) {
+                                return const CircularProgressIndicator();
+                              }
                             },
                           ),
                         ),
@@ -239,9 +294,10 @@ class _PersonalInformationCurrentAddressState
                               setState(() {
                                 thAmphureValue = value;
                                 getCurrentTambon();
-                                print('list: $amphureItems');
-                                print('amphure 2: $value');
                               });
+                              if (_loadingTambon) {
+                                return const CircularProgressIndicator();
+                              }
                             },
                           ),
                         ),
@@ -259,8 +315,12 @@ class _PersonalInformationCurrentAddressState
                                 () {
                                   thProvinceValue = value;
                                   getCurrentAmphure();
+                                  // thAmphureValue = amphureItems.first;
                                 },
                               );
+                              if (_loadingAmphure) {
+                                return const CircularProgressIndicator();
+                              }
                             },
                           ),
                         ),
@@ -271,8 +331,19 @@ class _PersonalInformationCurrentAddressState
                           flex: 3,
                           child: TextField(
                             controller: _zipCode,
-                            decoration: const InputDecoration(
-                              hintText: 'รหัสไปรษณีย์',
+                            decoration: InputDecoration(
+                              label: RichText(
+                                text: const TextSpan(
+                                    text: 'รหัสไปรษณีย์',
+                                    children: [
+                                      TextSpan(
+                                        text: '*',
+                                        style: TextStyle(
+                                          color: Colors.red,
+                                        ),
+                                      )
+                                    ]),
+                              ),
                             ),
                           ),
                         ),
@@ -283,8 +354,17 @@ class _PersonalInformationCurrentAddressState
                           flex: 3,
                           child: TextField(
                             controller: _country,
-                            decoration: const InputDecoration(
-                              hintText: 'ประเทศ',
+                            decoration: InputDecoration(
+                              label: RichText(
+                                text: const TextSpan(text: 'ประเทศ', children: [
+                                  TextSpan(
+                                    text: '*',
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                    ),
+                                  )
+                                ]),
+                              ),
                             ),
                           ),
                         ),
