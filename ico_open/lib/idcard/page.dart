@@ -2,7 +2,8 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:ico_open/personal_info/page.dart';
+import 'package:ico_open/idcard/api.dart' as api;
+import 'package:ico_open/model/idcard.dart';
 import 'package:ico_open/preinfo/page.dart';
 
 class IDCardPage extends StatefulWidget {
@@ -15,13 +16,22 @@ class IDCardPage extends StatefulWidget {
 final TextEditingController _idcard = TextEditingController();
 final TextEditingController _lasercodestr = TextEditingController();
 final TextEditingController _lasercodenum = TextEditingController();
+bool _varidatedIDcard = false;
+bool _varidatedLaserStr = false;
+bool _varidatedLaserId = false;
+bool _varidatedPostInfo = false;
+String idCardValue = '';
+String laserCodeStrValue = '';
+String laserCodeNumValue = '';
+
+// const postIDCard = IDcardModel;
 
 // final TextEditingController _month = TextEditingController();
 // final TextEditingController _year = TextEditingController();
 enum SingingCharacter { single, married, disvorced }
 
 class _IDCardPageState extends State<IDCardPage> {
-  SingingCharacter? _character = SingingCharacter.single;
+  SingingCharacter? _marriageStatus = SingingCharacter.single;
 
   @override
   void initState() {
@@ -29,6 +39,22 @@ class _IDCardPageState extends State<IDCardPage> {
     _createYearLists();
   }
 
+  void _postIDCardInfo(IDcardModel idCard) async {
+    final post = await api.postIDCard(idCard);
+    setState(() {
+      _varidatedPostInfo = post;
+    });
+    log('varlidate post info: $_varidatedPostInfo');
+  }
+
+  void _getIsCorrectIDCard(String idcard) async {
+    final isCorrect = await api.getVerifiedIDCard(idcard);
+    setState(() {
+      _varidatedIDcard = !isCorrect;
+    });
+  }
+
+  List<String> dateItems = date31Items;
   void _createYearLists() {
     int currentYear = DateTime.now().year + 543;
     int start = currentYear - 20;
@@ -39,12 +65,144 @@ class _IDCardPageState extends State<IDCardPage> {
     }
     // print(yearLists);
     setState(() {
-      yearLists = list;
+      yearItems = list;
+      yearValue = yearItems.first;
+      dateValue = dateItems.first;
+      monthValue = monthItems.first;
     });
+  }
+
+  void _verifyDateFeild() {
+    final remainder = int.parse(yearValue!) % 4;
+    final dateInt = int.parse(dateValue!);
+    log('date: $dateInt, month: $monthValue, year: $yearValue', name: 'info');
+    switch (monthValue) {
+      case 'ก.พ.':
+        if (dateInt >= 29) {
+          if (remainder == 3) {
+            setState(
+              () {
+                dateValue = '29';
+                dateItems = date29Items;
+              },
+            );
+          } else {
+            setState(() {
+              dateValue = '28';
+              dateItems = date28Items;
+            });
+          }
+        } else {
+          if (remainder == 3) {
+            setState(
+              () {
+                dateItems = date29Items;
+              },
+            );
+          } else {
+            setState(
+              () {
+                dateItems = date28Items;
+              },
+            );
+          }
+        }
+      case 'เม.ย.':
+      case 'มิ.ย.':
+      case 'ก.ย.':
+      case 'พ.ย.':
+        if (dateInt >= 31) {
+          setState(() {
+            dateValue = '30';
+            dateItems = date30Items;
+          });
+        } else {
+          setState(
+            () {
+              dateItems = date30Items;
+            },
+          );
+        }
+      default:
+        dateItems = date31Items;
+    }
+  }
+
+  String? dateValue;
+  final dateLabel = 'วันที่';
+  String? monthValue;
+  final monthLabel = 'เดือน';
+  String? yearValue;
+  final yearLabel = 'ปี(พ.ศ.)';
+  Widget dropdownButtonBuilder(
+      {required String? value,
+      required String label,
+      required List<String> items,
+      required Function(String?) onChanged}) {
+    return DropdownButtonFormField(
+      value: value,
+      decoration: InputDecoration(
+        label: Text(
+          label,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            color: Colors.black,
+            fontSize: 15,
+          ),
+        ),
+      ),
+      onChanged: (String? value) {
+        setState(() {
+          onChanged(value);
+        });
+      },
+      items: items.map<DropdownMenuItem<String>>((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList(),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final dateFeild = dropdownButtonBuilder(
+      value: dateValue,
+      label: dateLabel,
+      items: dateItems,
+      onChanged: (String? value) {
+        setState(() {
+          dateValue = value;
+          _verifyDateFeild();
+        });
+      },
+    );
+
+    final monthField = dropdownButtonBuilder(
+      value: monthValue,
+      label: monthLabel,
+      items: monthItems,
+      onChanged: (String? value) {
+        setState(() {
+          monthValue = value;
+          _verifyDateFeild();
+        });
+      },
+    );
+
+    final yearField = dropdownButtonBuilder(
+      value: yearValue,
+      label: yearLabel,
+      items: yearItems,
+      onChanged: (String? value) {
+        setState(() {
+          yearValue = value;
+          _verifyDateFeild();
+        });
+      },
+    );
+
     return Scaffold(
       body: Container(
         padding: const EdgeInsets.all(50),
@@ -92,35 +250,47 @@ class _IDCardPageState extends State<IDCardPage> {
                     )
                   ]),
               // color: Colors.lightBlue,
-              child: const Row(
+              child: Row(
                 children: [
-                  SizedBox(
+                  const SizedBox(
                     width: 50,
                   ),
                   SizedBox(
                     width: 300,
-                    child: Text(
-                      'วัน/เดือน/ปี เกิด',
-                      style: TextStyle(fontSize: 20),
+                    child: RichText(
+                      text: const TextSpan(
+                        text: 'วัน/เดือน/ปี เกิด',
+                        style: TextStyle(
+                          fontSize: 20,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: '*',
+                            style: TextStyle(
+                              color: Colors.red,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  Expanded(
+                  const Expanded(
                     flex: 5,
                     child: SizedBox(),
                   ),
                   Expanded(
                     flex: 1,
-                    child: DateDropdownButton(),
+                    child: dateFeild,
                   ),
                   Expanded(
                     flex: 1,
-                    child: MonthDropdownButton(),
+                    child: monthField,
                   ),
                   Expanded(
                     flex: 1,
-                    child: YearDropdownButton(),
+                    child: yearField,
                   ),
-                  Expanded(
+                  const Expanded(
                     flex: 1,
                     child: SizedBox(),
                   ),
@@ -145,11 +315,23 @@ class _IDCardPageState extends State<IDCardPage> {
                   const SizedBox(
                     width: 50,
                   ),
-                  const SizedBox(
+                  SizedBox(
                     width: 300,
-                    child: Text(
-                      'สถานะ',
-                      style: TextStyle(fontSize: 20),
+                    child: RichText(
+                      text: const TextSpan(
+                        text: 'สถานะ',
+                        style: TextStyle(
+                          fontSize: 20,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: '*',
+                            style: TextStyle(
+                              color: Colors.red,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   const Expanded(
@@ -162,10 +344,10 @@ class _IDCardPageState extends State<IDCardPage> {
                       title: const Text('โสด'),
                       leading: Radio<SingingCharacter>(
                         value: SingingCharacter.single,
-                        groupValue: _character,
+                        groupValue: _marriageStatus,
                         onChanged: (SingingCharacter? value) {
                           setState(() {
-                            _character = value;
+                            _marriageStatus = value;
                           });
                         },
                       ),
@@ -177,10 +359,10 @@ class _IDCardPageState extends State<IDCardPage> {
                       title: const Text('สมรส'),
                       leading: Radio<SingingCharacter>(
                         value: SingingCharacter.married,
-                        groupValue: _character,
+                        groupValue: _marriageStatus,
                         onChanged: (SingingCharacter? value) {
                           setState(() {
-                            _character = value;
+                            _marriageStatus = value;
                           });
                         },
                       ),
@@ -192,10 +374,10 @@ class _IDCardPageState extends State<IDCardPage> {
                       title: const Text('หย่า'),
                       leading: Radio<SingingCharacter>(
                         value: SingingCharacter.disvorced,
-                        groupValue: _character,
+                        groupValue: _marriageStatus,
                         onChanged: (SingingCharacter? value) {
                           setState(() {
-                            _character = value;
+                            _marriageStatus = value;
                           });
                         },
                       ),
@@ -226,11 +408,21 @@ class _IDCardPageState extends State<IDCardPage> {
                   const SizedBox(
                     width: 50,
                   ),
-                  const SizedBox(
+                  SizedBox(
                     width: 300,
-                    child: Text(
-                      'หมายเลขบัตรประจำตัวประชาชน',
-                      style: TextStyle(fontSize: 20),
+                    child: RichText(
+                      text: const TextSpan(
+                        text: 'หมายเลขบัตรประจำตัวประชาชน',
+                        style: TextStyle(fontSize: 20),
+                        children: [
+                          TextSpan(
+                            text: '*',
+                            style: TextStyle(
+                              color: Colors.red,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   const Expanded(
@@ -239,11 +431,14 @@ class _IDCardPageState extends State<IDCardPage> {
                   ),
                   Expanded(
                     flex: 3,
-                    child: TextFormField(
+                    child: TextField(
                       maxLength: 13,
                       controller: _idcard,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'ตัวเลข 13หลัก',
+                        errorText: _varidatedIDcard
+                            ? 'กรุณากรอกหมายเลขบัตรประจำตัวประชาชนให้ถูกต้อง'
+                            : null,
                       ),
                       inputFormatters: [
                         FilteringTextInputFormatter.allow(
@@ -252,12 +447,21 @@ class _IDCardPageState extends State<IDCardPage> {
                           ),
                         ),
                       ],
-                      validator: (value) {
-                        log('validator:', name: value.toString());
-                        if (value!.length == 13 || value.isEmpty) {
-                          return 'กรุณาใส่เลขบัตรประชาชนให้ถูกต้อง';
+                      onSubmitted: (value) {
+                        if (value.isEmpty) {
+                          setState(
+                            () {
+                              _varidatedIDcard = true;
+                            },
+                          );
+                        } else {
+                          _getIsCorrectIDCard(value);
+                          if (!_varidatedIDcard) {
+                            setState(() {
+                              idCardValue = value;
+                            });
+                          }
                         }
-                        return null;
                       },
                     ),
                   ),
@@ -286,11 +490,21 @@ class _IDCardPageState extends State<IDCardPage> {
                   const SizedBox(
                     width: 50,
                   ),
-                  const SizedBox(
+                  SizedBox(
                     width: 300,
-                    child: Text(
-                      'เลขหลังบัตรประชาชน (Laser Code)',
-                      style: TextStyle(fontSize: 20),
+                    child: RichText(
+                      text: const TextSpan(
+                        text: 'เลขหลังบัตรประชาชน (Laser Code)',
+                        style: TextStyle(fontSize: 20),
+                        children: [
+                          TextSpan(
+                            text: '*',
+                            style: TextStyle(
+                              color: Colors.red,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   const Expanded(
@@ -299,11 +513,14 @@ class _IDCardPageState extends State<IDCardPage> {
                   ),
                   Expanded(
                     flex: 1,
-                    child: TextFormField(
+                    child: TextField(
                       maxLength: 2,
                       controller: _lasercodestr,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'ตัวอักษร 2หลักแรก',
+                        errorText: _varidatedLaserStr
+                            ? 'กรุณากรอกข้อมูลให้ถูกต้องครบถ้วย'
+                            : null,
                       ),
                       inputFormatters: [
                         FilteringTextInputFormatter.allow(
@@ -312,16 +529,35 @@ class _IDCardPageState extends State<IDCardPage> {
                           ),
                         ),
                       ],
+                      onSubmitted: (value) {
+                        if (value.isEmpty || value.length != 2) {
+                          setState(() {
+                            _varidatedLaserStr = true;
+                          });
+                          log('validate laser state: $_varidatedLaserStr');
+                          log('laser state: $_lasercodestr');
+                        } else {
+                          setState(() {
+                            _varidatedLaserStr = false;
+                            laserCodeStrValue = value;
+                          });
+                          log('validate laser state: $_varidatedLaserStr');
+                          log('laser state: $_lasercodestr');
+                        }
+                      },
                     ),
                   ),
                   const Text('-'),
                   Expanded(
                     flex: 2,
-                    child: TextFormField(
+                    child: TextField(
                       maxLength: 10,
                       controller: _lasercodenum,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'ตามด้วยตัวเลข 10หลัก',
+                        errorText: _varidatedLaserId
+                            ? 'กรุณากรอกข้อมูลให้ถูกต้องครบถ้วย'
+                            : null,
                       ),
                       inputFormatters: [
                         FilteringTextInputFormatter.allow(
@@ -330,6 +566,20 @@ class _IDCardPageState extends State<IDCardPage> {
                           ),
                         ),
                       ],
+                      onSubmitted: (value) {
+                        if (value.isEmpty || value.length != 10) {
+                          setState(() {
+                            _varidatedLaserId = true;
+                          });
+                          log('validate laser id: $_varidatedLaserId');
+                        } else {
+                          setState(() {
+                            _varidatedLaserId = false;
+                            laserCodeNumValue = value;
+                          });
+                          log('validate laser id: $_varidatedLaserId');
+                        }
+                      },
                     ),
                   ),
                   const Expanded(
@@ -379,15 +629,60 @@ class _IDCardPageState extends State<IDCardPage> {
                     child: FloatingActionButton(
                       backgroundColor: Colors.orange,
                       onPressed: () {
-                        log('laser code:',name: _lasercodestr.toString());
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return const PersonalInformation();
+                        log('laser code:', name: _lasercodestr.toString());
+                        if (_idcard.text.toString().isEmpty) {
+                          setState(
+                            () {
+                              _varidatedIDcard = true;
                             },
-                          ),
-                        );
+                          );
+                        } else {
+                          _getIsCorrectIDCard(_idcard.text.toString());
+                          idCardValue = _idcard.text.toString();
+                        }
+                        if (_lasercodenum.text.isEmpty || _lasercodenum.text.length != 10) {
+                          setState(() {
+                            _varidatedLaserId = true;
+                          });
+                          log('validate laser id: $_varidatedLaserId');
+                        } else {
+                          setState(() {
+                            _varidatedLaserId = false;
+                            laserCodeNumValue = _lasercodenum.text;
+                          });
+                          log('validate laser id: $_varidatedLaserId');
+                        }
+                        if (_lasercodestr.text.isEmpty || _lasercodestr.text.length != 2) {
+                          setState(() {
+                            _varidatedLaserStr = true;
+                          });
+                          log('validate laser state: $_varidatedLaserStr');
+                          log('laser state: $_lasercodestr');
+                        } else {
+                          setState(() {
+                            _varidatedLaserStr = false;
+                            laserCodeStrValue = _lasercodestr.text;
+                          });
+                          log('validate laser state: $_varidatedLaserStr');
+                          log('laser state: $_lasercodestr');
+                        }
+
+                        final date = '$dateValue $monthValue $yearValue';
+                        final laser = '$laserCodeStrValue-$laserCodeNumValue';
+                        String marriageStatus = '';
+                        if (_marriageStatus == SingingCharacter.single) { marriageStatus = 'โสด';}
+                        if (_marriageStatus == SingingCharacter.married) { marriageStatus = 'สมรส';}
+                        if (_marriageStatus == SingingCharacter.disvorced) { marriageStatus = 'หย่า';}
+                        final postIDCard = IDcardModel(birthdate: date, status: marriageStatus, idcard: idCardValue, laserCode: laser,);
+                        _postIDCardInfo(postIDCard);
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //     builder: (context) {
+                        //       return const PersonalInformation();
+                        //     },
+                        //   ),
+                        // );
                       },
                       child: const Icon(
                         Icons.arrow_circle_right,
@@ -406,14 +701,7 @@ class _IDCardPageState extends State<IDCardPage> {
   }
 }
 
-class DateDropdownButton extends StatefulWidget {
-  const DateDropdownButton({super.key});
-
-  @override
-  State<DateDropdownButton> createState() => _DateDropdownButtonState();
-}
-
-const List<String> dateLists = [
+const List<String> date31Items = [
   '1',
   '2',
   '3',
@@ -446,46 +734,101 @@ const List<String> dateLists = [
   '30',
   '31',
 ];
+const List<String> date30Items = [
+  '1',
+  '2',
+  '3',
+  '4',
+  '5',
+  '6',
+  '7',
+  '8',
+  '9',
+  '10',
+  '11',
+  '12',
+  '13',
+  '14',
+  '15',
+  '16',
+  '17',
+  '18',
+  '19',
+  '20',
+  '21',
+  '22',
+  '23',
+  '24',
+  '25',
+  '26',
+  '27',
+  '28',
+  '29',
+  '30',
+];
+const List<String> date29Items = [
+  '1',
+  '2',
+  '3',
+  '4',
+  '5',
+  '6',
+  '7',
+  '8',
+  '9',
+  '10',
+  '11',
+  '12',
+  '13',
+  '14',
+  '15',
+  '16',
+  '17',
+  '18',
+  '19',
+  '20',
+  '21',
+  '22',
+  '23',
+  '24',
+  '25',
+  '26',
+  '27',
+  '28',
+  '29',
+];
+const List<String> date28Items = [
+  '1',
+  '2',
+  '3',
+  '4',
+  '5',
+  '6',
+  '7',
+  '8',
+  '9',
+  '10',
+  '11',
+  '12',
+  '13',
+  '14',
+  '15',
+  '16',
+  '17',
+  '18',
+  '19',
+  '20',
+  '21',
+  '22',
+  '23',
+  '24',
+  '25',
+  '26',
+  '27',
+  '28',
+];
 
-class _DateDropdownButtonState extends State<DateDropdownButton> {
-  String dateDropdownValue = dateLists.first;
-
-  @override
-  Widget build(BuildContext context) {
-    return DropdownButton<String>(
-      value: dateDropdownValue,
-      hint: const Text('วันที่'),
-      icon: const Icon(
-        Icons.arrow_downward,
-        size: 5,
-      ),
-      alignment: AlignmentDirectional.center,
-      // elevation: 5,
-      menuMaxHeight: 200,
-      style: const TextStyle(color: Colors.deepPurple),
-      onChanged: (String? value) {
-        setState(() {
-          dateDropdownValue = value!;
-        });
-      },
-      items: dateLists.map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList(),
-    );
-  }
-}
-
-class MonthDropdownButton extends StatefulWidget {
-  const MonthDropdownButton({super.key});
-
-  @override
-  State<MonthDropdownButton> createState() => _MonthDropdownButtonState();
-}
-
-const List<String> monthLists = [
+const List<String> monthItems = [
   'ม.ค.',
   'ก.พ.',
   'มี.ค.',
@@ -500,85 +843,4 @@ const List<String> monthLists = [
   'ธ.ค.',
 ];
 
-class _MonthDropdownButtonState extends State<MonthDropdownButton> {
-  String monthDropdownValue = monthLists.first;
-
-  @override
-  Widget build(BuildContext context) {
-    return DropdownButton<String>(
-      value: monthDropdownValue,
-      hint: const Text('เดือน'),
-      icon: const Icon(
-        Icons.arrow_downward,
-        size: 5,
-      ),
-      alignment: Alignment.center,
-      // elevation: 5,
-      menuMaxHeight: 200,
-      style: const TextStyle(color: Colors.deepPurple),
-      onChanged: (String? value) {
-        setState(() {
-          monthDropdownValue = value!;
-        });
-      },
-      items: monthLists.map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList(),
-    );
-  }
-}
-
-class YearDropdownButton extends StatefulWidget {
-  const YearDropdownButton({super.key});
-
-  @override
-  State<YearDropdownButton> createState() => _YearDropdownButtonState();
-}
-
-List<String> yearLists = [];
-
-class _YearDropdownButtonState extends State<YearDropdownButton> {
-  String yearDropdownValue = yearLists.first;
-  // @override
-  // void _createYearLists() {
-  //   DateTime now = DateTime.now();
-  //   int start = now.year - 20;
-  //   int end = now.year - 100;
-
-  //   for (var i = start; i >= end; i--) {
-  //     yearLists.add(i.toString());
-  //   }
-  //   print(yearLists);
-  // }
-
-  @override
-  Widget build(BuildContext context) {
-    // _createYearLists();
-    return DropdownButton<String>(
-      value: yearDropdownValue,
-      hint: const Text('ปี(พ.ศ.)'),
-      icon: const Icon(
-        Icons.arrow_downward,
-        size: 5,
-      ),
-      alignment: Alignment.center,
-      // elevation: 5,
-      menuMaxHeight: 200,
-      style: const TextStyle(color: Colors.deepPurple),
-      onChanged: (String? value) {
-        setState(() {
-          yearDropdownValue = value!;
-        });
-      },
-      items: yearLists.map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList(),
-    );
-  }
-}
+List<String> yearItems = [];

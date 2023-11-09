@@ -46,7 +46,7 @@ final _zipCode = TextEditingController();
       _loadingAmphure = false;
       thAmphureValue = amphureItems.first;
     });
-    print('amphure items: $amphureItems');
+    // print('amphure items: $amphureItems');
   }
 
   void getCurrentTambon() async {
@@ -55,7 +55,7 @@ final _zipCode = TextEditingController();
       _loadingTambon = false;
       thTambonValue = tambonItems.first;
     });
-    print('tambon items: $tambonItems');
+    // print('tambon items: $tambonItems');
   }
 
   void getCurrentZipcode() async {

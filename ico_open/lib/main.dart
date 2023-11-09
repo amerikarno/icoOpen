@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ico_open/personal_info/page.dart';
+import 'package:ico_open/idcard/page.dart';
 // import 'package:flutter/services.dart';
 
 
@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       // home: MyHomePage(),
-      home: PersonalInformation()
+      home: IDCardPage()
     );
   }
 }

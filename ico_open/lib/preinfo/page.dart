@@ -481,7 +481,6 @@ class _MyHomePageState extends State<MyHomePage> {
                             log('mobile subject: ${_email.toString()}'),
                         controller: _mobileno,
                         decoration: InputDecoration(
-                          // labelText: 'หมายเลขโทรศัพท์มือถือ',
                           errorText: _validateMobileNo
                               ? _mobilenoError
                               : null,

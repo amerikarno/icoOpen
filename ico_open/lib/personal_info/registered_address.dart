@@ -44,7 +44,7 @@ class _PersonalInformationRegisteredAddressState
       _loadingAmphure = false;
       thAmphureValue = amphureItems.first;
     });
-    print('amphure items: $amphureItems');
+    // print('amphure items: $amphureItems');
   }
 
   void getCurrentTambon() async {
@@ -53,7 +53,7 @@ class _PersonalInformationRegisteredAddressState
       _loadingTambon = false;
       thTambonValue = tambonItems.first;
     });
-    print('tambon items: $tambonItems');
+    // print('tambon items: $tambonItems');
   }
 
   void getCurrentZipcode() async {
@@ -111,7 +111,6 @@ class _PersonalInformationRegisteredAddressState
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     getCurrentProvince();
   }
