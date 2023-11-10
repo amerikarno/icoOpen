@@ -25,7 +25,7 @@ class PersonalInformationBottom extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) {
-                            return const IDCardPage();
+                            return  IDCardPage();
                           },
                         ),
                       );

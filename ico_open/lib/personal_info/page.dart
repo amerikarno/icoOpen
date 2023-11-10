@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:ico_open/config/config.dart';
+import 'package:ico_open/model/preinfo.dart' as model;
 import 'package:ico_open/personal_info/advicer.dart';
 import 'package:ico_open/personal_info/bank_account.dart';
 import 'package:ico_open/personal_info/bottom.dart';
@@ -14,6 +15,7 @@ import 'package:ico_open/personal_info/current_address.dart';
 
 class PersonalInformation extends StatefulWidget {
   const PersonalInformation({super.key});
+  // final model.Preinfo preinfo;
 
   @override
   State<StatefulWidget> createState() => _PersonalInformationState();

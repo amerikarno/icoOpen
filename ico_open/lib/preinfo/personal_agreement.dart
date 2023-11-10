@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ico_open/model/personal_agreement.dart';
 
+  bool _validatePersonalAgreement = false;
   bool isPersonalAgreementChecked = false;
 
 class CheckboxPersonalAggreement extends StatefulWidget {
@@ -32,7 +33,8 @@ class _CheckboxPersonalAggreementState
       value: isPersonalAgreementChecked,
       onChanged: (bool? value) {
         setState(() {
-          isPersonalAgreementChecked = value!;
+          _validatePersonalAgreement = value!;
+          isPersonalAgreementChecked = value;
         });
       },
     );

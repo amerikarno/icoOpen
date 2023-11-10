@@ -4,8 +4,9 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
-
 import 'package:ico_open/idcard/page.dart';
+import 'package:ico_open/model/preinfo.dart';
+
 import 'package:ico_open/preinfo/personal_agreement.dart';
 // import 'package:ico_open/model/model.dart';
 
@@ -38,8 +39,13 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _validateEnSurName = false;
   bool _validateEmail = false;
   bool _validateMobileNo = false;
-  bool _validatePersonalAgreement = false;
   bool _passedVeridateEmail = false;
+
+  bool isPassedMobileChecked = false;
+  bool isPassedEmailChecked = false;
+
+  bool _loadingEmail = true;
+  bool _loadingMobile = true;
 
   @override
   void dispose() {
@@ -47,7 +53,7 @@ class _MyHomePageState extends State<MyHomePage> {
     _email.dispose();
   }
 
-  void _verifyEmail(String email) async {
+  Future<bool> _verifyEmail(String email) async {
     if (email.isEmpty) {
       log('email is empty', name: _passedVeridateEmail.toString());
       setState(() {
@@ -77,14 +83,16 @@ class _MyHomePageState extends State<MyHomePage> {
         log('start to verify');
         log('data', name: data.toString());
         if (data['isRegisteredEmail'] == 'true') {
-          log('registered email', name: data['registeredEmail'].toString());
+          log('[true]registered email: ${data['registeredEmail'].toString()}');
         } else {
-          log('registered email', name: data['registeredEmail'].toString());
+          log('[else]registered email: ${data['registeredEmail'].toString()}');
           _passedVeridateEmail = true;
-          log('verified email', name: _passedVeridateEmail.toString());
+          log('verified email: ${_passedVeridateEmail.toString()}');
         }
         setState(() {
+          // isPassedEmailChecked = true;
           _validateEmail = false;
+          _loadingEmail = false;
         });
       }
 
@@ -93,12 +101,24 @@ class _MyHomePageState extends State<MyHomePage> {
         setState(() {
           _emailError = 'กรุณาใส่อีเมลให้ถูกต้อง';
           _validateEmail = true;
+          _loadingEmail = false;
+          // isPassedEmailChecked = false;
         });
       }
     }
+    return Future.delayed(const Duration(seconds: 5), () => !_validateEmail);
   }
 
-  void _verifyMobileNo(String mobileno) async {
+  void getIsPassedValidateEmail(String email) async {
+    final passed = await _verifyEmail(email);
+    setState(() {
+      isPassedEmailChecked = passed;
+      _loadingEmail = false;
+    });
+    if (_loadingEmail) {const CircularProgressIndicator();}
+  }
+
+  Future<bool> _verifyMobileNo(String mobileno) async {
     if (mobileno.isEmpty) {
       log('email is empty', name: _passedVeridateEmail.toString());
       setState(() {
@@ -128,14 +148,18 @@ class _MyHomePageState extends State<MyHomePage> {
         log('start to verify');
         log('data', name: data.toString());
         if (data['isRegisteredMobileNo']) {
-          log('registered mobile no', name: data['registeredMobileNo'].toString());
+          log('registered mobile no',
+              name: data['registeredMobileNo'].toString());
         } else {
-          log('registered mobile no', name: data['registeredMobileNo'].toString());
+          log('registered mobile no',
+              name: data['registeredMobileNo'].toString());
           _passedVeridateEmail = true;
           log('verified mobile no', name: _passedVeridateEmail.toString());
         }
         setState(() {
           _validateMobileNo = false;
+          _loadingMobile = false;
+          // isPassedMobileChecked = true;
         });
       }
 
@@ -144,9 +168,23 @@ class _MyHomePageState extends State<MyHomePage> {
         setState(() {
           _mobilenoError = 'กรุณาใส่หมายเลขโทรศัพท์มือถือให้ถูกต้อง';
           _validateMobileNo = true;
+          _loadingMobile = false;
+          // isPassedMobileChecked = false;
         });
       }
     }
+    print('verify mobile');
+    return Future.delayed(const Duration(seconds: 5), () => !_validateMobileNo);
+  }
+
+  void getIsPassedValidateMobile(String mobile) async {
+    final passed = await _verifyMobileNo(mobile);
+    setState(() {
+      isPassedMobileChecked = passed;
+      _loadingMobile = false;
+    });
+    print('verify mobile2');
+    if (_loadingMobile) {const CircularProgressIndicator();}
   }
 
   final thList = [
@@ -179,7 +217,6 @@ class _MyHomePageState extends State<MyHomePage> {
     }
     return null;
   }
-
 
   String? thValue;
   String? engValue;
@@ -457,8 +494,11 @@ class _MyHomePageState extends State<MyHomePage> {
                         ],
                         onSubmitted: (value) {
                           setState(() {
-                            _verifyEmail(value);
+                            getIsPassedValidateEmail(value);
                           });
+                          if (_loadingEmail) {
+                            const CircularProgressIndicator();
+                          }
                         },
                       ),
                     ),
@@ -481,9 +521,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             log('mobile subject: ${_email.toString()}'),
                         controller: _mobileno,
                         decoration: InputDecoration(
-                          errorText: _validateMobileNo
-                              ? _mobilenoError
-                              : null,
+                          errorText: _validateMobileNo ? _mobilenoError : null,
                           label: RichText(
                             text: const TextSpan(
                               text: 'หมายเลขโทรศัพท์มือถือ',
@@ -505,8 +543,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         ],
                         onSubmitted: (value) {
                           setState(() {
-                            _verifyMobileNo(value);
+                            getIsPassedValidateMobile(value);
                           });
+                          if (_loadingMobile) {const CircularProgressIndicator();}
                         },
                       ),
                     ),
@@ -580,23 +619,35 @@ class _MyHomePageState extends State<MyHomePage> {
                                 _validateEmail = _email.text.trim().isEmpty;
                                 _validateMobileNo =
                                     _mobileno.text.trim().isEmpty;
-                                _validatePersonalAgreement =
-                                    isPersonalAgreementChecked;
-                                _verifyEmail(_email.text);
+                                    // isPersonalAgreementChecked = _validatePersonalAgreement;
+                                getIsPassedValidateEmail(_email.text);
+                                getIsPassedValidateMobile(_mobileno.text);
+                                print(
+                                    'title: $thValue name: ${_thname.text} surname: ${_thsurname.text}\ntitle: $engValue name: ${_enname.text} surname: ${_ensurname.text}\nemail: ${_email.text}, mobile: ${_mobileno.text}, agreement: $isPersonalAgreementChecked');
                               });
+                              print('loading email: $_loadingEmail');
+                              if (_loadingEmail) {const CircularProgressIndicator();}
+                              print('loading mobile: $_loadingMobile');
+                              if (_loadingMobile) {const CircularProgressIndicator();}
+
+                              print('validate: $_validateTHName, $_validateTHSurName, $_validateEnName, $_validateEnSurName, $_validateEmail, $_validateMobileNo, $isPersonalAgreementChecked, $isPassedEmailChecked, $isPassedMobileChecked');
                               if (!_validateTHName &&
                                   !_validateTHSurName &&
                                   !_validateEnName &&
                                   !_validateEnSurName &&
                                   !_validateEmail &&
                                   !_validateMobileNo &&
-                                  _validatePersonalAgreement &&
-                                  _passedVeridateEmail) {
+                                  isPersonalAgreementChecked &&
+                                  isPassedEmailChecked &&
+                                  isPassedMobileChecked) {
+                                print(
+                                    'title: $thValue name: ${_thname.text} surname: ${_thsurname.text}\ntitle: $engValue name: ${_enname.text} surname: ${_ensurname.text}\nemail: ${_email.text}, mobile: ${_mobileno.text}, agreement: $isPersonalAgreementChecked');
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) {
-                                      return const IDCardPage();
+                                      // return const IDCardPage();
+                                      return  IDCardPage(preinfo: Preinfo(thtitle: thValue!, thname: _thname.text, thsurname: _thsurname.text, engtitle: engValue!, engname: _enname.text, engsurname: _ensurname.text, email: _email.text, mobile: _mobileno.text, agreement: isPersonalAgreementChecked),);
                                     },
                                   ),
                                 );

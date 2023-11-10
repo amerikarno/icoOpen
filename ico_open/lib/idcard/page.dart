@@ -4,11 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ico_open/idcard/api.dart' as api;
 import 'package:ico_open/model/idcard.dart';
+import 'package:ico_open/model/preinfo.dart' as modelpreinfo;
 import 'package:ico_open/preinfo/page.dart';
 
 class IDCardPage extends StatefulWidget {
-  const IDCardPage({super.key});
-
+  IDCardPage({super.key, preinfo});
+  modelpreinfo.Preinfo? preinfo;
   @override
   State<IDCardPage> createState() => _IDCardPageState();
 }
@@ -202,6 +203,8 @@ class _IDCardPageState extends State<IDCardPage> {
         });
       },
     );
+
+    print('preInfo: ${widget.preinfo!.mobile}');
 
     return Scaffold(
       body: Container(
@@ -640,7 +643,8 @@ class _IDCardPageState extends State<IDCardPage> {
                           _getIsCorrectIDCard(_idcard.text.toString());
                           idCardValue = _idcard.text.toString();
                         }
-                        if (_lasercodenum.text.isEmpty || _lasercodenum.text.length != 10) {
+                        if (_lasercodenum.text.isEmpty ||
+                            _lasercodenum.text.length != 10) {
                           setState(() {
                             _varidatedLaserId = true;
                           });
@@ -652,7 +656,8 @@ class _IDCardPageState extends State<IDCardPage> {
                           });
                           log('validate laser id: $_varidatedLaserId');
                         }
-                        if (_lasercodestr.text.isEmpty || _lasercodestr.text.length != 2) {
+                        if (_lasercodestr.text.isEmpty ||
+                            _lasercodestr.text.length != 2) {
                           setState(() {
                             _varidatedLaserStr = true;
                           });
@@ -670,10 +675,21 @@ class _IDCardPageState extends State<IDCardPage> {
                         final date = '$dateValue $monthValue $yearValue';
                         final laser = '$laserCodeStrValue-$laserCodeNumValue';
                         String marriageStatus = '';
-                        if (_marriageStatus == SingingCharacter.single) { marriageStatus = 'โสด';}
-                        if (_marriageStatus == SingingCharacter.married) { marriageStatus = 'สมรส';}
-                        if (_marriageStatus == SingingCharacter.disvorced) { marriageStatus = 'หย่า';}
-                        final postIDCard = IDcardModel(birthdate: date, status: marriageStatus, idcard: idCardValue, laserCode: laser,);
+                        if (_marriageStatus == SingingCharacter.single) {
+                          marriageStatus = 'โสด';
+                        }
+                        if (_marriageStatus == SingingCharacter.married) {
+                          marriageStatus = 'สมรส';
+                        }
+                        if (_marriageStatus == SingingCharacter.disvorced) {
+                          marriageStatus = 'หย่า';
+                        }
+                        final postIDCard = IDcardModel(
+                          birthdate: date,
+                          status: marriageStatus,
+                          idcard: idCardValue,
+                          laserCode: laser,
+                        );
                         _postIDCardInfo(postIDCard);
                         // Navigator.push(
                         //   context,
