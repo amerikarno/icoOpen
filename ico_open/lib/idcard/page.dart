@@ -8,6 +8,7 @@ import 'package:ico_open/model/preinfo.dart' as modelpreinfo;
 import 'package:ico_open/preinfo/page.dart';
 
 class IDCardPage extends StatefulWidget {
+  // const IDCardPage({super.key});
   IDCardPage({super.key, preinfo});
   modelpreinfo.Preinfo? preinfo;
   @override
@@ -204,7 +205,7 @@ class _IDCardPageState extends State<IDCardPage> {
       },
     );
 
-    print('preInfo: ${widget.preinfo!.mobile}');
+    // print('preInfo: ${widget.preinfo!.mobile}');
 
     return Scaffold(
       body: Container(

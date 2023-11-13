@@ -40,9 +40,11 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _validateEmail = false;
   bool _validateMobileNo = false;
   bool _passedVeridateEmail = false;
+  bool _passedVeridateEmailMobile = false;
 
   bool isPassedMobileChecked = false;
   bool isPassedEmailChecked = false;
+  bool isPassedEmailMobileChecked = false;
 
   bool _loadingEmail = true;
   bool _loadingMobile = true;
@@ -53,7 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
     _email.dispose();
   }
 
-  Future<bool> _verifyEmail(String email) async {
+  Future<void> _verifyEmail(String email) async {
     if (email.isEmpty) {
       log('email is empty', name: _passedVeridateEmail.toString());
       setState(() {
@@ -86,8 +88,10 @@ class _MyHomePageState extends State<MyHomePage> {
           log('[true]registered email: ${data['registeredEmail'].toString()}');
         } else {
           log('[else]registered email: ${data['registeredEmail'].toString()}');
-          _passedVeridateEmail = true;
           log('verified email: ${_passedVeridateEmail.toString()}');
+          setState(() {
+            _passedVeridateEmail = true;
+          });
         }
         setState(() {
           // isPassedEmailChecked = true;
@@ -106,16 +110,20 @@ class _MyHomePageState extends State<MyHomePage> {
         });
       }
     }
-    return Future.delayed(const Duration(seconds: 5), () => !_validateEmail);
+    print('passed: $_passedVeridateEmail');
+    // return _passedVeridateEmail;
   }
 
   void getIsPassedValidateEmail(String email) async {
-    final passed = await _verifyEmail(email);
+    await _verifyEmail(email);
     setState(() {
-      isPassedEmailChecked = passed;
+      print(
+          'before: $isPassedEmailChecked, $_loadingEmail, $_passedVeridateEmail');
+      isPassedEmailChecked = _passedVeridateEmail;
       _loadingEmail = false;
+      print(
+          'ater: $isPassedEmailChecked, $_loadingEmail, $_passedVeridateEmail');
     });
-    if (_loadingEmail) {const CircularProgressIndicator();}
   }
 
   Future<bool> _verifyMobileNo(String mobileno) async {
@@ -184,7 +192,113 @@ class _MyHomePageState extends State<MyHomePage> {
       _loadingMobile = false;
     });
     print('verify mobile2');
-    if (_loadingMobile) {const CircularProgressIndicator();}
+    if (_loadingMobile) {
+      const CircularProgressIndicator();
+    }
+  }
+
+  Future<bool> _verifyEmailMobileNo(String email, String mobileno) async {
+    if (mobileno.isEmpty || email.isEmpty) {
+      log('email or mobile is empty', name: _passedVeridateEmail.toString());
+      setState(() {
+        _validateMobileNo = true;
+        _validateEmail = true;
+      });
+    } else {
+      final url = Uri(
+        scheme: 'http',
+        host: 'localhost',
+        port: 1323,
+        path: 'verify/email/$email/mobile/$mobileno',
+      );
+      var response = await http.get(url).timeout(
+            const Duration(seconds: 1),
+            onTimeout: () => http.Response('error', 408),
+          );
+      log(
+        'url:',
+        name: url.toString(),
+      );
+      log('respons code:', name: response.statusCode.toString());
+      log('respons body:', name: response.body.toString());
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        log('start to verify');
+        log('data', name: data.toString());
+        if (data['isRegisteredMobileNo'] || data['isRegisteredEmail']) {
+          log('registered mobile no',
+              name: data['registeredMobileNo'].toString());
+        } else {
+          log('registered mobile no',
+              name: data['registeredMobileNo'].toString());
+          _passedVeridateEmailMobile = true;
+          log('verified mobile no: ${_passedVeridateEmailMobile.toString()}');
+        }
+        setState(() {
+          _passedVeridateEmailMobile = true;
+          _validateMobileNo = false;
+          _loadingMobile = false;
+          _validateEmail = false;
+          _loadingEmail = false;
+          // isPassedMobileChecked = true;
+          print('passed $_passedVeridateEmailMobile');
+        });
+      }
+
+      if (data['isInvalidMobileNoFormat']) {
+        log('invalid mobile format',
+            name: _passedVeridateEmailMobile.toString());
+        setState(() {
+          _emailError = 'กรุณาใส่อีเมลให้ถูกต้อง';
+          _validateEmail = true;
+          _loadingEmail = false;
+          _mobilenoError = 'กรุณาใส่หมายเลขโทรศัพท์มือถือให้ถูกต้อง';
+          _validateMobileNo = true;
+          _loadingMobile = false;
+          // isPassedMobileChecked = false;
+        });
+      }
+    }
+    print('verify mobile $_passedVeridateEmailMobile');
+    return _passedVeridateEmailMobile;
+  }
+
+  void getIsPassedValidateEmailMobile(String email, String mobile) async {
+    var verify = await _verifyEmailMobileNo(email, mobile);
+    setState(() {
+      isPassedEmailMobileChecked = verify;
+      _loadingMobile = false;
+    });
+    print('verify mobile2');
+    // if (_loadingMobile) {
+    //   const CircularProgressIndicator();
+    // }
+  }
+
+  void gotoNextPage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          // return  IDCardPage();
+          print('goto idcard page');
+          return IDCardPage(
+            preinfo: Preinfo(
+                thtitle: thValue!,
+                thname: _thname.text,
+                thsurname: _thsurname.text,
+                engtitle: engValue!,
+                engname: _enname.text,
+                engsurname: _ensurname.text,
+                email: _email.text,
+                mobile: _mobileno.text,
+                agreement: isPersonalAgreementChecked),
+          );
+        },
+      ),
+    );
   }
 
   final thList = [
@@ -254,6 +368,20 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final thLabel = 'คำนำหน้าชื่อ (ภาษาไทย)';
   final engLabel = 'คำนำหน้าชื่อ (ภาษาอังกฤษ)';
+
+  Widget nextButtonWidget({
+    required Function() onpressed,
+  }) {
+    return FloatingActionButton(
+      backgroundColor: Colors.orange,
+      onPressed: onpressed,
+      child: const Icon(
+        Icons.arrow_right_alt,
+        size: 30,
+        color: Colors.white,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -494,7 +622,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         ],
                         onSubmitted: (value) {
                           setState(() {
-                            getIsPassedValidateEmail(value);
+                            _verifyEmail(value);
                           });
                           if (_loadingEmail) {
                             const CircularProgressIndicator();
@@ -545,7 +673,9 @@ class _MyHomePageState extends State<MyHomePage> {
                           setState(() {
                             getIsPassedValidateMobile(value);
                           });
-                          if (_loadingMobile) {const CircularProgressIndicator();}
+                          if (_loadingMobile) {
+                            const CircularProgressIndicator();
+                          }
                         },
                       ),
                     ),
@@ -604,11 +734,50 @@ class _MyHomePageState extends State<MyHomePage> {
                       SizedBox(
                         width: 50,
                         height: 50,
+                        // child: FloatingActionButton(
+                        //   onPressed: () {
+                        //     SizedBox(
+                        //       child: FutureBuilder(
+                        //         future: _verifyEmailMobileNo(
+                        //             _email.text, _mobileno.text),
+                        //         builder: (BuildContext context,
+                        //             AsyncSnapshot snapshot) {
+                        //           if (snapshot.hasData) {
+                        //             print('data: $isPassedEmailMobileChecked');
+                        //             return const Text('has data');
+                        //           } else {
+                        //             return const CircularProgressIndicator();
+                        //           }
+                        //         },
+                        //       ),
+                        //     );
+                        //   },
+                        // ),
+                        // child: nextButtonWidget(onpressed: () {
+                        //   setState(() {
+                        //   _verifyEmailMobileNo(_email.text, _mobileno.text);
+                        //     _loadingEmail = false;
+                        //     isPassedEmailChecked = _passedVeridateEmailMobile;
+                        //   });
+                        //   print('next button loading: $_loadingEmail, $_passedVeridateEmailMobile');
+                        //   if (_loadingEmail) {
+                        //     return const CircularProgressIndicator();
+                        //   }
+                        //   print('next button: $isPassedEmailMobileChecked');
+                        // }),
                         child: FittedBox(
                           alignment: Alignment.bottomRight,
                           child: FloatingActionButton(
                             backgroundColor: Colors.orange,
-                            onPressed: () {
+                            onPressed: () async {
+                              // getIsPassedValidateEmail(_email.text);
+                              // getIsPassedValidateMobile(_mobileno.text);
+                              isPassedEmailMobileChecked =
+                                  await _verifyEmailMobileNo(
+                                      _email.text, _mobileno.text);
+                              // if (_loadingEmail) {
+                              //   return CircularProgressIndicator() ;
+                              // }
                               setState(() {
                                 _validateTHName = _thname.text.trim().isEmpty;
                                 _validateTHSurName =
@@ -619,18 +788,19 @@ class _MyHomePageState extends State<MyHomePage> {
                                 _validateEmail = _email.text.trim().isEmpty;
                                 _validateMobileNo =
                                     _mobileno.text.trim().isEmpty;
-                                    // isPersonalAgreementChecked = _validatePersonalAgreement;
-                                getIsPassedValidateEmail(_email.text);
-                                getIsPassedValidateMobile(_mobileno.text);
-                                print(
-                                    'title: $thValue name: ${_thname.text} surname: ${_thsurname.text}\ntitle: $engValue name: ${_enname.text} surname: ${_ensurname.text}\nemail: ${_email.text}, mobile: ${_mobileno.text}, agreement: $isPersonalAgreementChecked');
+                                // isPassedEmailChecked = _passedVeridateEmail;
+                                // isPersonalAgreementChecked = _validatePersonalAgreement;
                               });
+                              print(
+                                  'title: $thValue name: ${_thname.text} surname: ${_thsurname.text}\ntitle: $engValue name: ${_enname.text} surname: ${_ensurname.text}\nemail: ${_email.text}, mobile: ${_mobileno.text}, agreement: $isPersonalAgreementChecked');
                               print('loading email: $_loadingEmail');
-                              if (_loadingEmail) {const CircularProgressIndicator();}
+                              if (_loadingEmail) {
+                                const CircularProgressIndicator();
+                              }
                               print('loading mobile: $_loadingMobile');
-                              if (_loadingMobile) {const CircularProgressIndicator();}
 
-                              print('validate: $_validateTHName, $_validateTHSurName, $_validateEnName, $_validateEnSurName, $_validateEmail, $_validateMobileNo, $isPersonalAgreementChecked, $isPassedEmailChecked, $isPassedMobileChecked');
+                              print(
+                                  'validate: $_validateTHName, $_validateTHSurName, $_validateEnName, $_validateEnSurName, $_validateEmail, $_validateMobileNo, $isPersonalAgreementChecked, $isPassedEmailMobileChecked');
                               if (!_validateTHName &&
                                   !_validateTHSurName &&
                                   !_validateEnName &&
@@ -638,19 +808,19 @@ class _MyHomePageState extends State<MyHomePage> {
                                   !_validateEmail &&
                                   !_validateMobileNo &&
                                   isPersonalAgreementChecked &&
-                                  isPassedEmailChecked &&
-                                  isPassedMobileChecked) {
+                                  isPassedEmailMobileChecked) {
                                 print(
                                     'title: $thValue name: ${_thname.text} surname: ${_thsurname.text}\ntitle: $engValue name: ${_enname.text} surname: ${_ensurname.text}\nemail: ${_email.text}, mobile: ${_mobileno.text}, agreement: $isPersonalAgreementChecked');
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) {
-                                      // return const IDCardPage();
-                                      return  IDCardPage(preinfo: Preinfo(thtitle: thValue!, thname: _thname.text, thsurname: _thsurname.text, engtitle: engValue!, engname: _enname.text, engsurname: _ensurname.text, email: _email.text, mobile: _mobileno.text, agreement: isPersonalAgreementChecked),);
-                                    },
-                                  ),
-                                );
+                                // Navigator.push(
+                                //   context,
+                                //   MaterialPageRoute(
+                                //     builder: (context) {
+                                //       // return  IDCardPage();
+                                //       return  IDCardPage(preinfo: Preinfo(thtitle: thValue!, thname: _thname.text, thsurname: _thsurname.text, engtitle: engValue!, engname: _enname.text, engsurname: _ensurname.text, email: _email.text, mobile: _mobileno.text, agreement: isPersonalAgreementChecked),);
+                                //     },
+                                //   ),
+                                // );
+                                gotoNextPage();
                               }
                             },
                             child: const Icon(
