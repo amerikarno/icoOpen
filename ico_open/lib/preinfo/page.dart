@@ -2,13 +2,12 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+
 import 'package:ico_open/idcard/page.dart';
 import 'package:ico_open/model/preinfo.dart';
-
 import 'package:ico_open/preinfo/personal_agreement.dart';
-// import 'package:ico_open/model/model.dart';
+import 'package:ico_open/misc/misc.dart' as misc;
 
 // import 'package:ico_open/preinfo/title.dart';
 
@@ -33,6 +32,8 @@ class _MyHomePageState extends State<MyHomePage> {
   var _mobilenoError = 'กรุณาใส่หมายเลขโทรศัพท์มือถือ';
   // FocusNode _focusEmail = FocusNode();
 
+  bool _validateTHTitle = false;
+  bool _validateEnTitle = false;
   bool _validateTHName = false;
   bool _validateTHSurName = false;
   bool _validateEnName = false;
@@ -40,14 +41,17 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _validateEmail = false;
   bool _validateMobileNo = false;
   bool _passedVeridateEmail = false;
+  bool _passedVeridateMobile = false;
   bool _passedVeridateEmailMobile = false;
+  // bool _isPassedVeridateEmail = false;
+  // bool _isPassedVeridateMobile = false;
 
   bool isPassedMobileChecked = false;
   bool isPassedEmailChecked = false;
   bool isPassedEmailMobileChecked = false;
 
-  bool _loadingEmail = true;
-  bool _loadingMobile = true;
+  // bool _loadingEmail = true;
+  // bool _loadingMobile = true;
 
   @override
   void dispose() {
@@ -55,7 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
     _email.dispose();
   }
 
-  Future<void> _verifyEmail(String email) async {
+  Future<bool> _verifyEmail(String email) async {
     if (email.isEmpty) {
       log('email is empty', name: _passedVeridateEmail.toString());
       setState(() {
@@ -76,19 +80,15 @@ class _MyHomePageState extends State<MyHomePage> {
         'url:',
         name: url.toString(),
       );
-      log('respons code:', name: response.statusCode.toString());
-      log('respons body:', name: response.body.toString());
 
       final data = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
         log('start to verify');
-        log('data', name: data.toString());
         if (data['isRegisteredEmail'] == 'true') {
           log('[true]registered email: ${data['registeredEmail'].toString()}');
         } else {
           log('[else]registered email: ${data['registeredEmail'].toString()}');
-          log('verified email: ${_passedVeridateEmail.toString()}');
           setState(() {
             _passedVeridateEmail = true;
           });
@@ -96,34 +96,21 @@ class _MyHomePageState extends State<MyHomePage> {
         setState(() {
           // isPassedEmailChecked = true;
           _validateEmail = false;
-          _loadingEmail = false;
+          // _loadingEmail = false;
         });
       }
 
       if (data['isInvalidEmailFormat']) {
-        log('invalid email format', name: _passedVeridateEmail.toString());
         setState(() {
           _emailError = 'กรุณาใส่อีเมลให้ถูกต้อง';
           _validateEmail = true;
-          _loadingEmail = false;
+          // _loadingEmail = false;
           // isPassedEmailChecked = false;
         });
       }
     }
-    print('passed: $_passedVeridateEmail');
-    // return _passedVeridateEmail;
-  }
-
-  void getIsPassedValidateEmail(String email) async {
-    await _verifyEmail(email);
-    setState(() {
-      print(
-          'before: $isPassedEmailChecked, $_loadingEmail, $_passedVeridateEmail');
-      isPassedEmailChecked = _passedVeridateEmail;
-      _loadingEmail = false;
-      print(
-          'ater: $isPassedEmailChecked, $_loadingEmail, $_passedVeridateEmail');
-    });
+    log('is passed email validate: $_passedVeridateEmail');
+    return _passedVeridateEmail;
   }
 
   Future<bool> _verifyMobileNo(String mobileno) async {
@@ -161,40 +148,26 @@ class _MyHomePageState extends State<MyHomePage> {
         } else {
           log('registered mobile no',
               name: data['registeredMobileNo'].toString());
-          _passedVeridateEmail = true;
-          log('verified mobile no', name: _passedVeridateEmail.toString());
+          _passedVeridateMobile = true;
         }
         setState(() {
           _validateMobileNo = false;
-          _loadingMobile = false;
+          // _loadingMobile = false;
           // isPassedMobileChecked = true;
         });
       }
 
       if (data['isInvalidMobileNoFormat']) {
-        log('invalid mobile format', name: _passedVeridateEmail.toString());
         setState(() {
           _mobilenoError = 'กรุณาใส่หมายเลขโทรศัพท์มือถือให้ถูกต้อง';
           _validateMobileNo = true;
-          _loadingMobile = false;
+          // _loadingMobile = false;
           // isPassedMobileChecked = false;
         });
       }
     }
-    print('verify mobile');
-    return Future.delayed(const Duration(seconds: 5), () => !_validateMobileNo);
-  }
-
-  void getIsPassedValidateMobile(String mobile) async {
-    final passed = await _verifyMobileNo(mobile);
-    setState(() {
-      isPassedMobileChecked = passed;
-      _loadingMobile = false;
-    });
-    print('verify mobile2');
-    if (_loadingMobile) {
-      const CircularProgressIndicator();
-    }
+    log('invalid mobile format', name: _passedVeridateMobile.toString());
+    return _passedVeridateMobile;
   }
 
   Future<bool> _verifyEmailMobileNo(String email, String mobileno) async {
@@ -239,11 +212,10 @@ class _MyHomePageState extends State<MyHomePage> {
         setState(() {
           _passedVeridateEmailMobile = true;
           _validateMobileNo = false;
-          _loadingMobile = false;
+          // _loadingMobile = false;
           _validateEmail = false;
-          _loadingEmail = false;
+          // _loadingEmail = false;
           // isPassedMobileChecked = true;
-          print('passed $_passedVeridateEmailMobile');
         });
       }
 
@@ -253,28 +225,16 @@ class _MyHomePageState extends State<MyHomePage> {
         setState(() {
           _emailError = 'กรุณาใส่อีเมลให้ถูกต้อง';
           _validateEmail = true;
-          _loadingEmail = false;
+          // _loadingEmail = false;
           _mobilenoError = 'กรุณาใส่หมายเลขโทรศัพท์มือถือให้ถูกต้อง';
           _validateMobileNo = true;
-          _loadingMobile = false;
+          // _loadingMobile = false;
           // isPassedMobileChecked = false;
         });
       }
     }
-    print('verify mobile $_passedVeridateEmailMobile');
+    log('verify mobile $_passedVeridateEmailMobile');
     return _passedVeridateEmailMobile;
-  }
-
-  void getIsPassedValidateEmailMobile(String email, String mobile) async {
-    var verify = await _verifyEmailMobileNo(email, mobile);
-    setState(() {
-      isPassedEmailMobileChecked = verify;
-      _loadingMobile = false;
-    });
-    print('verify mobile2');
-    // if (_loadingMobile) {
-    //   const CircularProgressIndicator();
-    // }
   }
 
   void gotoNextPage() {
@@ -283,7 +243,7 @@ class _MyHomePageState extends State<MyHomePage> {
       MaterialPageRoute(
         builder: (context) {
           // return  IDCardPage();
-          print('goto idcard page');
+          log('goto idcard page');
           return IDCardPage(
             preinfo: Preinfo(
                 thtitle: thValue!,
@@ -335,14 +295,19 @@ class _MyHomePageState extends State<MyHomePage> {
   String? thValue;
   String? engValue;
 
-  Widget dropdownButtonBuilder(
-      {required String? value,
-      required String label,
-      required List<String> items,
-      required Function(String?) onChanged}) {
+  Widget dropdownButtonBuilder({
+    required String? value,
+    required String label,
+    required List<String> items,
+    required Function(String?) onChanged,
+    bool? errorCondition,
+    String? errorMessage,
+  }) {
+    errorCondition = errorCondition ?? false;
     return DropdownButtonFormField(
       value: value,
       decoration: InputDecoration(
+        errorText: errorCondition ? errorMessage : null,
         label: Text(
           label,
           textAlign: TextAlign.center,
@@ -393,6 +358,8 @@ class _MyHomePageState extends State<MyHomePage> {
         thValue = value!;
         engValue = thToEng(value);
       },
+      errorCondition: _validateTHTitle,
+      errorMessage: 'กรุณาใส่คำนำหน้าชื่อ (ภาษาไทย)',
     );
     final engField = dropdownButtonBuilder(
       value: engValue,
@@ -402,6 +369,8 @@ class _MyHomePageState extends State<MyHomePage> {
         thValue = value!;
         engValue = engToTh(value);
       },
+      errorCondition: _validateEnTitle,
+      errorMessage: 'กรุณาใส่คำนำหน้าชื่อ (ภาษาอังกฤษ)',
     );
 
     return Scaffold(
@@ -416,177 +385,104 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.1,
-                ),
-                const SizedBox(
-                  child: Text(
-                    'กรุณากรอกข้อมูลเพื่อเปิดบัญชี',
-                    style: TextStyle(
-                      color: Colors.orange,
-                      fontSize: 20,
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 10,
+                const Spacer(
+                  flex: 5,
                 ),
                 SizedBox(
-                  width: 230,
-                  child: thField,
-                  // child: THdropdownButton(),
+                  child: misc.subjectText(
+                      subject: 'กรุณากรอกข้อมูลเพื่อเปิดบัญชี'),
+                ),
+                const Spacer(
+                  flex: 2,
                 ),
                 Row(
                   children: [
-                    SizedBox(
-                      width: 230,
-                      child: TextField(
-                        controller: _thname,
-                        decoration: InputDecoration(
-                          errorText:
-                              _validateTHName ? 'กรุณาใส่ชื่อ (ภาษาไทย)' : null,
-                          label: RichText(
-                            text: const TextSpan(
-                              text: 'ชื่อ (ภาษาไทย)',
-                              children: [
-                                TextSpan(
-                                  text: '*',
-                                  style: TextStyle(
-                                    color: Colors.red,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(
-                            RegExp(r'[ก-๛]'),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 20,
-                    ),
                     Expanded(
-                      flex: 5,
-                      child: TextField(
-                        controller: _thsurname,
-                        decoration: InputDecoration(
-                          errorText: _validateTHSurName
-                              ? 'กรุณาใส่นามสกุล (ภาษาไทย)'
-                              : null,
-                          label: RichText(
-                            text: const TextSpan(
-                              text: 'นามสกุล (ภาษาไทย)',
-                              children: [
-                                TextSpan(
-                                  text: '*',
-                                  style: TextStyle(
-                                    color: Colors.red,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(
-                            RegExp(r'[ก-๛]'),
-                          ),
-                        ],
-                      ),
+                      flex: 7,
+                      child: thField,
+                      // child: THdropdownButton(),
+                    ),
+                    const Spacer(
+                      flex: 13,
                     ),
                   ],
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                SizedBox(
-                  width: 230,
-                  child: engField,
                 ),
                 Row(
                   children: [
-                    SizedBox(
-                      width: 230,
-                      child: TextField(
-                        controller: _enname,
-                        decoration: InputDecoration(
-                          errorText: _validateEnName
-                              ? 'กรุณาใส่ชื่อ (ภาษาอังกฤษ)'
-                              : null,
-                          label: RichText(
-                            text: const TextSpan(
-                              text: 'ชื่อ (ภาษาอังกฤษ)',
-                              children: [
-                                TextSpan(
-                                  text: '*',
-                                  style: TextStyle(
-                                    color: Colors.red,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(
-                            RegExp(r'[a-zA-Z]'),
-                          ),
-                        ],
-                      ),
+                    Expanded(
+                      flex: 7,
+                      child: misc.importantTextField(
+                          textController: _thname,
+                          errorTextCondition: _validateTHName,
+                          errorTextMessage: 'กรุณาใส่ชื่อ (ภาษาไทย)',
+                          subject: 'ชื่อ (ภาษาไทย)',
+                          filterPattern: RegExp(r'[ก-๛]')),
                     ),
-                    const SizedBox(
-                      width: 20,
+                    const Spacer(
+                      flex: 1,
                     ),
                     Expanded(
-                      flex: 5,
-                      child: TextField(
-                        controller: _ensurname,
-                        decoration: InputDecoration(
-                          // labelText: 'นามสกุล (ภาษาอังกฤษ)'
-                          errorText: _validateEnSurName
-                              ? 'กรุณาใส่นามสกุล (ภาษาอังกฤษ)'
-                              : null,
-                          label: RichText(
-                            text: const TextSpan(
-                              text: 'นามสกุล (ภาษาอังกฤษ)',
-                              children: [
-                                TextSpan(
-                                  text: '*',
-                                  style: TextStyle(
-                                    color: Colors.red,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(
-                            RegExp(r'[a-zA-Z]'),
-                          ),
-                        ],
-                      ),
+                      flex: 12,
+                      child: misc.importantTextField(
+                          textController: _thsurname,
+                          errorTextCondition: _validateTHSurName,
+                          errorTextMessage: 'กรุณาใส่นามสกุล (ภาษาไทย)',
+                          subject: 'นามสกุล (ภาษาไทย)',
+                          filterPattern: RegExp(r'[ก-๛]')),
                     ),
                   ],
                 ),
-                const SizedBox(
-                  height: 10,
+                const Spacer(
+                  flex: 1,
                 ),
-                const SizedBox(
-                  child: Text(
-                    'ข้อมูลสำหรับรับ Username, Password และเอกสารจากทางบริษัทฯ',
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.blue,
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 7,
+                      child: engField,
                     ),
+                    const Spacer(
+                      flex: 13,
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 7,
+                      child: misc.importantTextField(
+                          textController: _enname,
+                          errorTextCondition: _validateEnName,
+                          errorTextMessage: 'กรุณาใส่ชื่อ (ภาษาอังกฤษ)',
+                          subject: 'ชื่อ (ภาษาอังกฤษ)',
+                          filterPattern: RegExp(r'[a-zA-Z]')),
+                    ),
+                    const Spacer(
+                      flex: 1,
+                    ),
+                    Expanded(
+                      flex: 12,
+                      child: misc.importantTextField(
+                          textController: _ensurname,
+                          errorTextCondition: _validateEnSurName,
+                          errorTextMessage: 'กรุณาใส่นามสกุล (ภาษาอังกฤษ)',
+                          subject: 'นามสกุล (ภาษาอังกฤษ)',
+                          filterPattern: RegExp(r'[a-zA-Z]')),
+                    ),
+                  ],
+                ),
+                const Spacer(
+                  flex: 3,
+                ),
+                SizedBox(
+                  child: misc.subjectText(
+                    subject:
+                        'ข้อมูลสำหรับรับ Username, Password และเอกสารจากทางบริษัทฯ',
+                    color: Colors.blue,
                   ),
                 ),
-                const SizedBox(
-                  height: 10,
+                const Spacer(
+                  flex: 1,
                 ),
                 Row(
                   children: [
@@ -596,44 +492,24 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                     Expanded(
                       flex: 3,
-                      child: TextField(
-                        // focusNode: _focusEmail,
-                        controller: _email,
-                        decoration: InputDecoration(
-                          errorText: _validateEmail ? _emailError : null,
-                          label: RichText(
-                            text: const TextSpan(
-                              text: 'อีเมล',
-                              children: [
-                                TextSpan(
-                                  text: '*',
-                                  style: TextStyle(
-                                    color: Colors.red,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(
-                            RegExp(r'[a-zA-Z0-9@.]'),
-                          ),
-                        ],
-                        onSubmitted: (value) {
+                      child: misc.importantTextField(
+                        textController: _email,
+                        errorTextCondition: _validateEmail,
+                        errorTextMessage: _emailError,
+                        subject: 'อีเมล',
+                        filterPattern: RegExp(r'[a-zA-Z0-9@.]'),
+                        onsubmittedFunction: (value) async {
+                          final isPassed = await _verifyEmail(value);
                           setState(() {
-                            _verifyEmail(value);
+                            isPassedEmailChecked = isPassed;
                           });
-                          if (_loadingEmail) {
-                            const CircularProgressIndicator();
-                          }
                         },
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(
-                  height: 10,
+                const Spacer(
+                  flex: 1,
                 ),
                 Row(
                   children: [
@@ -642,52 +518,30 @@ class _MyHomePageState extends State<MyHomePage> {
                       color: Colors.lightBlue,
                     ),
                     Expanded(
-                      // width: 300,
                       flex: 5,
-                      child: TextField(
-                        onTap: () =>
-                            log('mobile subject: ${_email.toString()}'),
-                        controller: _mobileno,
-                        decoration: InputDecoration(
-                          errorText: _validateMobileNo ? _mobilenoError : null,
-                          label: RichText(
-                            text: const TextSpan(
-                              text: 'หมายเลขโทรศัพท์มือถือ',
-                              children: [
-                                TextSpan(
-                                  text: '*',
-                                  style: TextStyle(
-                                    color: Colors.red,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(
-                            RegExp(r'[0-9]'),
-                          ),
-                        ],
-                        onSubmitted: (value) {
-                          setState(() {
-                            getIsPassedValidateMobile(value);
-                          });
-                          if (_loadingMobile) {
-                            const CircularProgressIndicator();
-                          }
-                        },
-                      ),
+                      child: misc.importantTextField(
+                          textController: _mobileno,
+                          errorTextCondition: _validateMobileNo,
+                          errorTextMessage: _mobilenoError,
+                          subject: 'หมายเลขโทรศัพท์มือถือ',
+                          onsubmittedFunction: (value) async {
+                            final isPassed = await _verifyMobileNo(value);
+                            setState(() {
+                              isPassedMobileChecked = isPassed;
+                              // _isPassedVeridateMobile = true;
+                            });
+                          },
+                          filterPattern: RegExp(r'[0-9]')),
                     ),
                   ],
                 ),
-                const SizedBox(
-                  height: 10,
+                const Spacer(
+                  flex: 1,
                 ),
                 const Row(children: [
                   Expanded(flex: 1, child: CheckboxPersonalAggreement()),
                   Expanded(
-                    flex: 7,
+                    flex: 18,
                     child: Column(
                       children: [
                         Wrap(
@@ -704,14 +558,18 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                 ]),
+                const Spacer(
+                  flex: 1,
+                ),
                 Expanded(
+                  flex: 3,
                   child: Row(
                     children: [
-                      const SizedBox(
-                        width: 50,
+                      const Spacer(
+                        flex: 1,
                       ),
-                      SizedBox(
-                        width: 500,
+                      Expanded(
+                        flex: 14,
                         child: RichText(
                           text: const TextSpan(
                             text: '*',
@@ -731,101 +589,49 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                         ),
                       ),
-                      SizedBox(
-                        width: 50,
-                        height: 50,
-                        // child: FloatingActionButton(
-                        //   onPressed: () {
-                        //     SizedBox(
-                        //       child: FutureBuilder(
-                        //         future: _verifyEmailMobileNo(
-                        //             _email.text, _mobileno.text),
-                        //         builder: (BuildContext context,
-                        //             AsyncSnapshot snapshot) {
-                        //           if (snapshot.hasData) {
-                        //             print('data: $isPassedEmailMobileChecked');
-                        //             return const Text('has data');
-                        //           } else {
-                        //             return const CircularProgressIndicator();
-                        //           }
-                        //         },
-                        //       ),
-                        //     );
-                        //   },
-                        // ),
-                        // child: nextButtonWidget(onpressed: () {
-                        //   setState(() {
-                        //   _verifyEmailMobileNo(_email.text, _mobileno.text);
-                        //     _loadingEmail = false;
-                        //     isPassedEmailChecked = _passedVeridateEmailMobile;
-                        //   });
-                        //   print('next button loading: $_loadingEmail, $_passedVeridateEmailMobile');
-                        //   if (_loadingEmail) {
-                        //     return const CircularProgressIndicator();
-                        //   }
-                        //   print('next button: $isPassedEmailMobileChecked');
-                        // }),
+                      Expanded(
+                        flex: 5,
                         child: FittedBox(
                           alignment: Alignment.bottomRight,
                           child: FloatingActionButton(
                             backgroundColor: Colors.orange,
                             onPressed: () async {
-                              // getIsPassedValidateEmail(_email.text);
-                              // getIsPassedValidateMobile(_mobileno.text);
                               isPassedEmailMobileChecked =
                                   await _verifyEmailMobileNo(
                                       _email.text, _mobileno.text);
-                              // if (_loadingEmail) {
-                              //   return CircularProgressIndicator() ;
-                              // }
-                              setState(() {
-                                _validateTHName = _thname.text.trim().isEmpty;
-                                _validateTHSurName =
-                                    _thsurname.text.trim().isEmpty;
-                                _validateEnName = _enname.text.trim().isEmpty;
-                                _validateEnSurName =
-                                    _ensurname.text.trim().isEmpty;
-                                _validateEmail = _email.text.trim().isEmpty;
-                                _validateMobileNo =
-                                    _mobileno.text.trim().isEmpty;
-                                // isPassedEmailChecked = _passedVeridateEmail;
-                                // isPersonalAgreementChecked = _validatePersonalAgreement;
-                              });
-                              print(
-                                  'title: $thValue name: ${_thname.text} surname: ${_thsurname.text}\ntitle: $engValue name: ${_enname.text} surname: ${_ensurname.text}\nemail: ${_email.text}, mobile: ${_mobileno.text}, agreement: $isPersonalAgreementChecked');
-                              print('loading email: $_loadingEmail');
-                              if (_loadingEmail) {
-                                const CircularProgressIndicator();
+                              if (_thname.text.trim().isEmpty) {
+                                _validateTHName = true;
                               }
-                              print('loading mobile: $_loadingMobile');
+                              if (_thsurname.text.trim().isEmpty) {
+                                _validateTHSurName = true;
+                              }
+                              if (_enname.text.trim().isEmpty) {
+                                _validateEnName = true;
+                              }
+                              if (_ensurname.text.trim().isEmpty) {
+                                _validateEnSurName = true;
+                              }
+                              // if (thValue!.isEmpty) {_validateTHTitle = true;}
+                              // if (engValue!.isEmpty) {_validateEnTitle = true;}
 
-                              print(
-                                  'validate: $_validateTHName, $_validateTHSurName, $_validateEnName, $_validateEnSurName, $_validateEmail, $_validateMobileNo, $isPersonalAgreementChecked, $isPassedEmailMobileChecked');
-                              if (!_validateTHName &&
-                                  !_validateTHSurName &&
-                                  !_validateEnName &&
-                                  !_validateEnSurName &&
-                                  !_validateEmail &&
-                                  !_validateMobileNo &&
+                              if (_thname.text.trim().isNotEmpty &&
+                                  _thsurname.text.trim().isNotEmpty &&
+                                  _enname.text.trim().isNotEmpty &&
+                                  _ensurname.text.trim().isNotEmpty &&
+                                  _email.text.trim().isNotEmpty &&
+                                  _mobileno.text.trim().isNotEmpty &&
                                   isPersonalAgreementChecked &&
                                   isPassedEmailMobileChecked) {
-                                print(
-                                    'title: $thValue name: ${_thname.text} surname: ${_thsurname.text}\ntitle: $engValue name: ${_enname.text} surname: ${_ensurname.text}\nemail: ${_email.text}, mobile: ${_mobileno.text}, agreement: $isPersonalAgreementChecked');
-                                // Navigator.push(
-                                //   context,
-                                //   MaterialPageRoute(
-                                //     builder: (context) {
-                                //       // return  IDCardPage();
-                                //       return  IDCardPage(preinfo: Preinfo(thtitle: thValue!, thname: _thname.text, thsurname: _thsurname.text, engtitle: engValue!, engname: _enname.text, engsurname: _ensurname.text, email: _email.text, mobile: _mobileno.text, agreement: isPersonalAgreementChecked),);
-                                //     },
-                                //   ),
-                                // );
+                                log('''title: $thValue name: ${_thname.text} surname: ${_thsurname.text}
+                                title: $engValue name: ${_enname.text} surname: ${_ensurname.text}
+                                email: ${_email.text}, mobile: ${_mobileno.text}, agreement: $isPersonalAgreementChecked''');
+
                                 gotoNextPage();
                               }
                             },
                             child: const Icon(
                               Icons.arrow_right_alt,
-                              size: 30,
+                              size: 50,
                               color: Colors.white,
                             ),
                           ),

@@ -27,3 +27,20 @@ Widget importantTextField({
       ],
       onSubmitted: onsubmittedFunction);
 }
+
+Widget subjectText({
+  required String subject,
+  Color? color,
+  double? fontsize,
+}) {
+  color = color ?? Colors.orange;
+  fontsize = fontsize ?? 20;
+
+  return Text(
+    subject,
+    style: TextStyle(
+      fontSize: fontsize,
+      color: color,
+    ),
+  );
+}

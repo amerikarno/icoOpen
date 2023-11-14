@@ -25,9 +25,10 @@ class _CheckboxPersonalAggreementState
     }
 
     return CheckboxListTile(
-      // title: const Text("""ข้าพเจ้าได้อ่านและตกลงตามข้อมกำหนดและเงื่อนไขและรับทราบนโยบายความเป็นส่วนตัว ซึ่งระบุวิธีการที่บริษัท ฟินันเซีย ดิจิตทัล แอสแซท จำกัด(
-      //   "บริษัท"
-      // )""", maxLines: 2,overflow: TextOverflow.ellipsis,),
+      contentPadding: const EdgeInsets.all(0),
+      activeColor: Colors.transparent,
+      hoverColor: Colors.transparent,
+      splashRadius: 0,
       checkColor: Colors.white,
       fillColor: MaterialStateProperty.resolveWith(getColor),
       value: isPersonalAgreementChecked,
@@ -63,14 +64,6 @@ class PersonalAgreement extends StatelessWidget {
             TextButton(
               onPressed: () {
                 Navigator.pop(context, 'OK');
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) {
-                //       return const IDCardPage();
-                //     },
-                //   ),
-                // );
               },
               child: const Text(
                 'OK',
@@ -78,6 +71,11 @@ class PersonalAgreement extends StatelessWidget {
             ),
           ],
         ),
+      ),
+      onFocusChange: (hasFocus) {},
+      style: const ButtonStyle(
+        padding: MaterialStatePropertyAll(EdgeInsets.zero),
+        overlayColor: MaterialStatePropertyAll(Colors.transparent),
       ),
       child: const Text('อ่านรายละเอียดเพิ่มเติม'),
     );
