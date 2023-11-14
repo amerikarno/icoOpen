@@ -44,3 +44,27 @@ Widget subjectText({
     ),
   );
 }
+
+Widget subjectRichText({
+  required String subject,
+  Color? color,
+  double? fontsize,
+}) {
+  color = color ?? Colors.black;
+  fontsize = fontsize ?? 20;
+
+  return RichText(
+    text: TextSpan(
+      text: subject,
+      style: TextStyle(fontSize: fontsize, color: color),
+      children: const [
+        TextSpan(
+          text: '*',
+          style: TextStyle(
+            color: Colors.red,
+          ),
+        ),
+      ],
+    ),
+  );
+}

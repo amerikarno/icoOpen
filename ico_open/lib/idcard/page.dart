@@ -1,16 +1,18 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import 'package:ico_open/idcard/api.dart' as api;
 import 'package:ico_open/model/idcard.dart';
 import 'package:ico_open/model/preinfo.dart' as modelpreinfo;
-import 'package:ico_open/preinfo/page.dart';
+import 'package:ico_open/preinfo/page.dart' as preinfo;
+import 'package:ico_open/misc/misc.dart' as misc;
+import 'package:ico_open/preinfo/personal_agreement.dart';
 
 class IDCardPage extends StatefulWidget {
-  // const IDCardPage({super.key});
-  IDCardPage({super.key, preinfo});
-  modelpreinfo.Preinfo? preinfo;
+  const IDCardPage({super.key});
+  // IDCardPage({super.key, preinfo});
+  // modelpreinfo.Preinfo? preinfo;
   @override
   State<IDCardPage> createState() => _IDCardPageState();
 }
@@ -26,6 +28,7 @@ String idCardValue = '';
 String laserCodeStrValue = '';
 String laserCodeNumValue = '';
 
+// modelpreinfo.Preinfo preinfodata = modelpreinfo.Preinfo;
 // const postIDCard = IDcardModel;
 
 // final TextEditingController _month = TextEditingController();
@@ -261,22 +264,7 @@ class _IDCardPageState extends State<IDCardPage> {
                   ),
                   SizedBox(
                     width: 300,
-                    child: RichText(
-                      text: const TextSpan(
-                        text: 'วัน/เดือน/ปี เกิด',
-                        style: TextStyle(
-                          fontSize: 20,
-                        ),
-                        children: [
-                          TextSpan(
-                            text: '*',
-                            style: TextStyle(
-                              color: Colors.red,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    child: misc.subjectRichText(subject: 'วัน/เดือน/ปี เกิด'),
                   ),
                   const Expanded(
                     flex: 5,
@@ -414,20 +402,7 @@ class _IDCardPageState extends State<IDCardPage> {
                   ),
                   SizedBox(
                     width: 300,
-                    child: RichText(
-                      text: const TextSpan(
-                        text: 'หมายเลขบัตรประจำตัวประชาชน',
-                        style: TextStyle(fontSize: 20),
-                        children: [
-                          TextSpan(
-                            text: '*',
-                            style: TextStyle(
-                              color: Colors.red,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    child: misc.subjectRichText(subject: 'หมายเลขบัตรประจำตัวประชาชน'),
                   ),
                   const Expanded(
                     flex: 5,
@@ -435,39 +410,29 @@ class _IDCardPageState extends State<IDCardPage> {
                   ),
                   Expanded(
                     flex: 3,
-                    child: TextField(
-                      maxLength: 13,
-                      controller: _idcard,
-                      decoration: InputDecoration(
-                        labelText: 'ตัวเลข 13หลัก',
-                        errorText: _varidatedIDcard
-                            ? 'กรุณากรอกหมายเลขบัตรประจำตัวประชาชนให้ถูกต้อง'
-                            : null,
-                      ),
-                      inputFormatters: [
-                        FilteringTextInputFormatter.allow(
-                          RegExp(
-                            r'[0-9]',
-                          ),
-                        ),
-                      ],
-                      onSubmitted: (value) {
-                        if (value.isEmpty) {
-                          setState(
-                            () {
-                              _varidatedIDcard = true;
-                            },
-                          );
-                        } else {
-                          _getIsCorrectIDCard(value);
-                          if (!_varidatedIDcard) {
-                            setState(() {
-                              idCardValue = value;
-                            });
+                    child: misc.importantTextField(
+                        textController: _idcard,
+                        errorTextCondition: _varidatedIDcard,
+                        errorTextMessage:
+                            'กรุณากรอกหมายเลขบัตรประจำตัวประชาชนให้ถูกต้อง',
+                        subject: 'ตัวเลข 13หลัก',
+                        filterPattern: RegExp(r'[0-9]'),
+                        onsubmittedFunction: (value) {
+                          if (value.isEmpty) {
+                            setState(
+                              () {
+                                _varidatedIDcard = true;
+                              },
+                            );
+                          } else {
+                            _getIsCorrectIDCard(value);
+                            if (!_varidatedIDcard) {
+                              setState(() {
+                                idCardValue = value;
+                              });
+                            }
                           }
-                        }
-                      },
-                    ),
+                        }),
                   ),
                   const Expanded(
                     flex: 1,
@@ -495,96 +460,61 @@ class _IDCardPageState extends State<IDCardPage> {
                     width: 50,
                   ),
                   SizedBox(
-                    width: 300,
-                    child: RichText(
-                      text: const TextSpan(
-                        text: 'เลขหลังบัตรประชาชน (Laser Code)',
-                        style: TextStyle(fontSize: 20),
-                        children: [
-                          TextSpan(
-                            text: '*',
-                            style: TextStyle(
-                              color: Colors.red,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                      width: 300,
+                      child: misc.subjectRichText(
+                          subject: 'เลขหลังบัตรประชาชน (Laser Code)')),
                   const Expanded(
                     flex: 5,
                     child: SizedBox(),
                   ),
                   Expanded(
                     flex: 1,
-                    child: TextField(
-                      maxLength: 2,
-                      controller: _lasercodestr,
-                      decoration: InputDecoration(
-                        labelText: 'ตัวอักษร 2หลักแรก',
-                        errorText: _varidatedLaserStr
-                            ? 'กรุณากรอกข้อมูลให้ถูกต้องครบถ้วย'
-                            : null,
-                      ),
-                      inputFormatters: [
-                        FilteringTextInputFormatter.allow(
-                          RegExp(
-                            r'[a-zA-Z]',
-                          ),
-                        ),
-                      ],
-                      onSubmitted: (value) {
-                        if (value.isEmpty || value.length != 2) {
-                          setState(() {
-                            _varidatedLaserStr = true;
-                          });
-                          log('validate laser state: $_varidatedLaserStr');
-                          log('laser state: $_lasercodestr');
-                        } else {
-                          setState(() {
-                            _varidatedLaserStr = false;
-                            laserCodeStrValue = value;
-                          });
-                          log('validate laser state: $_varidatedLaserStr');
-                          log('laser state: $_lasercodestr');
-                        }
-                      },
-                    ),
+                    child: misc.importantTextField(
+                        textController: _lasercodestr,
+                        errorTextCondition: _varidatedLaserStr,
+                        errorTextMessage: 'กรุณากรอกข้อมูลให้ถูกต้องครบถ้วย',
+                        subject: 'ตัวอักษร 2หลักแรก',
+                        filterPattern: RegExp(r'[a-zA-Z]'),
+                        onsubmittedFunction: (value) {
+                          if (value.isEmpty || value.length != 2) {
+                            setState(() {
+                              _varidatedLaserStr = true;
+                            });
+                            log('validate laser state: $_varidatedLaserStr');
+                            log('laser state: $_lasercodestr');
+                          } else {
+                            setState(() {
+                              _varidatedLaserStr = false;
+                              laserCodeStrValue = value;
+                            });
+                            log('validate laser state: $_varidatedLaserStr');
+                            log('laser state: $_lasercodestr');
+                          }
+                        }),
                   ),
                   const Text('-'),
                   Expanded(
                     flex: 2,
-                    child: TextField(
-                      maxLength: 10,
-                      controller: _lasercodenum,
-                      decoration: InputDecoration(
-                        labelText: 'ตามด้วยตัวเลข 10หลัก',
-                        errorText: _varidatedLaserId
-                            ? 'กรุณากรอกข้อมูลให้ถูกต้องครบถ้วย'
-                            : null,
-                      ),
-                      inputFormatters: [
-                        FilteringTextInputFormatter.allow(
-                          RegExp(
-                            r'[0-9]',
-                          ),
-                        ),
-                      ],
-                      onSubmitted: (value) {
-                        if (value.isEmpty || value.length != 10) {
-                          setState(() {
-                            _varidatedLaserId = true;
-                          });
-                          log('validate laser id: $_varidatedLaserId');
-                        } else {
-                          setState(() {
-                            _varidatedLaserId = false;
-                            laserCodeNumValue = value;
-                          });
-                          log('validate laser id: $_varidatedLaserId');
-                        }
-                      },
-                    ),
+                    child: misc.importantTextField(
+                        textController: _lasercodenum,
+                        errorTextCondition: _varidatedLaserId,
+                        errorTextMessage: 'กรุณากรอกข้อมูลให้ถูกต้องครบถ้วย',
+                        subject: 'ตามด้วยตัวเลข 10หลัก',
+                        filterPattern: RegExp(r'[0-9]'),
+                        onsubmittedFunction: (value) {
+                          if (value.isEmpty || value.length != 10) {
+                            setState(() {
+                              _varidatedLaserId = true;
+                            });
+                            log('validate laser id: $_varidatedLaserId');
+                          } else {
+                            setState(() {
+                              _varidatedLaserId = false;
+                              laserCodeNumValue = value;
+                            });
+                            log('validate laser id: $_varidatedLaserId');
+                          }
+                        }),
                   ),
                   const Expanded(
                     flex: 1,
@@ -609,7 +539,7 @@ class _IDCardPageState extends State<IDCardPage> {
                           context,
                           MaterialPageRoute(
                             builder: (context) {
-                              return const MyHomePage();
+                              return const preinfo.MyHomePage();
                             },
                           ),
                         );
@@ -686,11 +616,23 @@ class _IDCardPageState extends State<IDCardPage> {
                           marriageStatus = 'หย่า';
                         }
                         final postIDCard = IDcardModel(
+                          thtitle: preinfo.thValue!,
+                          thname: preinfo.thname.text,
+                          thsurname: preinfo.thsurname.text,
+                          engtitle: preinfo.engValue!,
+                          engname: preinfo.enname.text,
+                          engsurname: preinfo.ensurname.text,
+                          email: preinfo.email.text,
+                          mobile: preinfo.mobileno.text,
+                          agreement: isPersonalAgreementChecked,
                           birthdate: date,
                           status: marriageStatus,
                           idcard: idCardValue,
                           laserCode: laser,
                         );
+                        log('thai: ${postIDCard.thtitle}${postIDCard.thname} ${postIDCard.thsurname}');
+                        log('english: ${postIDCard.engtitle}${postIDCard.engname} ${postIDCard.engsurname}');
+                        log('etc: ${postIDCard.email}${postIDCard.mobile} ${postIDCard.agreement}');
                         _postIDCardInfo(postIDCard);
                         // Navigator.push(
                         //   context,

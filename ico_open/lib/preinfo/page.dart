@@ -18,15 +18,18 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
+
+  String? thValue;
+  String? engValue;
 // String enDropdownValue = enTitles.first;
+  final TextEditingController thname = TextEditingController();
+  final TextEditingController thsurname = TextEditingController();
+  final TextEditingController enname = TextEditingController();
+  final TextEditingController ensurname = TextEditingController();
+  final TextEditingController email = TextEditingController();
+  final TextEditingController mobileno = TextEditingController();
 
 class _MyHomePageState extends State<MyHomePage> {
-  final TextEditingController _thname = TextEditingController();
-  final TextEditingController _thsurname = TextEditingController();
-  final TextEditingController _enname = TextEditingController();
-  final TextEditingController _ensurname = TextEditingController();
-  final TextEditingController _email = TextEditingController();
-  final TextEditingController _mobileno = TextEditingController();
 
   var _emailError = 'กรุณาใส่อีเมล';
   var _mobilenoError = 'กรุณาใส่หมายเลขโทรศัพท์มือถือ';
@@ -56,7 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void dispose() {
     super.dispose();
-    _email.dispose();
+    email.dispose();
   }
 
   Future<bool> _verifyEmail(String email) async {
@@ -237,25 +240,43 @@ class _MyHomePageState extends State<MyHomePage> {
     return _passedVeridateEmailMobile;
   }
 
+  // void _sendPreInfo2IDpage() {
+  //   log('thai name: $thValue${_thname.text} ${_thsurname.text}');
+  //   log('english name: $engValue${_enname.text} ${_ensurname.text}');
+  //   log('mobile: ${_mobileno.text}, email: ${_email.text}');
+  //   setState(() {
+  //     preinfodata!.thtitle = thValue!;
+  //     preinfodata!.thname = _thname.text;
+  //     preinfodata!.thsurname = _thsurname.text;
+  //     preinfodata!.engtitle = engValue!;
+  //     preinfodata!.engname = _enname.text;
+  //     preinfodata!.engsurname = _ensurname.text;
+  //     preinfodata!.email = _email.text;
+  //     preinfodata!.mobile = _mobileno.text;
+  //   });
+  // }
+
   void gotoNextPage() {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) {
-          // return  IDCardPage();
+          // _sendPreInfo2IDpage();
+          // log('_send preinfo data: $preinfodata');
           log('goto idcard page');
-          return IDCardPage(
-            preinfo: Preinfo(
-                thtitle: thValue!,
-                thname: _thname.text,
-                thsurname: _thsurname.text,
-                engtitle: engValue!,
-                engname: _enname.text,
-                engsurname: _ensurname.text,
-                email: _email.text,
-                mobile: _mobileno.text,
-                agreement: isPersonalAgreementChecked),
-          );
+          return const IDCardPage();
+          // return IDCardPage(
+          //   preinfo: Preinfo(
+          //       thtitle: thValue!,
+          //       thname: _thname.text,
+          //       thsurname: _thsurname.text,
+          //       engtitle: engValue!,
+          //       engname: _enname.text,
+          //       engsurname: _ensurname.text,
+          //       email: _email.text,
+          //       mobile: _mobileno.text,
+          //       agreement: isPersonalAgreementChecked),
+          // );
         },
       ),
     );
@@ -292,8 +313,6 @@ class _MyHomePageState extends State<MyHomePage> {
     return null;
   }
 
-  String? thValue;
-  String? engValue;
 
   Widget dropdownButtonBuilder({
     required String? value,
@@ -412,7 +431,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     Expanded(
                       flex: 7,
                       child: misc.importantTextField(
-                          textController: _thname,
+                          textController: thname,
                           errorTextCondition: _validateTHName,
                           errorTextMessage: 'กรุณาใส่ชื่อ (ภาษาไทย)',
                           subject: 'ชื่อ (ภาษาไทย)',
@@ -424,7 +443,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     Expanded(
                       flex: 12,
                       child: misc.importantTextField(
-                          textController: _thsurname,
+                          textController: thsurname,
                           errorTextCondition: _validateTHSurName,
                           errorTextMessage: 'กรุณาใส่นามสกุล (ภาษาไทย)',
                           subject: 'นามสกุล (ภาษาไทย)',
@@ -451,7 +470,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     Expanded(
                       flex: 7,
                       child: misc.importantTextField(
-                          textController: _enname,
+                          textController: enname,
                           errorTextCondition: _validateEnName,
                           errorTextMessage: 'กรุณาใส่ชื่อ (ภาษาอังกฤษ)',
                           subject: 'ชื่อ (ภาษาอังกฤษ)',
@@ -463,7 +482,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     Expanded(
                       flex: 12,
                       child: misc.importantTextField(
-                          textController: _ensurname,
+                          textController: ensurname,
                           errorTextCondition: _validateEnSurName,
                           errorTextMessage: 'กรุณาใส่นามสกุล (ภาษาอังกฤษ)',
                           subject: 'นามสกุล (ภาษาอังกฤษ)',
@@ -493,7 +512,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     Expanded(
                       flex: 3,
                       child: misc.importantTextField(
-                        textController: _email,
+                        textController: email,
                         errorTextCondition: _validateEmail,
                         errorTextMessage: _emailError,
                         subject: 'อีเมล',
@@ -520,7 +539,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     Expanded(
                       flex: 5,
                       child: misc.importantTextField(
-                          textController: _mobileno,
+                          textController: mobileno,
                           errorTextCondition: _validateMobileNo,
                           errorTextMessage: _mobilenoError,
                           subject: 'หมายเลขโทรศัพท์มือถือ',
@@ -541,7 +560,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 const Row(children: [
                   Expanded(flex: 1, child: CheckboxPersonalAggreement()),
                   Expanded(
-                    flex: 18,
+                    flex: 16,
                     child: Column(
                       children: [
                         Wrap(
@@ -598,33 +617,33 @@ class _MyHomePageState extends State<MyHomePage> {
                             onPressed: () async {
                               isPassedEmailMobileChecked =
                                   await _verifyEmailMobileNo(
-                                      _email.text, _mobileno.text);
-                              if (_thname.text.trim().isEmpty) {
+                                      email.text, mobileno.text);
+                              if (thname.text.trim().isEmpty) {
                                 _validateTHName = true;
                               }
-                              if (_thsurname.text.trim().isEmpty) {
+                              if (thsurname.text.trim().isEmpty) {
                                 _validateTHSurName = true;
                               }
-                              if (_enname.text.trim().isEmpty) {
+                              if (enname.text.trim().isEmpty) {
                                 _validateEnName = true;
                               }
-                              if (_ensurname.text.trim().isEmpty) {
+                              if (ensurname.text.trim().isEmpty) {
                                 _validateEnSurName = true;
                               }
                               // if (thValue!.isEmpty) {_validateTHTitle = true;}
                               // if (engValue!.isEmpty) {_validateEnTitle = true;}
 
-                              if (_thname.text.trim().isNotEmpty &&
-                                  _thsurname.text.trim().isNotEmpty &&
-                                  _enname.text.trim().isNotEmpty &&
-                                  _ensurname.text.trim().isNotEmpty &&
-                                  _email.text.trim().isNotEmpty &&
-                                  _mobileno.text.trim().isNotEmpty &&
+                              if (thname.text.trim().isNotEmpty &&
+                                  thsurname.text.trim().isNotEmpty &&
+                                  enname.text.trim().isNotEmpty &&
+                                  ensurname.text.trim().isNotEmpty &&
+                                  email.text.trim().isNotEmpty &&
+                                  mobileno.text.trim().isNotEmpty &&
                                   isPersonalAgreementChecked &&
                                   isPassedEmailMobileChecked) {
-                                log('''title: $thValue name: ${_thname.text} surname: ${_thsurname.text}
-                                title: $engValue name: ${_enname.text} surname: ${_ensurname.text}
-                                email: ${_email.text}, mobile: ${_mobileno.text}, agreement: $isPersonalAgreementChecked''');
+                                log('''title: $thValue name: ${thname.text} surname: ${thsurname.text}
+                                title: $engValue name: ${enname.text} surname: ${ensurname.text}
+                                email: ${email.text}, mobile: ${mobileno.text}, agreement: $isPersonalAgreementChecked''');
 
                                 gotoNextPage();
                               }

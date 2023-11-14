@@ -52,6 +52,15 @@ Future<bool> postIDCard(IDcardModel idCard) async {
         },
         body: jsonEncode(
           <String, String>{
+            'thTitle': idCard.thtitle,
+            'thName': idCard.thname,
+            'thSurname': idCard.thsurname,
+            'engTitle': idCard.engtitle,
+            'engName': idCard.engname,
+            'engSurname': idCard.engsurname,
+            'email': idCard.email,
+            'mobile': idCard.mobile,
+            'agreement': idCard.agreement.toString(),
             'birthDate': idCard.birthdate,
             'marriageStatus': idCard.status,
             'idCard': idCard.idcard,
