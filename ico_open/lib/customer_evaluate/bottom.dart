@@ -4,10 +4,12 @@ import 'package:ico_open/personal_info/page.dart';
 import 'package:ico_open/verify/page.dart';
 
 class CustomerEvaluateBottom extends StatelessWidget {
-  const CustomerEvaluateBottom({super.key});
+  final String id;
+  const CustomerEvaluateBottom({super.key, required this.id});
 
   @override
   Widget build(BuildContext context) {
+    // final userid = Widget..id;
     return SizedBox(
       width: MediaQuery.of(context).size.width * displayWidth,
       child: Column(
@@ -25,7 +27,7 @@ class CustomerEvaluateBottom extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) {
-                            return const PersonalInformation();
+                            return PersonalInformation(id: id,);
                           },
                         ),
                       );
@@ -63,7 +65,7 @@ class CustomerEvaluateBottom extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) {
-                            return const Verify();
+                            return Verify(id: id);
                           },
                         ),
                       );

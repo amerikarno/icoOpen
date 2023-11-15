@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'package:ico_open/config/config.dart';
+import 'package:ico_open/model/personal_info.dart';
 import 'package:ico_open/model/preinfo.dart' as model;
+import 'package:ico_open/personal_info/address.dart';
 import 'package:ico_open/personal_info/advicer.dart';
 import 'package:ico_open/personal_info/bank_account.dart';
 import 'package:ico_open/personal_info/bottom.dart';
@@ -14,7 +16,8 @@ import 'package:ico_open/personal_info/current_address.dart';
 // const double displayWidth = 0.6;
 
 class PersonalInformation extends StatefulWidget {
-  const PersonalInformation({super.key});
+  final String id;
+  const PersonalInformation({super.key, required this.id});
   // final model.Preinfo preinfo;
 
   @override
@@ -38,31 +41,37 @@ class _PersonalInformationState extends State<PersonalInformation> {
   //     _loadingProvince = false;
   //   });
   // }
+ AddressModel? registered;
 
   @override
   Widget build(BuildContext context) {
+
+  final userid = widget.id;
+  double height = 50;
   //   getCurrentProvince();
   //   if (_loadingProvince) return const CircularProgressIndicator();
-    return const Scaffold(
+    return  Scaffold(
       body: SingleChildScrollView(
         child: Center(
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              HighSpace(height: 50),
-              PersonalInformationHeader(),
-              HighSpace(height: 50),
-              PersonalInformationRegisteredAddress(),
-              HighSpace(height: 50),
-              PersonalInformationCurrentAddress(),
-              HighSpace(height: 50),
-              PersonalInformationOccupation(),
-              HighSpace(height: 50),
-              PersonalInformationBankAccount(),
-              HighSpace(height: 50),
-              PersonalInformationAdvisors(),
-              HighSpace(height: 50),
-              PersonalInformationBottom(),
-              HighSpace(height: 50),
+              HighSpace(height: height),
+              const PersonalInformationHeader(),
+              HighSpace(height: height),
+              AddressWidget(address: registered),
+                            const PersonalInformationRegisteredAddress(),
+              HighSpace(height: height),
+              const PersonalInformationCurrentAddress(),
+              HighSpace(height: height),
+              const PersonalInformationOccupation(),
+              HighSpace(height: height),
+              const PersonalInformationBankAccount(),
+              HighSpace(height: height),
+              // const PersonalInformationAdvisors(),
+              // HighSpace(height: height),
+              PersonalInformationBottom(id: userid),
+              HighSpace(height: height),
             ],
           ),
         ),

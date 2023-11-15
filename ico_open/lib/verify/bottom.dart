@@ -3,7 +3,8 @@ import 'package:ico_open/config/config.dart';
 import 'package:ico_open/customer_evaluate/page.dart';
 
 class VerifyBottom extends StatelessWidget {
-  const VerifyBottom({super.key});
+  final String id;
+  const VerifyBottom({super.key, required this.id});
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +25,7 @@ class VerifyBottom extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) {
-                            return const CustomerEvaluate();
+                            return CustomerEvaluate(id: id,);
                           },
                         ),
                       );

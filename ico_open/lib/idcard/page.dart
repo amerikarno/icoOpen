@@ -4,9 +4,11 @@ import 'package:flutter/services.dart';
 
 import 'package:ico_open/idcard/api.dart' as api;
 import 'package:ico_open/model/idcard.dart';
+import 'package:ico_open/model/personal_info.dart';
 import 'package:ico_open/model/preinfo.dart' as modelpreinfo;
 import 'package:ico_open/preinfo/page.dart' as preinfo;
 import 'package:ico_open/misc/misc.dart' as misc;
+import 'package:ico_open/personal_info/page.dart' as personalinfo;
 import 'package:ico_open/preinfo/personal_agreement.dart';
 
 class IDCardPage extends StatefulWidget {
@@ -37,7 +39,7 @@ enum SingingCharacter { single, married, disvorced }
 
 class _IDCardPageState extends State<IDCardPage> {
   SingingCharacter? _marriageStatus = SingingCharacter.single;
-
+  String userid = '';
   @override
   void initState() {
     super.initState();
@@ -45,9 +47,9 @@ class _IDCardPageState extends State<IDCardPage> {
   }
 
   void _postIDCardInfo(IDcardModel idCard) async {
-    final post = await api.postIDCard(idCard);
+    userid = await api.postIDCard(idCard);
     setState(() {
-      _varidatedPostInfo = post;
+      _varidatedPostInfo = (userid.isNotEmpty ? true : false);
     });
     log('varlidate post info: $_varidatedPostInfo');
   }
@@ -402,7 +404,8 @@ class _IDCardPageState extends State<IDCardPage> {
                   ),
                   SizedBox(
                     width: 300,
-                    child: misc.subjectRichText(subject: 'หมายเลขบัตรประจำตัวประชาชน'),
+                    child: misc.subjectRichText(
+                        subject: 'หมายเลขบัตรประจำตัวประชาชน'),
                   ),
                   const Expanded(
                     flex: 5,
@@ -634,14 +637,14 @@ class _IDCardPageState extends State<IDCardPage> {
                         log('english: ${postIDCard.engtitle}${postIDCard.engname} ${postIDCard.engsurname}');
                         log('etc: ${postIDCard.email}${postIDCard.mobile} ${postIDCard.agreement}');
                         _postIDCardInfo(postIDCard);
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //     builder: (context) {
-                        //       return const PersonalInformation();
-                        //     },
-                        //   ),
-                        // );
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return  personalinfo.PersonalInformation(id: userid);
+                            },
+                          ),
+                        );
                       },
                       child: const Icon(
                         Icons.arrow_circle_right,

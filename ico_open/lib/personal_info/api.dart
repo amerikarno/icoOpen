@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:http/http.dart' as http;
+import 'package:ico_open/model/personal_info.dart';
 
 // dynamic data;
 
@@ -105,6 +106,51 @@ String? zipcode;
     zipcode = data.toString();
     log('zipcode: $zipcode');
     return zipcode;
+  }
+
+  return '';
+}
+
+
+Future<String> postPersonalInfo(PersonalInformationModel personalInfo) async {
+  final url = Uri(
+    scheme: "http",
+    host: "localhost",
+    port: 1323,
+    path: "api/v1/idcard",
+  );
+  log('start post data...');
+  log('data: ${personalInfo.registeredAddress}\n${personalInfo.currentAddress}\n${personalInfo.officeAddress}\n${personalInfo.bankAccount}\n');
+
+  final response = await http
+      .post(
+        url,
+        headers: <String, String>{
+          "Content-Type": "application/json",
+        },
+        body: jsonEncode(
+          <String, dynamic>{
+            // 'thTitle': personalInfo.thtitle,
+            // 'thName': personalInfo.thname,
+            // 'thSurname': personalInfo.thsurname,
+            // 'engTitle': personalInfo.engtitle,
+            // 'engName': personalInfo.engname,
+            // 'engSurname': personalInfo.engsurname,
+            // 'email': personalInfo.email,
+            // 'mobile': personalInfo.mobile,
+            // 'agreement': personalInfo.agreement,
+            // 'birthDate': personalInfo.birthdate,
+            // 'marriageStatus': personalInfo.status,
+            // 'idCard': personalInfo.idcard,
+            // 'laserCode': personalInfo.laserCode,
+          },
+        ),
+      );
+      // .timeout(const Duration(microseconds: 500));
+  log('end of post data processing');
+  if (response.statusCode == 200) {
+    log('id card: ${response.body}');
+    return response.body;
   }
 
   return '';

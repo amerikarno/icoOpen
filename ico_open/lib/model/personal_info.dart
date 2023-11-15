@@ -1,26 +1,31 @@
 
-class PersonalInformation {
-  PersonalInformation({
+import 'package:flutter/material.dart';
+
+class PersonalInformationModel {
+  PersonalInformationModel({
     required this.registeredAddress,
+    required this.occupation,
   });
 
-  final Address registeredAddress;
-  Address? currentAddress;
-  Address? officeAddress;
-  BankAccount? bankAccount;
+  final AddressModel registeredAddress;
+  final OccupationModel occupation;
+  AddressModel? currentAddress;
+  AddressModel? officeAddress;
+  BankAccountModel? bankAccount;
 }
 
-class Address {
-  Address({
-    required this.houseNumber,
+class AddressModel {
+  AddressModel({
+    required this.homenumber,
     required this.subDistrictName,
     required this.districtName,
     required this.provinceName,
     required this.zipcode,
     required this.countryName,
+    required this.typeOfAddress,
   });
 
-  final String houseNumber;
+  String homenumber;
   String? villageNumber;
   String? villageName;
   String? subStreetName;
@@ -30,14 +35,33 @@ class Address {
   final String provinceName;
   final int zipcode;
   final String countryName;
+  final String typeOfAddress;
 }
 
-class BankAccount {
-  BankAccount({
+class BankAccountModel {
+  BankAccountModel({
     required this.bankName,
     required this.bankAccountID,
   });
   final String bankName;
   String? bankBranchName;
   final String bankAccountID;
+}
+
+class OccupationModel {
+  const OccupationModel ({
+    required this.sourceOfIncome,
+    required this.currentOccupation,
+    required this.officeName,
+    required this.positionName,
+    required this.typeOfBusiness,
+    required this.salaryRange,
+  });
+
+  final String sourceOfIncome;
+  final String currentOccupation;
+  final String officeName;
+  final String typeOfBusiness;
+  final String positionName;
+  final String salaryRange;
 }

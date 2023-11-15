@@ -34,7 +34,7 @@ Future<bool> getVerifiedIDCard(String idcard) async {
   );
 }
 
-Future<bool> postIDCard(IDcardModel idCard) async {
+Future<String> postIDCard(IDcardModel idCard) async {
   final url = Uri(
     scheme: "http",
     host: "localhost",
@@ -51,7 +51,7 @@ Future<bool> postIDCard(IDcardModel idCard) async {
           "Content-Type": "application/json",
         },
         body: jsonEncode(
-          <String, String>{
+          <String, dynamic>{
             'thTitle': idCard.thtitle,
             'thName': idCard.thname,
             'thSurname': idCard.thsurname,
@@ -60,7 +60,7 @@ Future<bool> postIDCard(IDcardModel idCard) async {
             'engSurname': idCard.engsurname,
             'email': idCard.email,
             'mobile': idCard.mobile,
-            'agreement': idCard.agreement.toString(),
+            'agreement': idCard.agreement,
             'birthDate': idCard.birthdate,
             'marriageStatus': idCard.status,
             'idCard': idCard.idcard,
@@ -72,10 +72,10 @@ Future<bool> postIDCard(IDcardModel idCard) async {
   log('end of post data processing');
   if (response.statusCode == 200) {
     log('id card: ${response.body}');
-    return true;
+    return response.body;
   }
 
-  return false;
+  return '';
 }
 
 // Future<List<String>> getTambon(String? amphure) async {

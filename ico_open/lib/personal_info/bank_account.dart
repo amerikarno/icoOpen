@@ -145,12 +145,15 @@ class BankTitleDropdownButton extends StatefulWidget {
 }
 
 const List<String> bankTitleLists = <String>[
-  'รายรับประจำ',
-  'รายรับพิเศษ',
-  'ค่าเช่า / ขายของ',
-  'เงินโบนัส / เงินรางวัล',
-  'กำไรจากการลงทุน',
-  'เงินออม',
+  'กรุงเทพ',
+  'กรุงไทย',
+  'กรุงศรีอยุธยา',
+  'กสิกรไทย',
+  'ซีไอเอ็มบีไทย',
+  'ทหารไทยธนชาต',
+  'ไทยพาณิชย์',
+  'ยูโอบี',
+  'แลนด์ แอนด์ เฮาส์',
 ];
 
 class _BankTitleDropdownButtonState extends State<BankTitleDropdownButton> {
@@ -168,9 +171,9 @@ class _BankTitleDropdownButtonState extends State<BankTitleDropdownButton> {
           ),
         ),
       ),
-      iconSize: 0,
+      // iconSize: 0,
       alignment: Alignment.centerLeft,
-      elevation: 16,
+      // elevation: 16,
       style: const TextStyle(color: Colors.deepPurple),
       onChanged: (String? value) {
         setState(() {
@@ -219,9 +222,9 @@ class _BankBranchDropdownButtonState extends State<BankBranchDropdownButton> {
           ),
         ),
       ),
-      iconSize: 0,
+      // iconSize: 0,
       alignment: Alignment.centerLeft,
-      elevation: 16,
+      // elevation: 16,
       style: const TextStyle(color: Colors.deepPurple),
       onChanged: (String? value) {
         setState(() {

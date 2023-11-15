@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:ico_open/config/config.dart';
 import 'package:ico_open/customer_evaluate/page.dart';
 import 'package:ico_open/idcard/page.dart';
+import 'package:ico_open/personal_info/registered_address.dart' as registered;
 
 class PersonalInformationBottom extends StatelessWidget {
-  const PersonalInformationBottom({super.key});
+  final String id;
+  const PersonalInformationBottom({super.key, required this.id});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +27,7 @@ class PersonalInformationBottom extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) {
-                            return  IDCardPage();
+                            return const IDCardPage();
                           },
                         ),
                       );
@@ -41,12 +43,18 @@ class PersonalInformationBottom extends StatelessWidget {
               const SizedBox(
                 width: 5,
               ),
-              const Text('ย้อนกลับ', style: TextStyle(fontSize: 15),),
+              const Text(
+                'ย้อนกลับ',
+                style: TextStyle(fontSize: 15),
+              ),
               const Expanded(
                 flex: 30,
                 child: SizedBox(),
               ),
-              const Text('ถัดไป', style: TextStyle(fontSize: 15),),
+              const Text(
+                'ถัดไป',
+                style: TextStyle(fontSize: 15),
+              ),
               const SizedBox(
                 width: 5,
               ),
@@ -59,14 +67,16 @@ class PersonalInformationBottom extends StatelessWidget {
                     backgroundColor: Colors.orange,
                     onPressed: () {
                       // print(_lasercodestr);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return const CustomerEvaluate();
-                          },
-                        ),
-                      );
+                      if (registered.homeNumberController.text.isNotEmpty) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return CustomerEvaluate(id: id);
+                            },
+                          ),
+                        );
+                      }
                     },
                     child: const Icon(
                       Icons.arrow_circle_right,

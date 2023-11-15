@@ -12,7 +12,8 @@ import 'package:ico_open/customer_evaluate/bottom.dart';
 // const double displayWidth = 0.6;
 
 class CustomerEvaluate extends StatefulWidget {
-  const CustomerEvaluate({super.key});
+  final String id;
+  const CustomerEvaluate({super.key, required this.id});
 
   @override
   State<StatefulWidget> createState() => _CustomerEvaluateState();
@@ -25,26 +26,28 @@ class _CustomerEvaluateState extends State<CustomerEvaluate> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    final userid = widget.id;
+    double height = 50;
+    return Scaffold(
       body: SingleChildScrollView(
         child: Center(
           child: Column(
             children: [
-              HighSpace(height: 50),
-              CustomerEvaluateHeader(),
-              HighSpace(height: 50),
-              CustomerEvaluateScores(),
-              HighSpace(height: 50),
-              CustomerEvaluateResults(),
-              HighSpace(height: 50),
-              CustomerFATCA(),
-              HighSpace(height: 50),
-              CustomerAgreement(),
-              HighSpace(height: 50),
+              HighSpace(height: height),
+              const CustomerEvaluateHeader(),
+              HighSpace(height: height),
+              const CustomerEvaluateScores(),
+              HighSpace(height: height),
+              const CustomerEvaluateResults(),
+              HighSpace(height: height),
+              const CustomerFATCA(),
+              HighSpace(height: height),
+              const CustomerAgreement(),
+              HighSpace(height: height),
               // CustomerEvaluateAdvisors(),
               // HighSpace(height: 50),
-              CustomerEvaluateBottom(),
-              HighSpace(height: 50),
+              CustomerEvaluateBottom(id:userid),
+              HighSpace(height: height),
             ],
           ),
         ),

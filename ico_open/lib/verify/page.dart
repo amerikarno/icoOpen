@@ -9,7 +9,8 @@ import 'package:ico_open/verify/email_mobile.dart';
 // const double displayWidth = 0.6;
 
 class Verify extends StatefulWidget {
-  const Verify({super.key});
+  final String id;
+  const Verify({super.key, required this.id});
 
   @override
   State<StatefulWidget> createState() => _VerifyState();
@@ -22,35 +23,37 @@ class _VerifyState extends State<Verify> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    final _userid = widget.id;
+    double _height = 50;
+    return Scaffold(
       body: SingleChildScrollView(
         child: Center(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              HighSpace(height: 50),
-              VerifyHeader(),
-              HighSpace(height: 20),
-              Text(
+              HighSpace(height: _height),
+              const VerifyHeader(),
+              const HighSpace(height: 20),
+              const Text(
                 'กรุณายืนยันหมายเลข "โทรศัพท์" และ "อีเมล์" ของท่าน',
                 style: TextStyle(
                   fontSize: 20,
                   color: Colors.blueAccent,
                 ),
               ),
-              HighSpace(height: 20),
-              VerifyEmailMobile(),
-              HighSpace(height: 50),
+              const HighSpace(height: 20),
+              const VerifyEmailMobile(),
+              HighSpace(height: _height),
               // VerifyResults(),
-              // HighSpace(height: 50),
+              // HighSpace(height: _height),
               // CustomerFATCA(),
-              // HighSpace(height: 50),
+              // HighSpace(height: _height),
               // CustomerAgreement(),
-              // HighSpace(height: 50),
+              // HighSpace(height: _height),
               // VerifyAdvisors(),
-              // HighSpace(height: 50),
-              VerifyBottom(),
-              HighSpace(height: 50),
+              // HighSpace(height: _height),
+              VerifyBottom(id: _userid),
+              HighSpace(height: _height),
             ],
           ),
         ),

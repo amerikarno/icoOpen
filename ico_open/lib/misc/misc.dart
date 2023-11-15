@@ -1,31 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-Widget importantTextField({
+Widget  importantTextField({
   required TextEditingController textController,
   required bool errorTextCondition,
   required String errorTextMessage,
   required String subject,
   required Pattern filterPattern,
   Function(String)? onsubmittedFunction,
+  Function(String)? onchangedFunction,
+  Function()? onTabFunction,
+  bool? isimportant,
 }) {
+  isimportant = isimportant ?? true;
   return TextField(
       controller: textController,
       decoration: InputDecoration(
-        errorText: errorTextCondition ? errorTextMessage : null,
-        label: RichText(
-          text: TextSpan(
-            text: subject,
-            children: const [
-              TextSpan(text: '*', style: TextStyle(color: Colors.red)),
-            ],
-          ),
-        ),
-      ),
+          errorText: errorTextCondition ? errorTextMessage : null,
+          label: isimportant
+              ? RichText(
+                  text: TextSpan(
+                    text: subject,
+                    children: const [
+                      TextSpan(text: '*', style: TextStyle(color: Colors.red)),
+                    ],
+                  ),
+                )
+              : Text(subject)),
       inputFormatters: [
         FilteringTextInputFormatter.allow(filterPattern),
       ],
-      onSubmitted: onsubmittedFunction);
+      onSubmitted: onsubmittedFunction,
+      onTap: onTabFunction,
+      onChanged: onchangedFunction);
 }
 
 Widget subjectText({
@@ -67,4 +74,8 @@ Widget subjectRichText({
       ],
     ),
   );
+}
+
+String thErrorMessage(String message) {
+  return 'กรุณากรอก$message';
 }
