@@ -11,11 +11,11 @@ class PersonalInformationBankAccount extends StatefulWidget {
       _PersonalInformationBankAccountState();
 }
 
-enum BankAccounts { registered, unregistered }
+enum isAddedBankAccounts { yes, no }
 
 class _PersonalInformationBankAccountState
     extends State<PersonalInformationBankAccount> {
-  BankAccounts? _bankAccounts = BankAccounts.registered;
+  isAddedBankAccounts? _bankAccounts = isAddedBankAccounts.no;
   final TextEditingController _bankAccountNo = TextEditingController();
 
   @override
@@ -35,28 +35,83 @@ class _PersonalInformationBankAccountState
       ),
       child: Column(
         children: [
-          Row(
+         const Row(
             children: [
-              const Icon(Icons.location_on),
-              const Text(
+               Icon(Icons.location_on),
+               Text(
                 'บัญชีธนาคารของท่าน (เพื่อความสะดวกในการถอนเงินและรับเงินปันผล)',
                 style: TextStyle(
                   fontSize: 25,
                   fontWeight: FontWeight.bold,
                 ),
+              ), ],
+          ),
+            const Row(
+                      children: [
+                        Text('กรุณาระบุชื่อธนาคารก่อนกรอกชื่อสาขา'),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        const Expanded(
+                          flex: 1,
+                          child: BankTitleDropdownButton(),
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        const Expanded(
+                          flex: 1,
+                          child: BankBranchDropdownButton(),
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Expanded(
+                          child: TextField(
+                            controller: _bankAccountNo,
+                            decoration: const InputDecoration(
+                              label: Text(
+                                'เลขที่บัญชี',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+                              ),
+                            ),
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(
+                                RegExp(
+                                  r'[0-9]',
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  const SizedBox(height: 50,),
+          Row(
+            children: [
+              const Icon(Icons.location_on),
+              const Text(
+                'เพิ่มบัญชีธนาคารที่ 2 (เพื่อใช้ฝากเงิน)',
+                style: TextStyle(
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              // const Expanded(
-              //   flex: 1,
-              //   child: SizedBox(),
-              // ),
+              const Expanded(
+                flex: 3,
+                child: SizedBox(),
+              ),
               Expanded(
                 flex: 1,
                 child: ListTile(
-                  title: const Text('ทำตอนนี้'),
-                  leading: Radio<BankAccounts>(
-                    value: BankAccounts.registered,
+                  title: const Text('ใช้'),
+                  leading: Radio<isAddedBankAccounts>(
+                    value: isAddedBankAccounts.yes,
                     groupValue: _bankAccounts,
-                    onChanged: (BankAccounts? value) {
+                    onChanged: (isAddedBankAccounts? value) {
                       setState(() {
                         _bankAccounts = value;
                       });
@@ -67,11 +122,11 @@ class _PersonalInformationBankAccountState
               Expanded(
                 flex: 1,
                 child: ListTile(
-                  title: const Text('ทำภายหลัง'),
-                  leading: Radio<BankAccounts>(
-                    value: BankAccounts.unregistered,
+                  title: const Text('ไม่ใช้'),
+                  leading: Radio<isAddedBankAccounts>(
+                    value: isAddedBankAccounts.no,
                     groupValue: _bankAccounts,
-                    onChanged: (BankAccounts? value) {
+                    onChanged: (isAddedBankAccounts? value) {
                       setState(() {
                         _bankAccounts = value;
                       });
@@ -81,7 +136,8 @@ class _PersonalInformationBankAccountState
               ),
             ],
           ),
-          (_bankAccounts == BankAccounts.registered)
+          
+          (_bankAccounts == isAddedBankAccounts.yes)
               ? Column(
                   children: [
                     const Row(

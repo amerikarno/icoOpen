@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 class PersonalInformationModel {
@@ -17,9 +16,7 @@ class PersonalInformationModel {
 class AddressModel {
   AddressModel({
     required this.homenumber,
-    required this.subDistrictName,
-    required this.districtName,
-    required this.provinceName,
+    // required this.subDistrictName,
     required this.zipcode,
     required this.countryName,
     required this.typeOfAddress,
@@ -30,12 +27,12 @@ class AddressModel {
   String? villageName;
   String? subStreetName;
   String? streetName;
-  final String subDistrictName;
-  final String districtName;
-  final String provinceName;
-  final int zipcode;
-  final String countryName;
-  final String typeOfAddress;
+  String? subDistrictName;
+  String? districtName;
+  String? provinceName;
+  int zipcode;
+  String countryName;
+  String typeOfAddress;
 }
 
 class BankAccountModel {
@@ -49,7 +46,7 @@ class BankAccountModel {
 }
 
 class OccupationModel {
-  const OccupationModel ({
+  const OccupationModel({
     required this.sourceOfIncome,
     required this.currentOccupation,
     required this.officeName,

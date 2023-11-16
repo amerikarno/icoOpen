@@ -8,6 +8,7 @@ import 'package:ico_open/model/model.dart' as model;
 import 'package:ico_open/misc/misc.dart' as misc;
 import 'package:ico_open/personal_info/page.dart';
 import 'package:ico_open/personal_info/registered_address.dart' as registered;
+import 'package:ico_open/personal_info/widgets.dart';
 
 enum CurrentAddress { registered, others }
 
@@ -130,6 +131,7 @@ class _PersonalInformationCurrentAddressState
 
   @override
   Widget build(BuildContext context) {
+    final current = AddressWidget(typeOfAddress: 'current');
     final homeNumberTextField = misc.importantTextField(
         textController: homeNumberController,
         errorTextCondition: _homeNumberErrorCondition,
@@ -284,33 +286,7 @@ class _PersonalInformationCurrentAddressState
           //             color: Colors.red)
           //       ]),
           (_currentAddress == CurrentAddress.others)
-              ? Column(children: [
-                  const SizedBox(height: 20),
-                  Row(children: [
-                    Expanded(flex: 3, child: homeNumberTextField),
-                    const SizedBox(width: 10),
-                    Expanded(flex: 1, child: villageNumberTextField),
-                    const SizedBox(width: 10),
-                    Expanded(flex: 3, child: villageNameTextField),
-                    const SizedBox(width: 10),
-                    Expanded(flex: 3, child: subStreetNameTextField),
-                    const SizedBox(width: 10),
-                    Expanded(flex: 3, child: streetNameTextField),
-                  ]),
-                  const SizedBox(height: 20),
-                  Row(children: [
-                    Expanded(flex: 3, child: tambonDropdown),
-                    const SizedBox(width: 10),
-                    Expanded(flex: 3, child: amphureDropdown),
-                    const SizedBox(width: 10),
-                    Expanded(flex: 3, child: provinceDropdown),
-                    const SizedBox(width: 10),
-                    Expanded(flex: 3, child: zipcodeTextField),
-                    const SizedBox(width: 10),
-                    Expanded(flex: 3, child: countryTextField),
-                  ]),
-                ])
-              : const Column()
+              ? current: const Column()
         ],
       ),
     );

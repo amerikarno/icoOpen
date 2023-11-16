@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:ico_open/config/config.dart';
-import 'package:ico_open/model/personal_info.dart';
-import 'package:ico_open/model/preinfo.dart' as model;
-import 'package:ico_open/personal_info/address.dart';
-import 'package:ico_open/personal_info/advicer.dart';
+import 'package:ico_open/model/personal_info.dart' as model;
 import 'package:ico_open/personal_info/bank_account.dart';
 import 'package:ico_open/personal_info/bottom.dart';
 import 'package:ico_open/personal_info/occupation.dart';
@@ -23,34 +20,36 @@ class PersonalInformation extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => _PersonalInformationState();
 }
- List<String> provinces = [];
-class _PersonalInformationState extends State<PersonalInformation> {
-  // CurrentAddress? _currentAddress = CurrentAddress.registered;
-  // final TextEditingController _homeNumber = TextEditingController();
-  // final TextEditingController _thsurname = TextEditingController();
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   getZipCode();
-  // }
-  // bool _loadingProvince = true;
-  // void getCurrentProvince() async {
-  //   provinces = await getProvince();
-  //   setState(() {
-  //     _loadingProvince = false;
-  //   });
-  // }
- AddressModel? registered;
+List<String> provinces = [];
+// variables for personal addresses information.
+// model.AddressModel? registeredAddress;
+var registeredAddress = model.AddressModel(
+  typeOfAddress: 'registered_address',
+  homenumber: '',
+  zipcode: 0,
+  countryName: '',
+);
+var currentAddress = model.AddressModel(
+  typeOfAddress: 'current_address',
+  homenumber: '',
+  zipcode: 0,
+  countryName: '',
+);
+var othersAddress = model.AddressModel(
+  typeOfAddress: 'others_address',
+  homenumber: '',
+  zipcode: 0,
+  countryName: '',
+);
+
+class _PersonalInformationState extends State<PersonalInformation> {
+  double height = 50;
 
   @override
   Widget build(BuildContext context) {
-
-  final userid = widget.id;
-  double height = 50;
-  //   getCurrentProvince();
-  //   if (_loadingProvince) return const CircularProgressIndicator();
-    return  Scaffold(
+    final userid = widget.id;
+    return Scaffold(
       body: SingleChildScrollView(
         child: Center(
           child: Column(
@@ -59,8 +58,7 @@ class _PersonalInformationState extends State<PersonalInformation> {
               HighSpace(height: height),
               const PersonalInformationHeader(),
               HighSpace(height: height),
-              AddressWidget(address: registered),
-                            const PersonalInformationRegisteredAddress(),
+              const PersonalInformationRegisteredAddress(),
               HighSpace(height: height),
               const PersonalInformationCurrentAddress(),
               HighSpace(height: height),
@@ -97,8 +95,9 @@ class PersonalInformationHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
     return Container(
-      width: MediaQuery.of(context).size.width * displayWidth,
+      width: width * displayWidth,
       padding: const EdgeInsets.all(50),
       decoration: BoxDecoration(
           color: Colors.lightGreen.withOpacity(

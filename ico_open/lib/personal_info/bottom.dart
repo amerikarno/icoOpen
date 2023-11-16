@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:ico_open/config/config.dart';
-import 'package:ico_open/customer_evaluate/page.dart';
+import 'package:ico_open/personal_info/page.dart'as page;
 import 'package:ico_open/idcard/page.dart';
-import 'package:ico_open/personal_info/registered_address.dart' as registered;
+// import 'package:ico_open/personal_info/registered_address.dart' as registered;
 
 class PersonalInformationBottom extends StatelessWidget {
   final String id;
   const PersonalInformationBottom({super.key, required this.id});
-
+  // final register = registered.PersonalInformationRegisteredAddress;
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -66,17 +66,20 @@ class PersonalInformationBottom extends StatelessWidget {
                     shape: const CircleBorder(),
                     backgroundColor: Colors.orange,
                     onPressed: () {
+                      print('registered home number: ${page.registeredAddress.homenumber} ${page.registeredAddress.villageName} ${page.registeredAddress.subStreetName} ${page.registeredAddress.streetName}, ${page.registeredAddress.typeOfAddress}');
+                      print('current home number: ${page.currentAddress.homenumber}, ${page.currentAddress.typeOfAddress}');
+                      print('others home number: ${page.othersAddress.homenumber}, ${page.othersAddress.typeOfAddress}');
                       // print(_lasercodestr);
-                      if (registered.homeNumberController.text.isNotEmpty) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return CustomerEvaluate(id: id);
-                            },
-                          ),
-                        );
-                      }
+                      // if (registered.homeNumberController.text.isNotEmpty) {
+                      //   Navigator.push(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //       builder: (context) {
+                      //         return CustomerEvaluate(id: id);
+                      //       },
+                      //     ),
+                      //   );
+                      // }
                     },
                     child: const Icon(
                       Icons.arrow_circle_right,
