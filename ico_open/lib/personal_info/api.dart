@@ -2,13 +2,14 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:http/http.dart' as http;
+import 'package:ico_open/model/model.dart';
 import 'package:ico_open/model/personal_info.dart';
+import 'package:ico_open/personal_info/page.dart';
 
 // dynamic data;
 
-
 Future<List<String>> getProvince() async {
-List<String> provinces = [];
+  List<String> provinces = [];
 
   final url = Uri(
     scheme: "http",
@@ -33,7 +34,8 @@ List<String> provinces = [];
   // return provinces;
   return Future.delayed(
     const Duration(microseconds: 500),
-    () => provinces,);
+    () => provinces,
+  );
 }
 
 Future<List<String>> getAmphure(String? province) async {
@@ -63,7 +65,7 @@ Future<List<String>> getAmphure(String? province) async {
 }
 
 Future<List<String>> getTambon(String? amphure) async {
-List<String> tambons = [];
+  List<String> tambons = [];
 
   final url = Uri(
     scheme: "http",
@@ -89,7 +91,7 @@ List<String> tambons = [];
 }
 
 Future<String> getZipCode(String? zipname) async {
-String? zipcode;
+  String? zipcode;
 
   final url = Uri(
     scheme: "http",
@@ -111,8 +113,12 @@ String? zipcode;
   return '';
 }
 
-
 Future<String> postPersonalInfo(PersonalInformationModel personalInfo) async {
+  List<AddressModel>? addresses;
+  addresses!.add(registeredAddress);
+  addresses.add(currentAddress!);
+  addresses.add(othersAddress!);
+
   final url = Uri(
     scheme: "http",
     host: "localhost",
@@ -122,31 +128,30 @@ Future<String> postPersonalInfo(PersonalInformationModel personalInfo) async {
   log('start post data...');
   log('data: ${personalInfo.registeredAddress}\n${personalInfo.currentAddress}\n${personalInfo.officeAddress}\n${personalInfo.bankAccount}\n');
 
-  final response = await http
-      .post(
-        url,
-        headers: <String, String>{
-          "Content-Type": "application/json",
-        },
-        body: jsonEncode(
-          <String, dynamic>{
-            // 'thTitle': personalInfo.thtitle,
-            // 'thName': personalInfo.thname,
-            // 'thSurname': personalInfo.thsurname,
-            // 'engTitle': personalInfo.engtitle,
-            // 'engName': personalInfo.engname,
-            // 'engSurname': personalInfo.engsurname,
-            // 'email': personalInfo.email,
-            // 'mobile': personalInfo.mobile,
-            // 'agreement': personalInfo.agreement,
-            // 'birthDate': personalInfo.birthdate,
-            // 'marriageStatus': personalInfo.status,
-            // 'idCard': personalInfo.idcard,
-            // 'laserCode': personalInfo.laserCode,
-          },
-        ),
-      );
-      // .timeout(const Duration(microseconds: 500));
+  final response = await http.post(
+    url,
+    headers: <String, String>{
+      "Content-Type": "application/json",
+    },
+    body: jsonEncode(
+      <String, dynamic>{
+        // 'thTitle': personalInfo.thtitle,
+        // 'thName': personalInfo.thname,
+        // 'thSurname': personalInfo.thsurname,
+        // 'engTitle': personalInfo.engtitle,
+        // 'engName': personalInfo.engname,
+        // 'engSurname': personalInfo.engsurname,
+        // 'email': personalInfo.email,
+        // 'mobile': personalInfo.mobile,
+        // 'agreement': personalInfo.agreement,
+        // 'birthDate': personalInfo.birthdate,
+        // 'marriageStatus': personalInfo.status,
+        // 'idCard': personalInfo.idcard,
+        // 'laserCode': personalInfo.laserCode,
+      },
+    ),
+  );
+  // .timeout(const Duration(microseconds: 500));
   log('end of post data processing');
   if (response.statusCode == 200) {
     log('id card: ${response.body}');

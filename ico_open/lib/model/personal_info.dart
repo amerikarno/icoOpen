@@ -20,6 +20,7 @@ class AddressModel {
     required this.zipcode,
     required this.countryName,
     required this.typeOfAddress,
+    required this.condition,
   });
 
   String homenumber;
@@ -33,20 +34,23 @@ class AddressModel {
   int zipcode;
   String countryName;
   String typeOfAddress;
+  Condition condition;
 }
 
 class BankAccountModel {
   BankAccountModel({
     required this.bankName,
     required this.bankAccountID,
+    required this.serviceType,
   });
-  final String bankName;
+  String bankName;
   String? bankBranchName;
-  final String bankAccountID;
+  String bankAccountID;
+  final String serviceType;
 }
 
 class OccupationModel {
-  const OccupationModel({
+   OccupationModel({
     required this.sourceOfIncome,
     required this.currentOccupation,
     required this.officeName,
@@ -55,10 +59,15 @@ class OccupationModel {
     required this.salaryRange,
   });
 
-  final String sourceOfIncome;
-  final String currentOccupation;
-  final String officeName;
-  final String typeOfBusiness;
-  final String positionName;
-  final String salaryRange;
+   String sourceOfIncome;
+   String currentOccupation;
+   String officeName;
+   String typeOfBusiness;
+   String positionName;
+   String salaryRange;
+}
+
+class Condition {
+  Condition({required this.homenumber});
+  bool homenumber;
 }

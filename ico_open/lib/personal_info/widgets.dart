@@ -10,12 +10,19 @@ import 'package:ico_open/personal_info/api.dart' as api;
 
 class AddressWidget extends StatefulWidget {
   String typeOfAddress;
-  AddressWidget({super.key, required this.typeOfAddress});
+  bool condition;
+  AddressWidget({super.key, required this.typeOfAddress, required this.condition});
 
   @override
   State<AddressWidget> createState() => _AddressWidgetState();
 }
 
+bool tambonErrorCondition = false;
+  bool amphureErrorCondition = false;
+  bool provinceErrorCondition = false;
+  bool zipcodeErrorCondition = false;
+  bool countryErrorCondition = false;
+  bool homeNumberErrorCondition = false;
 class _AddressWidgetState extends State<AddressWidget> {
   @override
   void initState() {
@@ -35,13 +42,16 @@ class _AddressWidgetState extends State<AddressWidget> {
   final officeNameController = TextEditingController();
   final positionNameController = TextEditingController();
 // condition variables
-  bool _zipcodeErrorCondition = false;
-  bool _countryErrorCondition = false;
-  bool _homeNumberErrorCondition = false;
-  bool _villageNumberErrorCondition = false;
-  bool _villageNameErrorCondition = false;
-  bool _subStreetNameErrorCondition = false;
-  bool _streetNameErrorCondition = false;
+  // bool tambonErrorCondition = false;
+  // bool amphureErrorCondition = false;
+  // bool provinceErrorCondition = false;
+  // bool zipcodeErrorCondition = false;
+  // bool countryErrorCondition = false;
+  // bool homeNumberErrorCondition = false;
+  final bool _villageNumberErrorCondition = false;
+  final bool _villageNameErrorCondition = false;
+  final bool _subStreetNameErrorCondition = false;
+  final bool _streetNameErrorCondition = false;
 
   bool _loadingAmphure = true;
   bool _loadingTambon = true;
@@ -61,13 +71,13 @@ class _AddressWidgetState extends State<AddressWidget> {
   AddressModel? address;
   void _loadAddress() {
     switch (widget.typeOfAddress) {
-      case 'registered':
+      case 'r':
         address = registeredAddress;
         break;
-      case 'current':
+      case 'c':
         address = currentAddress;
         break;
-      case 'others':
+      case 'o':
         address = othersAddress;
         break;
     }
@@ -78,10 +88,13 @@ class _AddressWidgetState extends State<AddressWidget> {
       required String label,
       required List<String> items,
       required Function(String?) onChanged,
+      required bool condition,
+      required String errorText,
       Function()? onTabFunction}) {
     return DropdownButtonFormField(
       value: value,
       decoration: InputDecoration(
+        errorText: condition ? errorText : null,
         label: RichText(
           text: TextSpan(text: label, children: const [
             TextSpan(
@@ -148,7 +161,7 @@ class _AddressWidgetState extends State<AddressWidget> {
     // predefined address methods
     final homeNumberTextField = misc.importantTextField(
         textController: homeNumberController,
-        errorTextCondition: _homeNumberErrorCondition,
+        errorTextCondition: widget.condition,
         errorTextMessage: misc.thErrorMessage(model.homeNumberSubject),
         subject: model.homeNumberSubject,
         filterPattern: RegExp(r'[0-9/-]'),
@@ -157,11 +170,11 @@ class _AddressWidgetState extends State<AddressWidget> {
             print('not empty: $value');
             setState(() {
               address!.homenumber = value;
-              _homeNumberErrorCondition = false;
+              address!.condition!.homenumber = false;
             });
           } else {
             setState(() {
-              _homeNumberErrorCondition = true;
+              address!.condition!.homenumber = true;
             });
           }
         });
@@ -183,11 +196,11 @@ class _AddressWidgetState extends State<AddressWidget> {
         onTabFunction: () {
           if (homeNumberController.text.isNotEmpty) {
             setState(() {
-              _homeNumberErrorCondition = false;
+              address!.condition!.homenumber = false;
             });
           } else {
             setState(() {
-              _homeNumberErrorCondition = true;
+              address!.condition!.homenumber = true;
             });
           }
         },
@@ -241,6 +254,8 @@ class _AddressWidgetState extends State<AddressWidget> {
       value: thTambonValue,
       label: thTambonLable,
       items: tambonItems,
+      condition: tambonErrorCondition,
+      errorText: misc.thErrorMessage(thTambonLable),
       onChanged: (value) {
         setState(() {
           address!.subDistrictName = value;
@@ -257,6 +272,8 @@ class _AddressWidgetState extends State<AddressWidget> {
       value: thAmphureValue,
       label: thAmphureLable,
       items: amphureItems,
+      condition: amphureErrorCondition,
+      errorText: misc.thErrorMessage(thAmphureLable),
       onChanged: (String? value) {
         setState(() {
           address!.districtName = value;
@@ -275,6 +292,8 @@ class _AddressWidgetState extends State<AddressWidget> {
       value: thProvinceValue,
       label: thProvinceLable,
       items: provinceItems,
+      condition: provinceErrorCondition,
+      errorText: misc.thErrorMessage(thProvinceLable),
       onChanged: (String? value) {
         setState(
           () {
@@ -293,7 +312,7 @@ class _AddressWidgetState extends State<AddressWidget> {
 
     final zipcodeTextField = misc.importantTextField(
         textController: zipCodeController,
-        errorTextCondition: _zipcodeErrorCondition,
+        errorTextCondition: zipcodeErrorCondition,
         errorTextMessage: misc.thErrorMessage(model.zipcodeSubject),
         subject: model.zipcodeSubject,
         onchangedFunction: (value) {
@@ -301,11 +320,11 @@ class _AddressWidgetState extends State<AddressWidget> {
             print('not empty: $value');
             setState(() {
               address!.zipcode = int.parse(value);
-              _zipcodeErrorCondition = false;
+              zipcodeErrorCondition = false;
             });
           } else {
             setState(() {
-              _zipcodeErrorCondition = true;
+              zipcodeErrorCondition = true;
             });
           }
         },
@@ -313,7 +332,7 @@ class _AddressWidgetState extends State<AddressWidget> {
 
     final countryTextField = misc.importantTextField(
         textController: countryController,
-        errorTextCondition: _countryErrorCondition,
+        errorTextCondition: countryErrorCondition,
         errorTextMessage: misc.thErrorMessage(model.countrySubject),
         subject: model.countrySubject,
         onchangedFunction: (value) {
@@ -321,11 +340,11 @@ class _AddressWidgetState extends State<AddressWidget> {
             print('not empty: $value');
             setState(() {
               address!.countryName = value;
-              _countryErrorCondition = false;
+              countryErrorCondition = false;
             });
           } else {
             setState(() {
-              _countryErrorCondition = true;
+              countryErrorCondition = true;
             });
           }
         },
@@ -362,6 +381,155 @@ class _AddressWidgetState extends State<AddressWidget> {
           const SizedBox(width: 10),
           Expanded(flex: 3, child: countryTextField),
         ]),
+      ],
+    );
+  }
+}
+
+class BankAccountWidget extends StatefulWidget {
+  String bankNo;
+  BankAccountWidget({super.key, required this.bankNo});
+
+  @override
+  State<BankAccountWidget> createState() => _BankAccountWidgetState();
+}
+
+class _BankAccountWidgetState extends State<BankAccountWidget> {
+  @override
+  void initState() {
+    super.initState();
+    _loadBank();
+  }
+
+  String? bankNameValue;
+  String? bankBranchNameValue;
+
+  List<String> bankNameItems = <String>[
+    'กรุงเทพ',
+    'กรุงไทย',
+    'กรุงศรีอยุธยา',
+    'กสิกรไทย',
+    'ซีไอเอ็มบีไทย',
+    'ทหารไทยธนชาต',
+    'ไทยพาณิชย์',
+    'ยูโอบี',
+    'แลนด์ แอนด์ เฮาส์',
+  ];
+  
+   List<String> bankBranchNameItems = <String>[
+  'รายรับประจำ',
+  'รายรับพิเศษ',
+  'ค่าเช่า / ขายของ',
+  'เงินโบนัส / เงินรางวัล',
+  'กำไรจากการลงทุน',
+  'เงินออม',
+];
+
+  final _bankAccountNumberController = TextEditingController();
+
+  bool bankNameCondition = false;
+  bool bankBranchNameCondition = false;
+  bool bankAccountNumberCondition = false;
+
+  BankAccountModel? bank;
+  void _loadBank() {
+    switch (widget.bankNo) {
+      case '1':
+        bank = firstBank;
+        break;
+      case '2':
+        bank = secondBank;
+        break;
+    }
+  }
+
+  Widget dropdownButtonBuilderFunction(
+      {required String? value,
+      required String label,
+      required List<String> items,
+      required Function(String?) onChanged,
+      required bool condition,
+      required String errorText,
+      Function()? onTabFunction}) {
+    return DropdownButtonFormField(
+      value: value,
+      decoration: InputDecoration(
+        errorText: condition ? errorText : null,
+        label: RichText(
+          text: TextSpan(text: label, children: const [
+            TextSpan(
+              text: '*',
+              style: TextStyle(
+                color: Colors.red,
+              ),
+            )
+          ]),
+        ),
+      ),
+      onChanged: (String? value) {
+        setState(() {
+          onChanged(value);
+        });
+      },
+      onTap: onTabFunction,
+      items: items.map<DropdownMenuItem<String>>((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList(),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bankNameDropDown = dropdownButtonBuilderFunction(
+      value: bankNameValue,
+      label: model.bankNameSubject,
+      items: bankNameItems,
+      condition: bankNameCondition,
+      errorText: misc.thErrorMessage(model.bankNameSubject),
+      onChanged: (value) {
+        setState(() {
+          bankNameValue = value!;
+          bank!.bankName = value;
+        });
+      },
+    );
+
+    final bankBranchNameDropDown = dropdownButtonBuilderFunction(
+      value: bankBranchNameValue,
+      label: model.bankBranchNameSubject,
+      items: bankBranchNameItems,
+      condition: bankBranchNameCondition,
+      errorText: misc.thErrorMessage(model.bankBranchNameSubject),
+      onChanged: (value) {
+        setState(() {
+          bankBranchNameValue = value!;
+          bank!.bankBranchName = value;
+        });
+      },
+    );
+
+    final bankBranchNumberTextField = misc.importantTextField(
+        textController: _bankAccountNumberController,
+        errorTextCondition: bankAccountNumberCondition,
+        errorTextMessage: misc.thErrorMessage(model.bankAccountNumberSubject),
+        subject: model.bankAccountNumberSubject,
+        filterPattern: model.numberfilter,
+        onchangedFunction: (value) {
+          setState(() {
+            bank!.bankAccountID = value;
+          });
+        });
+
+    return Row(
+      children: [
+        Expanded(flex: 1, child: bankNameDropDown),
+        const SizedBox(width: 10),
+        Expanded(flex: 1, child: bankBranchNameDropDown),
+        const SizedBox(width: 10),
+        Expanded(child: bankBranchNumberTextField),
       ],
     );
   }

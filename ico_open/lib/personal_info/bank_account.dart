@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:ico_open/config/config.dart';
+import 'package:ico_open/personal_info/page.dart';
+import 'package:ico_open/personal_info/widgets.dart';
 
 class PersonalInformationBankAccount extends StatefulWidget {
   const PersonalInformationBankAccount({super.key});
@@ -16,7 +18,11 @@ enum isAddedBankAccounts { yes, no }
 class _PersonalInformationBankAccountState
     extends State<PersonalInformationBankAccount> {
   isAddedBankAccounts? _bankAccounts = isAddedBankAccounts.no;
-  final TextEditingController _bankAccountNo = TextEditingController();
+  final _bankAccountNo = TextEditingController();
+  final _2bankAccountNo = TextEditingController();
+
+  final firstBank = BankAccountWidget(bankNo: '1');
+  final secondBank = BankAccountWidget(bankNo: '2');
 
   @override
   Widget build(BuildContext context) {
@@ -35,61 +41,23 @@ class _PersonalInformationBankAccountState
       ),
       child: Column(
         children: [
-         const Row(
+          const Row(
             children: [
-               Icon(Icons.location_on),
-               Text(
+              Icon(Icons.location_on),
+              Text(
                 'บัญชีธนาคารของท่าน (เพื่อความสะดวกในการถอนเงินและรับเงินปันผล)',
                 style: TextStyle(
                   fontSize: 25,
                   fontWeight: FontWeight.bold,
                 ),
-              ), ],
+              ),
+            ],
           ),
-            const Row(
-                      children: [
-                        Text('กรุณาระบุชื่อธนาคารก่อนกรอกชื่อสาขา'),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        const Expanded(
-                          flex: 1,
-                          child: BankTitleDropdownButton(),
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        const Expanded(
-                          flex: 1,
-                          child: BankBranchDropdownButton(),
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        Expanded(
-                          child: TextField(
-                            controller: _bankAccountNo,
-                            decoration: const InputDecoration(
-                              label: Text(
-                                'เลขที่บัญชี',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                ),
-                              ),
-                            ),
-                            inputFormatters: [
-                              FilteringTextInputFormatter.allow(
-                                RegExp(
-                                  r'[0-9]',
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  const SizedBox(height: 50,),
+          const Row(children: [Text('กรุณาระบุชื่อธนาคารก่อนกรอกชื่อสาขา')]),
+          firstBank,
+          const SizedBox(
+            height: 50,
+          ),
           Row(
             children: [
               const Icon(Icons.location_on),
@@ -136,7 +104,6 @@ class _PersonalInformationBankAccountState
               ),
             ],
           ),
-          
           (_bankAccounts == isAddedBankAccounts.yes)
               ? Column(
                   children: [
@@ -145,44 +112,7 @@ class _PersonalInformationBankAccountState
                         Text('กรุณาระบุชื่อธนาคารก่อนกรอกชื่อสาขา'),
                       ],
                     ),
-                    Row(
-                      children: [
-                        const Expanded(
-                          flex: 1,
-                          child: BankTitleDropdownButton(),
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        const Expanded(
-                          flex: 1,
-                          child: BankBranchDropdownButton(),
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        Expanded(
-                          child: TextField(
-                            controller: _bankAccountNo,
-                            decoration: const InputDecoration(
-                              label: Text(
-                                'เลขที่บัญชี',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                ),
-                              ),
-                            ),
-                            inputFormatters: [
-                              FilteringTextInputFormatter.allow(
-                                RegExp(
-                                  r'[0-9]',
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    )
+                  secondBank
                   ],
                 )
               : const Column(),
@@ -234,6 +164,7 @@ class _BankTitleDropdownButtonState extends State<BankTitleDropdownButton> {
       onChanged: (String? value) {
         setState(() {
           bankTitleDropdownValue = value!;
+          firstBank.bankName = value;
         });
       },
       items: bankTitleLists.map<DropdownMenuItem<String>>((String value) {
@@ -285,6 +216,7 @@ class _BankBranchDropdownButtonState extends State<BankBranchDropdownButton> {
       onChanged: (String? value) {
         setState(() {
           bankBranchDropdownValue = value!;
+          firstBank.bankBranchName =value;
         });
       },
       items: bankBranchLists.map<DropdownMenuItem<String>>((String value) {

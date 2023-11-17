@@ -185,39 +185,65 @@ class _PersonalInformationOccupationState
         value: sourceOfIncomeValue,
         label: model.sourceOfIncomeSubject,
         items: _sourceOfIncomeItems,
-        onChanged: (value) {});
+        onChanged: (value) {
+          setState(() {
+            occupation.sourceOfIncome =value!;
+          });
+        });
 
     final currentOccupation = dropdownTHProvinceButtonBuilder(
         value: currentOccupationValue,
         label: model.currentOccupationSubject,
         items: _sourceOfIncomeItems,
-        onChanged: (value) {});
+        onChanged: (value) {
+          setState(() {
+            occupation.currentOccupation =value!;
+          });
+        });
 
     officeNameValue = misc.importantTextField(
         textController: officeNameController,
         errorTextCondition: _officeNameCondition,
         errorTextMessage: misc.thErrorMessage(model.officeNameSubject),
         subject: model.officeNameSubject,
+        onchangedFunction: (value) {
+          setState(() {
+            occupation.officeName =value;
+          });
+        },
         filterPattern: model.allfilter);
 
     final typeOfBusiness = dropdownTHProvinceButtonBuilder(
         value: typeOfBusinessValue,
         label: model.typeOfBusinessSubject,
         items: _typeOfBusinessItems,
-        onChanged: (value) {});
+        onChanged: (value) {
+          setState(() {
+            occupation.typeOfBusiness =value!;
+          });
+        });
 
     positionValue = misc.importantTextField(
         textController: positionNameController,
         errorTextCondition: _positionNameCondition,
         errorTextMessage: misc.thErrorMessage(model.positionSubject),
         subject: model.positionSubject,
+        onchangedFunction: (value) {
+          setState(() {
+            occupation.positionName = value;
+          });
+        },
         filterPattern: model.allfilter);
 
     final salary = dropdownTHProvinceButtonBuilder(
         value: salaryValue,
         label: model.salarySubject,
         items: _salaryItems,
-        onChanged: (value) {});
+        onChanged: (value) {
+          setState(() {
+            occupation.salaryRange = value!;
+          });
+        });
 
     final tambonDropdown = dropdownTHProvinceButtonBuilder(
       value: thTambonValue,
@@ -388,6 +414,7 @@ class _PersonalInformationOccupationState
                     onChanged: (OfficeAddress? value) {
                       setState(() {
                         _currentAddress = value;
+                        othersAddress.typeOfAddress = 'r';
                       });
                     },
                   ),
@@ -403,6 +430,7 @@ class _PersonalInformationOccupationState
                     onChanged: (OfficeAddress? value) {
                       setState(() {
                         _currentAddress = value;
+                        othersAddress.typeOfAddress = 'c';
                       });
                     },
                   ),
@@ -418,6 +446,7 @@ class _PersonalInformationOccupationState
                     onChanged: (OfficeAddress? value) {
                       setState(() {
                         _currentAddress = value;
+                        othersAddress.typeOfAddress = 'o';
                         getCurrentProvince();
                       });
                     },

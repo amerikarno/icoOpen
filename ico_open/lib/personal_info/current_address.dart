@@ -131,7 +131,7 @@ class _PersonalInformationCurrentAddressState
 
   @override
   Widget build(BuildContext context) {
-    final current = AddressWidget(typeOfAddress: 'current');
+    final current = AddressWidget(typeOfAddress: 'current', condition: false,);
     final homeNumberTextField = misc.importantTextField(
         textController: homeNumberController,
         errorTextCondition: _homeNumberErrorCondition,
@@ -236,6 +236,7 @@ class _PersonalInformationCurrentAddressState
         onChanged: (CurrentAddress? value) {
           setState(() {
             _currentAddress = value;
+            currentAddress.typeOfAddress = 'current_address';
             getCurrentProvince();
           });
         },
@@ -250,6 +251,7 @@ class _PersonalInformationCurrentAddressState
         onChanged: (CurrentAddress? value) {
           setState(() {
             _currentAddress = value;
+            currentAddress.typeOfAddress = 'registered_address';
           });
         },
       ),

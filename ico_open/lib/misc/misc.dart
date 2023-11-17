@@ -77,5 +77,5 @@ Widget subjectRichText({
 }
 
 String thErrorMessage(String message) {
-  return 'กรุณากรอก$message';
+  return 'กรุณากรอก $message';
 }

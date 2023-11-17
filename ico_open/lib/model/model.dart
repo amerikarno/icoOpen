@@ -28,6 +28,9 @@ const salarySubject = 'รายได้ต่อเดือน';
 const otherAddressSubject = 'ที่อยู่อื่น (โปรดระบุ)';
 const registeredAddressSubject = 'ที่อยู่ตามบัตรประชาชน';
 const currentAddressSubject = 'ที่อยู่ปัจจุบัน';
+const bankAccountNumberSubject = 'เลขที่บัญชี';
+const bankNameSubject = 'ธนาคาร';
+const bankBranchNameSubject = 'ชื่อสาขา';
 
 final allfilter = RegExp(r'[a-zA-Z0-9ก-๛]');
 final thaiEngFilter = RegExp(r'[a-zA-Zก-๛]');
