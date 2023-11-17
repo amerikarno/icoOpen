@@ -34,21 +34,42 @@ var registeredAddress = modelPI.AddressModel(
   homenumber: '',
   zipcode: 0,
   countryName: '',
-  condition: modelPI.Condition(homenumber: false),
+  condition: modelPI.Condition(
+    homenumber: false,
+    subdistrict: false,
+    district: false,
+    province: false,
+    zipcode: false,
+    country: false,
+  ),
 );
 var currentAddress = modelPI.AddressModel(
   typeOfAddress: 'r',
   homenumber: '',
   zipcode: 0,
   countryName: '',
-  condition: modelPI.Condition(homenumber: false),
+  condition: modelPI.Condition(
+    homenumber: false,
+    subdistrict: false,
+    district: false,
+    province: false,
+    zipcode: false,
+    country: false,
+  ),
 );
 var othersAddress = modelPI.AddressModel(
   typeOfAddress: 'r',
   homenumber: '',
   zipcode: 0,
   countryName: '',
-  condition: modelPI.Condition(homenumber: false),
+  condition: modelPI.Condition(
+    homenumber: false,
+    subdistrict: false,
+    district: false,
+    province: false,
+    zipcode: false,
+    country: false,
+  ),
 );
 var occupation = modelPI.OccupationModel(
   sourceOfIncome: '',
@@ -70,12 +91,11 @@ var secondBank = modelPI.BankAccountModel(
 );
 
 class _PersonalInformationState extends State<PersonalInformation> {
-
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-   getCurrentProvince();
+    getCurrentProvince();
   }
 
   double height = 50;
@@ -191,7 +211,7 @@ class _PersonalInformationState extends State<PersonalInformation> {
     // final userid = widget.id;
     final homeNumberTextField = misc.importantTextField(
         textController: rHomeNumberController,
-        errorTextCondition: homeNumberErrorCondition,
+        errorTextCondition: registeredAddress.condition.homenumber,
         errorTextMessage: misc.thErrorMessage(model.homeNumberSubject),
         subject: model.homeNumberSubject,
         filterPattern: RegExp(r'[0-9/-]'),
@@ -211,7 +231,7 @@ class _PersonalInformationState extends State<PersonalInformation> {
 
     final villageNumberTextField = misc.importantTextField(
         textController: rVillageNumberController,
-        errorTextCondition: registeredAddress.condition.homenumber,
+        errorTextCondition: _villageNumberErrorCondition,
         errorTextMessage: misc.thErrorMessage(model.villageNoSubject),
         subject: model.villageNoSubject,
         filterPattern: model.numberfilter,
@@ -284,14 +304,21 @@ class _PersonalInformationState extends State<PersonalInformation> {
       value: thTambonValue,
       label: thTambonLable,
       items: tambonItems,
-      condition: tambonErrorCondition,
+      condition: registeredAddress.condition.subdistrict,
       errorText: misc.thErrorMessage(thTambonLable),
       onChanged: (value) {
-        setState(() {
-          registeredAddress.subDistrictName = value;
-          thTambonValue = value;
-          getCurrentZipcode();
-        });
+        if (value!.isEmpty) {
+          setState(() {
+            registeredAddress.condition.subdistrict = true;
+          });
+        } else {
+          setState(() {
+            registeredAddress.subDistrictName = value;
+            thTambonValue = value;
+            registeredAddress.condition.subdistrict = false;
+            getCurrentZipcode();
+          });
+        }
         if (_loadingZipcode) {
           return const CircularProgressIndicator();
         }
@@ -302,16 +329,21 @@ class _PersonalInformationState extends State<PersonalInformation> {
       value: thAmphureValue,
       label: thAmphureLable,
       items: amphureItems,
-      condition: amphureErrorCondition,
+      condition: registeredAddress.condition.district,
       errorText: misc.thErrorMessage(thAmphureLable),
       onChanged: (String? value) {
-        setState(() {
-          registeredAddress.districtName = value;
-          thAmphureValue = value;
-          thTambonValue = null;
-          getCurrentTambon();
-          // if (thTambonValue!.isNotEmpty) {thTambonValue = null;}
-        });
+        if (value!.isEmpty) {
+          registeredAddress.condition.district = true;
+        } else {
+          registeredAddress.condition.district = false;
+          setState(() {
+            registeredAddress.districtName = value;
+            thAmphureValue = value;
+            thTambonValue = null;
+            getCurrentTambon();
+            // if (thTambonValue!.isNotEmpty) {thTambonValue = null;}
+          });
+        }
         if (_loadingTambon) {
           return const CircularProgressIndicator();
         }
@@ -322,18 +354,25 @@ class _PersonalInformationState extends State<PersonalInformation> {
       value: thProvinceValue,
       label: thProvinceLable,
       items: provinceItems,
-      condition: provinceErrorCondition,
+      condition: registeredAddress.condition.country,
       errorText: misc.thErrorMessage(thProvinceLable),
       onChanged: (String? value) {
-        setState(
-          () {
-            registeredAddress.provinceName = value;
-            thProvinceValue = value;
-            thAmphureValue = null;
-            thTambonValue = null;
-            getCurrentAmphure();
-          },
-        );
+        if (value!.isEmpty) {
+          setState(() {
+            registeredAddress.condition.country = true;
+          });
+        } else {
+          setState(
+            () {
+              registeredAddress.condition.country = false;
+              registeredAddress.provinceName = value;
+              thProvinceValue = value;
+              thAmphureValue = null;
+              thTambonValue = null;
+              getCurrentAmphure();
+            },
+          );
+        }
         if (_loadingAmphure) {
           return const CircularProgressIndicator();
         }
@@ -499,9 +538,14 @@ class _PersonalInformationState extends State<PersonalInformation> {
 
                             if (registeredAddress.homenumber.isEmpty) {
                               setState(() {
-                                homeNumberErrorCondition = true;
+                                registeredAddress.condition.homenumber = true;
+                              });
+                            } else if (registeredAddress.countryName.isEmpty) {
+                              setState(() {
+                                registeredAddress.condition.country = true;
                               });
                             }
+
                             // print(_lasercodestr);
                             // if (registered.homeNumberController.text.isNotEmpty) {
                             //   Navigator.push(

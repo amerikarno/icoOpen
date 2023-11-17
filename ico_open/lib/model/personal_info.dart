@@ -50,7 +50,7 @@ class BankAccountModel {
 }
 
 class OccupationModel {
-   OccupationModel({
+  OccupationModel({
     required this.sourceOfIncome,
     required this.currentOccupation,
     required this.officeName,
@@ -59,15 +59,27 @@ class OccupationModel {
     required this.salaryRange,
   });
 
-   String sourceOfIncome;
-   String currentOccupation;
-   String officeName;
-   String typeOfBusiness;
-   String positionName;
-   String salaryRange;
+  String sourceOfIncome;
+  String currentOccupation;
+  String officeName;
+  String typeOfBusiness;
+  String positionName;
+  String salaryRange;
 }
 
 class Condition {
-  Condition({required this.homenumber});
+  Condition({
+    required this.homenumber,
+    required this.subdistrict,
+    required this.district,
+    required this.province,
+    required this.zipcode,
+    required this.country,
+  });
   bool homenumber;
+  bool subdistrict;
+  bool district;
+  bool province;
+  bool zipcode;
+  bool country;
 }
