@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-Widget  importantTextField({
+Widget importantTextField({
   required TextEditingController textController,
   required bool errorTextCondition,
   required String errorTextMessage,
@@ -78,4 +78,33 @@ Widget subjectRichText({
 
 String thErrorMessage(String message) {
   return 'กรุณากรอก $message';
+}
+
+Widget dropdownButtonBuilderFunction(
+    {required String? value,
+    required String label1,
+    required String label2,
+    required List<String> items,
+    required bool condition,
+    required String errorText,
+    Function(String?)? onChanged,
+    Function()? onTabFunction}) {
+  return DropdownButtonFormField(
+    value: value,
+    decoration: InputDecoration(
+      errorText: condition ? errorText : null,
+      label: RichText(
+          text: TextSpan(text: label1, children: [
+        TextSpan(text: label2, style: const TextStyle(color: Colors.red))
+      ])),
+    ),
+    onChanged: onChanged,
+    onTap: onTabFunction,
+    items: items.map<DropdownMenuItem<String>>((String value) {
+      return DropdownMenuItem<String>(
+        value: value,
+        child: Text(value),
+      );
+    }).toList(),
+  );
 }

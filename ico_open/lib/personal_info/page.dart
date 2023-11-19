@@ -146,15 +146,9 @@ class _PersonalInformationState extends State<PersonalInformation> {
       decoration: InputDecoration(
         errorText: condition ? errorText : null,
         label: RichText(
-          text: TextSpan(text: label, children: const [
-            TextSpan(
-              text: '*',
-              style: TextStyle(
-                color: Colors.red,
-              ),
-            )
-          ]),
-        ),
+            text: TextSpan(text: label, children: const [
+          TextSpan(text: '*', style: TextStyle(color: Colors.red))
+        ])),
       ),
       onChanged: (String? value) {
         setState(() {
@@ -171,12 +165,31 @@ class _PersonalInformationState extends State<PersonalInformation> {
     );
   }
 
+  Function(String? value) tambonChangedFunction() {
+  return (value) {
+        if (value!.isEmpty) {
+          setState(() {
+            registeredAddress.condition.subdistrict = true;
+          });
+        } else {
+          setState(() {
+            registeredAddress.subDistrictName = value;
+            thTambonValue = value;
+            registeredAddress.condition.subdistrict = false;
+            getCurrentZipcode();
+          });
+        }
+        if (_loadingZipcode) {
+          return const CircularProgressIndicator();
+        }
+      };
+  }
+
   void getCurrentAmphure() async {
     amphureItems = await api.getAmphure(thProvinceValue);
     setState(() {
       _loadingAmphure = false;
     });
-    // print('amphure items: $amphureItems');
   }
 
   void getCurrentTambon() async {
@@ -184,16 +197,13 @@ class _PersonalInformationState extends State<PersonalInformation> {
     setState(() {
       _loadingTambon = false;
     });
-    // print('tambon items: $tambonItems');
   }
 
   void getCurrentProvince() async {
     provinces = await api.getProvince();
     rCountryController.text = 'ไทย';
-    // log('current provinces: $provinces');
     setState(() {
       provinceItems = provinces;
-      // thProvinceValue = provinceItems.first;
     });
   }
 
@@ -208,7 +218,6 @@ class _PersonalInformationState extends State<PersonalInformation> {
 
   @override
   Widget build(BuildContext context) {
-    // final userid = widget.id;
     final homeNumberTextField = misc.importantTextField(
         textController: rHomeNumberController,
         errorTextCondition: registeredAddress.condition.homenumber,
@@ -300,29 +309,31 @@ class _PersonalInformationState extends State<PersonalInformation> {
           }
         },
         isimportant: false);
-    final tambonDropdown = dropdownButtonBuilderFunction(
+    final tambonDropdown = misc.dropdownButtonBuilderFunction(
       value: thTambonValue,
-      label: thTambonLable,
+      label1: thTambonLable,
+      label2: model.markImportant,
       items: tambonItems,
       condition: registeredAddress.condition.subdistrict,
       errorText: misc.thErrorMessage(thTambonLable),
-      onChanged: (value) {
-        if (value!.isEmpty) {
-          setState(() {
-            registeredAddress.condition.subdistrict = true;
-          });
-        } else {
-          setState(() {
-            registeredAddress.subDistrictName = value;
-            thTambonValue = value;
-            registeredAddress.condition.subdistrict = false;
-            getCurrentZipcode();
-          });
-        }
-        if (_loadingZipcode) {
-          return const CircularProgressIndicator();
-        }
-      },
+      onChanged: tambonChangedFunction(),
+      // onChanged: (value) {
+      //   if (value!.isEmpty) {
+      //     setState(() {
+      //       registeredAddress.condition.subdistrict = true;
+      //     });
+      //   } else {
+      //     setState(() {
+      //       registeredAddress.subDistrictName = value;
+      //       thTambonValue = value;
+      //       registeredAddress.condition.subdistrict = false;
+      //       getCurrentZipcode();
+      //     });
+      //   }
+      //   if (_loadingZipcode) {
+      //     return const CircularProgressIndicator();
+      //   }
+      // },
     );
 
     final amphureDropdown = dropdownButtonBuilderFunction(

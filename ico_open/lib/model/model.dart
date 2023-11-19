@@ -31,6 +31,7 @@ const currentAddressSubject = 'ที่อยู่ปัจจุบัน';
 const bankAccountNumberSubject = 'เลขที่บัญชี';
 const bankNameSubject = 'ธนาคาร';
 const bankBranchNameSubject = 'ชื่อสาขา';
+const markImportant = '*';
 
 final allfilter = RegExp(r'[a-zA-Z0-9ก-๛]');
 final thaiEngFilter = RegExp(r'[a-zA-Zก-๛]');
