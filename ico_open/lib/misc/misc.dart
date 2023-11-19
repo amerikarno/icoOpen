@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'package:ico_open/misc/misc.dart' as misc;
+
 Widget importantTextField({
   required TextEditingController textController,
   required bool errorTextCondition,
@@ -107,4 +109,54 @@ Widget dropdownButtonBuilderFunction(
       );
     }).toList(),
   );
+}
+
+Widget getTitleRow(String titleWidget) {
+  return Row(children: [
+    const Icon(Icons.home),
+    misc.subjectRichText(subject: titleWidget, fontsize: 25)
+  ]);
+}
+
+Widget addressFunction(
+    {required Widget homeWidget,
+    required Widget villegeNumberWidget,
+    required Widget villegeNameWidget,
+    required Widget subStreetNameWidget,
+    required Widget streetNameWidget,
+    required Widget subDistrictNameWidget,
+    required Widget districtNameWidget,
+    required Widget provinceNameWidget,
+    required Widget zipCodeWidget,
+    required Widget countryWidget,
+    String? titleWidget}) {
+  return Column(children: [
+    Row(children: [
+      if (titleWidget != null) const Icon(Icons.home),
+      misc.subjectRichText(subject: titleWidget!, fontsize: 25)
+    ]),
+    Row(children: [
+      Expanded(flex: 3, child: homeWidget),
+      const SizedBox(width: 10),
+      Expanded(flex: 1, child: villegeNumberWidget),
+      const SizedBox(width: 10),
+      Expanded(flex: 3, child: villegeNameWidget),
+      const SizedBox(width: 10),
+      Expanded(flex: 3, child: subDistrictNameWidget),
+      const SizedBox(width: 10),
+      Expanded(flex: 3, child: streetNameWidget),
+    ]),
+    const SizedBox(height: 20),
+    Row(children: [
+      Expanded(flex: 3, child: subDistrictNameWidget),
+      const SizedBox(width: 10),
+      Expanded(flex: 3, child: districtNameWidget),
+      const SizedBox(width: 10),
+      Expanded(flex: 3, child: provinceNameWidget),
+      const SizedBox(width: 10),
+      Expanded(flex: 3, child: zipCodeWidget),
+      const SizedBox(width: 10),
+      Expanded(flex: 3, child: countryWidget),
+    ])
+  ]);
 }
