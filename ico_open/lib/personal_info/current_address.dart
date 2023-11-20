@@ -20,9 +20,9 @@ class PersonalInformationCurrentAddress extends StatefulWidget {
       _PersonalInformationCurrentAddressState();
 }
 
+  CurrentAddress? currentAddress = CurrentAddress.registered;
 class _PersonalInformationCurrentAddressState
     extends State<PersonalInformationCurrentAddress> {
-  CurrentAddress? _currentAddress = CurrentAddress.registered;
 
   final homeNumberController = TextEditingController();
   final villageNumberController = TextEditingController();
@@ -131,38 +131,39 @@ class _PersonalInformationCurrentAddressState
 
   @override
   Widget build(BuildContext context) {
-    final current = AddressWidget(typeOfAddress: 'current', condition: false,);
+    // final current = AddressWidget(typeOfAddress: 'current', condition: false,);
     final homeNumberTextField = misc.importantTextField(
         textController: homeNumberController,
         errorTextCondition: _homeNumberErrorCondition,
-        errorTextMessage: misc.thErrorMessage(model.homeNumberSubject),
+        errorTextMessage: misc.thErrorTextFieldMessage(model.homeNumberSubject),
         subject: model.homeNumberSubject,
         filterPattern: RegExp(r'[0-9/-]'));
     final villageNumberTextField = misc.importantTextField(
         textController: villageNumberController,
         errorTextCondition: _villageNumberErrorCondition,
-        errorTextMessage: misc.thErrorMessage(model.villageNoSubject),
+        errorTextMessage: misc.thErrorTextFieldMessage(model.villageNoSubject),
         subject: model.villageNoSubject,
         filterPattern: model.numberfilter,
         isimportant: false);
     final villageNameTextField = misc.importantTextField(
         textController: villageNameController,
         errorTextCondition: _villageNameErrorCondition,
-        errorTextMessage: misc.thErrorMessage(model.villageNameSubject),
+        errorTextMessage:
+            misc.thErrorTextFieldMessage(model.villageNameSubject),
         subject: model.villageNameSubject,
         filterPattern: model.allfilter,
         isimportant: false);
     final subStreetNameTextField = misc.importantTextField(
         textController: subStreetNameController,
         errorTextCondition: _subStreetNameErrorCondition,
-        errorTextMessage: misc.thErrorMessage(model.subStreetSubject),
+        errorTextMessage: misc.thErrorTextFieldMessage(model.subStreetSubject),
         subject: model.subStreetSubject,
         filterPattern: model.allfilter,
         isimportant: false);
     final streetNameTextField = misc.importantTextField(
         textController: streetNameController,
         errorTextCondition: _streetNameErrorCondition,
-        errorTextMessage: misc.thErrorMessage(model.streetSubject),
+        errorTextMessage: misc.thErrorTextFieldMessage(model.streetSubject),
         subject: model.streetSubject,
         filterPattern: model.allfilter,
         isimportant: false);
@@ -217,14 +218,14 @@ class _PersonalInformationCurrentAddressState
     final zipcodeTextField = misc.importantTextField(
         textController: zipCodeController,
         errorTextCondition: _zipcodeErrorCondition,
-        errorTextMessage: misc.thErrorMessage(model.zipcodeSubject),
+        errorTextMessage: misc.thErrorTextFieldMessage(model.zipcodeSubject),
         subject: model.zipcodeSubject,
         filterPattern: model.numberfilter);
 
     final countryTextField = misc.importantTextField(
         textController: countryController,
         errorTextCondition: _countryErrorCondition,
-        errorTextMessage: misc.thErrorMessage(model.countrySubject),
+        errorTextMessage: misc.thErrorTextFieldMessage(model.countrySubject),
         subject: model.countrySubject,
         filterPattern: model.allfilter);
 
@@ -232,11 +233,11 @@ class _PersonalInformationCurrentAddressState
       title: const Text(model.otherAddressSubject),
       leading: Radio<CurrentAddress>(
         value: CurrentAddress.others,
-        groupValue: _currentAddress,
+        groupValue: currentAddress,
         onChanged: (CurrentAddress? value) {
           setState(() {
-            _currentAddress = value;
-            currentAddress.typeOfAddress = 'current_address';
+            currentAddress = value;
+            // currentAddress.typeOfAddress = 'current_address';
             getCurrentProvince();
           });
         },
@@ -247,15 +248,28 @@ class _PersonalInformationCurrentAddressState
       title: const Text(model.registeredAddressSubject),
       leading: Radio<CurrentAddress>(
         value: CurrentAddress.registered,
-        groupValue: _currentAddress,
+        groupValue: currentAddress,
         onChanged: (CurrentAddress? value) {
           setState(() {
-            _currentAddress = value;
-            currentAddress.typeOfAddress = 'registered_address';
+            currentAddress = value;
+            // currentAddress.typeOfAddress = 'registered_address';
           });
         },
       ),
     );
+
+    var current = misc.addressFunction(
+        titleWidget: '',
+        homeWidget: homeNumberTextField,
+        villegeNumberWidget: villageNumberTextField,
+        villegeNameWidget: villageNameTextField,
+        subStreetNameWidget: subStreetNameTextField,
+        streetNameWidget: streetNameTextField,
+        subDistrictNameWidget: tambonDropdown,
+        districtNameWidget: amphureDropdown,
+        provinceNameWidget: provinceDropdown,
+        zipCodeWidget: zipcodeTextField,
+        countryWidget: countryTextField);
 
     return Container(
       width: MediaQuery.of(context).size.width * displayWidth,
@@ -287,8 +301,7 @@ class _PersonalInformationCurrentAddressState
           //             fontsize: 13,
           //             color: Colors.red)
           //       ]),
-          (_currentAddress == CurrentAddress.others)
-              ? current: const Column()
+          (currentAddress == CurrentAddress.others) ? current : const Column()
         ],
       ),
     );

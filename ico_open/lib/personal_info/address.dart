@@ -15,7 +15,7 @@ class AddressWidget extends StatelessWidget {
     final homenumber = misc.importantTextField(
         textController: homeNumberController,
         errorTextCondition: homeNumberErrorCondition,
-        errorTextMessage: misc.thErrorMessage(model.homeNumberSubject),
+        errorTextMessage: misc.thErrorTextFieldMessage(model.homeNumberSubject),
         subject: model.homeNumberSubject,
         filterPattern: model.allfilter,
         onchangedFunction: setHomeNumberState);

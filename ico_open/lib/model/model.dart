@@ -32,6 +32,10 @@ const bankAccountNumberSubject = 'เลขที่บัญชี';
 const bankNameSubject = 'ธนาคาร';
 const bankBranchNameSubject = 'ชื่อสาขา';
 const markImportant = '*';
+const bankHeaderSubject = 'บัญชีธนาคารของท่าน (เพื่อความสะดวกในการถอนเงินและรับเงินปันผล)';
+const firstBankSubject = 'กรุณาระบุชื่อธนาคารก่อนกรอกชื่อสาขา';
+const secondBankSubject = 'เพิ่มบัญชีธนาคารที่ 2 (เพื่อใช้ฝากเงิน)';
+const officeLocation = 'ที่ตั้งที่ทำงาน';
 
 final allfilter = RegExp(r'[a-zA-Z0-9ก-๛]');
 final thaiEngFilter = RegExp(r'[a-zA-Zก-๛]');

@@ -66,10 +66,10 @@ Widget subjectRichText({
     text: TextSpan(
       text: subject,
       style: TextStyle(fontSize: fontsize, color: color),
-      children: const [
+      children: [
         TextSpan(
-          text: '*',
-          style: TextStyle(
+          text: (subject.isEmpty) ? '' : '*',
+          style: const TextStyle(
             color: Colors.red,
           ),
         ),
@@ -78,8 +78,12 @@ Widget subjectRichText({
   );
 }
 
-String thErrorMessage(String message) {
+String thErrorTextFieldMessage(String message) {
   return 'กรุณากรอก $message';
+}
+
+String thErrorDropdownMessage(String message) {
+  return 'กรุณาเลือก $message';
 }
 
 Widget dropdownButtonBuilderFunction(
@@ -119,7 +123,8 @@ Widget getTitleRow(String titleWidget) {
 }
 
 Widget addressFunction(
-    {required Widget homeWidget,
+    {required String titleWidget,
+    required Widget homeWidget,
     required Widget villegeNumberWidget,
     required Widget villegeNameWidget,
     required Widget subStreetNameWidget,
@@ -128,12 +133,12 @@ Widget addressFunction(
     required Widget districtNameWidget,
     required Widget provinceNameWidget,
     required Widget zipCodeWidget,
-    required Widget countryWidget,
-    String? titleWidget}) {
+    required Widget countryWidget}) {
+      
   return Column(children: [
     Row(children: [
-      if (titleWidget != null) const Icon(Icons.home),
-      misc.subjectRichText(subject: titleWidget!, fontsize: 25)
+      if (titleWidget.isNotEmpty) const Icon(Icons.home),
+      misc.subjectRichText(subject: titleWidget, fontsize: 25)
     ]),
     Row(children: [
       Expanded(flex: 3, child: homeWidget),
@@ -142,7 +147,7 @@ Widget addressFunction(
       const SizedBox(width: 10),
       Expanded(flex: 3, child: villegeNameWidget),
       const SizedBox(width: 10),
-      Expanded(flex: 3, child: subDistrictNameWidget),
+      Expanded(flex: 3, child: subStreetNameWidget),
       const SizedBox(width: 10),
       Expanded(flex: 3, child: streetNameWidget),
     ]),
@@ -160,3 +165,4 @@ Widget addressFunction(
     ])
   ]);
 }
+

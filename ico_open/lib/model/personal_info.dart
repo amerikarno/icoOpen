@@ -4,36 +4,44 @@ class PersonalInformationModel {
   PersonalInformationModel({
     required this.registeredAddress,
     required this.occupation,
+    required this.firstBankAccount,
+    // required this.currentType,
+    // required this.officeType,
   });
 
   final AddressModel registeredAddress;
   final OccupationModel occupation;
+  final BankAccountModel firstBankAccount;
+  // final String currentType;
+  // final String officeType;
   AddressModel? currentAddress;
   AddressModel? officeAddress;
-  BankAccountModel? bankAccount;
+  BankAccountModel? secondBankAccount;
 }
 
 class AddressModel {
   AddressModel({
-    required this.homenumber,
-    // required this.subDistrictName,
-    required this.zipcode,
-    required this.countryName,
-    required this.typeOfAddress,
+    // required this.homenumber,
+    // // required this.subDistrictName,
+    // required this.zipcode,
+    // required this.countryName,
+    // required this.typeOfAddress,
+    required this.controller,
     required this.condition,
   });
 
-  String homenumber;
-  String? villageNumber;
-  String? villageName;
-  String? subStreetName;
-  String? streetName;
+  // String homenumber;
+  // String? villageNumber;
+  // String? villageName;
+  // String? subStreetName;
+  // String? streetName;
   String? subDistrictName;
   String? districtName;
   String? provinceName;
-  int zipcode;
-  String countryName;
-  String typeOfAddress;
+  // int zipcode;
+  // String countryName;
+  // String typeOfAddress;
+  Controller controller;
   Condition condition;
 }
 
@@ -82,4 +90,28 @@ class Condition {
   bool province;
   bool zipcode;
   bool country;
+}
+class Controller {
+  Controller({
+    required this.homenumber,
+    required this.villageNumber,
+    required this.villageName,
+    required this.subStreetName,
+    required this.streetName,
+    // required this.subdistrict,
+    // required this.district,
+    // required this.province,
+    required this.zipcode,
+    required this.country,
+  });
+  TextEditingController homenumber;
+  TextEditingController villageNumber;
+  TextEditingController villageName;
+  TextEditingController subStreetName;
+  TextEditingController streetName;
+  // TextEditingController subdistrict;
+  // TextEditingController district;
+  // TextEditingController province;
+  TextEditingController zipcode;
+  TextEditingController country;
 }

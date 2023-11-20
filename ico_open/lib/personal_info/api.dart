@@ -115,9 +115,12 @@ Future<String> getZipCode(String? zipname) async {
 
 Future<String> postPersonalInfo(PersonalInformationModel personalInfo) async {
   List<AddressModel>? addresses;
-  addresses!.add(registeredAddress);
-  addresses.add(currentAddress!);
-  addresses.add(othersAddress!);
+  addresses!.add(personalInfo.registeredAddress);
+  addresses.add(personalInfo.currentAddress!);
+  addresses.add(personalInfo.officeAddress!);
+  List<BankAccountModel>? bankAccounts;
+  bankAccounts!.add(personalInfo.firstBankAccount);
+  bankAccounts.add(personalInfo.secondBankAccount!);
 
   final url = Uri(
     scheme: "http",
@@ -126,7 +129,7 @@ Future<String> postPersonalInfo(PersonalInformationModel personalInfo) async {
     path: "api/v1/idcard",
   );
   log('start post data...');
-  log('data: ${personalInfo.registeredAddress}\n${personalInfo.currentAddress}\n${personalInfo.officeAddress}\n${personalInfo.bankAccount}\n');
+  log('data: ${personalInfo.registeredAddress}\n${personalInfo.currentAddress}\n${personalInfo.officeAddress}\n${personalInfo.firstBankAccount}\n');
 
   final response = await http.post(
     url,

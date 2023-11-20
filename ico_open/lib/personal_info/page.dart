@@ -9,7 +9,7 @@ import 'package:ico_open/personal_info/bank_account.dart';
 import 'package:ico_open/personal_info/api.dart' as api;
 import 'package:ico_open/personal_info/occupation.dart';
 import 'package:ico_open/personal_info/registered_address.dart';
-import 'package:ico_open/personal_info/current_address.dart';
+import 'package:ico_open/personal_info/current_address.dart' as ca;
 import 'package:ico_open/personal_info/registered_address_widget.dart';
 import 'package:ico_open/personal_info/widgets.dart';
 
@@ -27,13 +27,22 @@ class PersonalInformation extends StatefulWidget {
 }
 
 List<String> provinces = [];
+List<String> cProvinces = [];
+List<String> oProvinces = [];
 // variables for personal addresses information.
 // model.AddressModel? registeredAddress;
 var registeredAddress = modelPI.AddressModel(
-  typeOfAddress: 'r',
-  homenumber: '',
-  zipcode: 0,
-  countryName: '',
+  controller: modelPI.Controller(
+      homenumber: TextEditingController(),
+      villageNumber: TextEditingController(),
+      villageName: TextEditingController(),
+      subStreetName: TextEditingController(),
+      streetName: TextEditingController(),
+      // subdistrict: TextEditingController(),
+      // district: TextEditingController(),
+      // province: TextEditingController(),
+      zipcode: TextEditingController(),
+      country: TextEditingController()),
   condition: modelPI.Condition(
     homenumber: false,
     subdistrict: false,
@@ -44,10 +53,17 @@ var registeredAddress = modelPI.AddressModel(
   ),
 );
 var currentAddress = modelPI.AddressModel(
-  typeOfAddress: 'r',
-  homenumber: '',
-  zipcode: 0,
-  countryName: '',
+  controller: modelPI.Controller(
+      homenumber: TextEditingController(),
+      villageNumber: TextEditingController(),
+      villageName: TextEditingController(),
+      subStreetName: TextEditingController(),
+      streetName: TextEditingController(),
+      // subdistrict: TextEditingController(),
+      // district: TextEditingController(),
+      // province: TextEditingController(),
+      zipcode: TextEditingController(),
+      country: TextEditingController()),
   condition: modelPI.Condition(
     homenumber: false,
     subdistrict: false,
@@ -57,11 +73,18 @@ var currentAddress = modelPI.AddressModel(
     country: false,
   ),
 );
-var othersAddress = modelPI.AddressModel(
-  typeOfAddress: 'r',
-  homenumber: '',
-  zipcode: 0,
-  countryName: '',
+var officeAddress = modelPI.AddressModel(
+  controller: modelPI.Controller(
+      homenumber: TextEditingController(),
+      villageNumber: TextEditingController(),
+      villageName: TextEditingController(),
+      subStreetName: TextEditingController(),
+      streetName: TextEditingController(),
+      // subdistrict: TextEditingController(),
+      // district: TextEditingController(),
+      // province: TextEditingController(),
+      zipcode: TextEditingController(),
+      country: TextEditingController()),
   condition: modelPI.Condition(
     homenumber: false,
     subdistrict: false,
@@ -90,10 +113,13 @@ var secondBank = modelPI.BankAccountModel(
   serviceType: 'd',
 );
 
+enum SelectedAddressEnum { registered, current, office }
+
+enum isAddedBankAccountsEnum { yes, no }
+
 class _PersonalInformationState extends State<PersonalInformation> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     getCurrentProvince();
   }
@@ -107,11 +133,18 @@ class _PersonalInformationState extends State<PersonalInformation> {
   String? zipcode;
 
   List<String> provinceItems = provinces;
+  List<String> cProvinceItems = cProvinces;
+  List<String> oProvinceItems = oProvinces;
+
   final thProvinceLable = 'จังหวัด';
   final thAmphureLable = 'เขตอำเภอ';
   List<String> amphureItems = [];
+  List<String> cAmphureItems = [];
+  List<String> oAmphureItems = [];
   final thTambonLable = 'แขวงตำบล';
   List<String> tambonItems = [];
+  List<String> cTambonItems = [];
+  List<String> oTambonItems = [];
   // controller variables
   final rHomeNumberController = TextEditingController();
   final rVillageNumberController = TextEditingController();
@@ -133,56 +166,68 @@ class _PersonalInformationState extends State<PersonalInformation> {
   bool _loadingTambon = true;
   bool _loadingZipcode = true;
 
-  Widget dropdownButtonBuilderFunction(
-      {required String? value,
-      required String label,
-      required List<String> items,
-      required Function(String?) onChanged,
-      required bool condition,
-      required String errorText,
-      Function()? onTabFunction}) {
-    return DropdownButtonFormField(
-      value: value,
-      decoration: InputDecoration(
-        errorText: condition ? errorText : null,
-        label: RichText(
-            text: TextSpan(text: label, children: const [
-          TextSpan(text: '*', style: TextStyle(color: Colors.red))
-        ])),
-      ),
-      onChanged: (String? value) {
+  Function(String? value) tambonChangedFunction() {
+    return (value) {
+      if (value == null) {
         setState(() {
-          onChanged(value);
+          registeredAddress.condition.subdistrict = true;
         });
-      },
-      onTap: onTabFunction,
-      items: items.map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList(),
-    );
+      } else {
+        setState(() {
+          registeredAddress.subDistrictName = value;
+          thTambonValue = value;
+          registeredAddress.condition.subdistrict = false;
+          getCurrentZipcode();
+        });
+      }
+      if (_loadingZipcode) {
+        return const CircularProgressIndicator();
+      }
+    };
   }
 
-  Function(String? value) tambonChangedFunction() {
-  return (value) {
-        if (value!.isEmpty) {
-          setState(() {
-            registeredAddress.condition.subdistrict = true;
-          });
-        } else {
-          setState(() {
-            registeredAddress.subDistrictName = value;
-            thTambonValue = value;
-            registeredAddress.condition.subdistrict = false;
-            getCurrentZipcode();
-          });
-        }
-        if (_loadingZipcode) {
-          return const CircularProgressIndicator();
-        }
-      };
+  Function(String? value) amphureChangedFunction() {
+    return (value) {
+      if (value == null) {
+        registeredAddress.condition.district = true;
+      } else {
+        registeredAddress.condition.district = false;
+        setState(() {
+          registeredAddress.districtName = value;
+          thAmphureValue = value;
+          thTambonValue = null;
+          getCurrentTambon();
+        });
+      }
+      if (_loadingTambon) {
+        return const CircularProgressIndicator();
+      }
+    };
+  }
+
+  Function(String? value) provinceChangedFunction() {
+    return (value) {
+      if (value == null) {
+        setState(() {
+          registeredAddress.condition.province = true;
+        });
+      } else {
+        setState(
+          () {
+            registeredAddress.condition.province = false;
+            registeredAddress.provinceName = value;
+            registeredAddress.controller.country.text = 'ไทย';
+            thProvinceValue = value;
+            thAmphureValue = null;
+            thTambonValue = null;
+            getCurrentAmphure();
+          },
+        );
+      }
+      if (_loadingAmphure) {
+        return const CircularProgressIndicator();
+      }
+    };
   }
 
   void getCurrentAmphure() async {
@@ -201,7 +246,6 @@ class _PersonalInformationState extends State<PersonalInformation> {
 
   void getCurrentProvince() async {
     provinces = await api.getProvince();
-    rCountryController.text = 'ไทย';
     setState(() {
       provinceItems = provinces;
     });
@@ -210,25 +254,332 @@ class _PersonalInformationState extends State<PersonalInformation> {
   void getCurrentZipcode() async {
     final zipname = thProvinceValue! + thAmphureValue! + thTambonValue!;
     zipcode = await api.getZipCode(zipname);
-    rZipCodeController.text = zipcode!;
+    registeredAddress.controller.zipcode.text = zipcode!;
     setState(() {
       _loadingZipcode = false;
     });
   }
 
+  // current address configuration
+  SelectedAddressEnum? currentAddressEnum = SelectedAddressEnum.registered;
+  String? cThProvinceValue;
+  String? cThAmphureValue;
+  String? cThTambonValue;
+  String? cZipcode;
+  Function(String? value) cTambonChangedFunction() {
+    return (value) {
+      if (value == null) {
+        setState(() {
+          currentAddress.condition.subdistrict = true;
+        });
+      } else {
+        setState(() {
+          currentAddress.subDistrictName = value;
+          cThTambonValue = value;
+          currentAddress.condition.subdistrict = false;
+          cGetCurrentZipcode();
+        });
+      }
+      if (_loadingZipcode) {
+        return const CircularProgressIndicator();
+      }
+    };
+  }
+
+  Function(String? value) cAmphureChangedFunction() {
+    return (value) {
+      if (value == null) {
+        currentAddress.condition.district = true;
+      } else {
+        currentAddress.condition.district = false;
+        setState(() {
+          currentAddress.districtName = value;
+          cThAmphureValue = value;
+          cThTambonValue = null;
+          cGetCurrentTambon();
+        });
+      }
+      if (_loadingTambon) {
+        return const CircularProgressIndicator();
+      }
+    };
+  }
+
+  Function(String? value) cProvinceChangedFunction() {
+    return (value) {
+      if (value == null) {
+        setState(() {
+          currentAddress.condition.province = true;
+        });
+      } else {
+        setState(
+          () {
+            currentAddress.condition.province = false;
+            currentAddress.provinceName = value;
+            currentAddress.controller.country.text = 'ไทย';
+            cThProvinceValue = value;
+            cThAmphureValue = null;
+            cThTambonValue = null;
+            cGetCurrentAmphure();
+          },
+        );
+      }
+      if (_loadingAmphure) {
+        return const CircularProgressIndicator();
+      }
+    };
+  }
+
+  void cGetCurrentAmphure() async {
+    cAmphureItems = await api.getAmphure(cThProvinceValue);
+    setState(() {
+      _loadingAmphure = false;
+    });
+  }
+
+  void cGetCurrentTambon() async {
+    cTambonItems = await api.getTambon(cThAmphureValue);
+    setState(() {
+      _loadingTambon = false;
+    });
+  }
+
+  void cGetCurrentProvince() async {
+    cProvinces = await api.getProvince();
+    setState(() {
+      cProvinceItems = cProvinces;
+    });
+  }
+
+  void cGetCurrentZipcode() async {
+    final czipname = cThProvinceValue! + cThAmphureValue! + cThTambonValue!;
+    cZipcode = await api.getZipCode(czipname);
+    currentAddress.controller.zipcode.text = cZipcode!;
+    setState(() {
+      _loadingZipcode = false;
+    });
+  }
+
+  // office address configuration
+  final officeNameController = TextEditingController();
+  final positionNameController = TextEditingController();
+  bool sourceOfIncomeCondition = false;
+  bool officeNameCondition = false;
+  bool positionNameCondition = false;
+  bool currentOccupationCondition = false;
+  bool typeOfBusinessCondition = false;
+  bool salaryRangeCondition = false;
+  SelectedAddressEnum? officeAddressEnum = SelectedAddressEnum.registered;
+  String? oThProvinceValue;
+  String? oThAmphureValue;
+  String? oThTambonValue;
+  String? oZipcode;
+  Function(String? value) oTambonChangedFunction() {
+    return (value) {
+      if (value == null) {
+        setState(() {
+          officeAddress.condition.subdistrict = true;
+        });
+      } else {
+        setState(() {
+          officeAddress.subDistrictName = value;
+          oThTambonValue = value;
+          officeAddress.condition.subdistrict = false;
+          oGetCurrentZipcode();
+        });
+      }
+      if (_loadingZipcode) {
+        return const CircularProgressIndicator();
+      }
+    };
+  }
+
+  Function(String? value) oAmphureChangedFunction() {
+    return (value) {
+      if (value == null) {
+        officeAddress.condition.district = true;
+      } else {
+        officeAddress.condition.district = false;
+        setState(() {
+          officeAddress.districtName = value;
+          oThAmphureValue = value;
+          oThTambonValue = null;
+          oGetCurrentTambon();
+        });
+      }
+      if (_loadingTambon) {
+        return const CircularProgressIndicator();
+      }
+    };
+  }
+
+  Function(String? value) oProvinceChangedFunction() {
+    return (value) {
+      if (value == null) {
+        setState(() {
+          officeAddress.condition.province = true;
+        });
+      } else {
+        setState(
+          () {
+            officeAddress.condition.province = false;
+            officeAddress.provinceName = value;
+            officeAddress.controller.country.text = 'ไทย';
+            oThProvinceValue = value;
+            oThAmphureValue = null;
+            oThTambonValue = null;
+            oGetCurrentAmphure();
+          },
+        );
+      }
+      if (_loadingAmphure) {
+        return const CircularProgressIndicator();
+      }
+    };
+  }
+
+  void oGetCurrentAmphure() async {
+    oAmphureItems = await api.getAmphure(oThProvinceValue);
+    setState(() {
+      _loadingAmphure = false;
+    });
+  }
+
+  void oGetCurrentTambon() async {
+    oTambonItems = await api.getTambon(oThAmphureValue);
+    setState(() {
+      _loadingTambon = false;
+    });
+  }
+
+  void oGetCurrentProvince() async {
+    oProvinces = await api.getProvince();
+    setState(() {
+      oProvinceItems = oProvinces;
+    });
+  }
+
+  void oGetCurrentZipcode() async {
+    final ozipname = oThProvinceValue! + oThAmphureValue! + oThTambonValue!;
+    oZipcode = await api.getZipCode(ozipname);
+    officeAddress.controller.zipcode.text = oZipcode!;
+    setState(() {
+      _loadingZipcode = false;
+    });
+  }
+
+  final List<String> _sourceOfIncomeItems = [
+    'ลูกจ้าง/พนักงานเอกชน',
+    'ข้าราชการ/พนักงานรัฐวิสาหกิจ',
+    'เจ้าของกิจการ/ค้าขาย',
+    'แม่บ้าน / พ่อบ้าน',
+    'เกษียน',
+    'นักลงทุน',
+    'นักศึกษา',
+    'อาชีพอิสระ',
+    'ค้าอัญมณี',
+    'ค้าของเก่า',
+    'แลกเปลี่ยนเงินตรา',
+    'บริการโอนเงิน',
+    'คาสิโน/บ่อน',
+    'ธุรกิจสถานบริการ',
+    'ค้าอาวุธ',
+    'นายหน้าจัดหางาน',
+    'ธุรกิจนำเที่ยว',
+  ];
+  final List<String> _typeOfBusinessItems = [
+    'ลูกจ้าง/พนักงานเอกชน',
+    'ข้าราชการ/พนักงานรัฐวิสาหกิจ',
+    'เจ้าของกิจการ/ค้าขาย',
+    'แม่บ้าน / พ่อบ้าน',
+    'เกษียน',
+    'นักลงทุน',
+    'นักศึกษา',
+    'อาชีพอิสระ',
+    'ค้าอัญมณี',
+    'ค้าของเก่า',
+    'แลกเปลี่ยนเงินตรา',
+    'บริการโอนเงิน',
+    'คาสิโน/บ่อน',
+    'ธุรกิจสถานบริการ',
+    'ค้าอาวุธ',
+    'นายหน้าจัดหางาน',
+    'ธุรกิจนำเที่ยว',
+  ];
+  final List<String> _salaryItems = [
+    '< 15,000',
+    '15,001 - 50,000',
+    '50,001 - 100,000',
+    '100,001 - 500,000',
+    '500,001 - 1,000,000',
+    '1,000,001 - 5,000,000',
+    '> 5,000,000',
+  ];
+
+  //bank accounts configure
+  isAddedBankAccountsEnum? isAddedBankAccount = isAddedBankAccountsEnum.no;
+  String? firstBankNameValue;
+  String? firstBankBranchNameValue;
+  String? secondBankNameValue;
+  String? secondBankBranchNameValue;
+
+  List<String> bankNameItems = <String>[
+    'กรุงเทพ',
+    'กรุงไทย',
+    'กรุงศรีอยุธยา',
+    'กสิกรไทย',
+    'ซีไอเอ็มบีไทย',
+    'ทหารไทยธนชาต',
+    'ไทยพาณิชย์',
+    'ยูโอบี',
+    'แลนด์ แอนด์ เฮาส์',
+  ];
+
+  List<String> bankBranchNameItems = <String>[
+    'รายรับประจำ',
+    'รายรับพิเศษ',
+    'ค่าเช่า / ขายของ',
+    'เงินโบนัส / เงินรางวัล',
+    'กำไรจากการลงทุน',
+    'เงินออม',
+  ];
+
+  final _firstbankAccountNumberController = TextEditingController();
+  final _secondbankAccountNumberController = TextEditingController();
+
+  bool firstBankNameCondition = false;
+  bool secondBankNameCondition = false;
+  bool firstBankBranchNameCondition = false;
+  bool secondBankBranchNameCondition = false;
+  bool firstBankAccountNumberCondition = false;
+  bool secondBankAccountNumberCondition = false;
+
+  // modelPI.BankAccountModel? bank;
+  // void _loadBank() {
+  //   switch (widget.bankNo) {
+  //     case '1':
+  //       bank = firstBank;
+  //       break;
+  //     case '2':
+  //       bank = secondBank;
+  //       break;
+  //   }
+  // }
+
   @override
   Widget build(BuildContext context) {
-    final homeNumberTextField = misc.importantTextField(
-        textController: rHomeNumberController,
+    final rHomeNumberTextField = misc.importantTextField(
+        textController: registeredAddress.controller.homenumber,
         errorTextCondition: registeredAddress.condition.homenumber,
-        errorTextMessage: misc.thErrorMessage(model.homeNumberSubject),
+        errorTextMessage: misc.thErrorTextFieldMessage(model.homeNumberSubject),
         subject: model.homeNumberSubject,
         filterPattern: RegExp(r'[0-9/-]'),
+        onsubmittedFunction: (value) {
+          registeredAddress.controller.homenumber.text = value;
+        },
         onchangedFunction: (value) {
           if (value.isNotEmpty) {
-            print('not empty: $value');
             setState(() {
-              registeredAddress.homenumber = value;
               registeredAddress.condition.homenumber = false;
             });
           } else {
@@ -238,22 +589,19 @@ class _PersonalInformationState extends State<PersonalInformation> {
           }
         });
 
-    final villageNumberTextField = misc.importantTextField(
-        textController: rVillageNumberController,
+    final rVillageNumberTextField = misc.importantTextField(
+        textController: registeredAddress.controller.villageNumber,
         errorTextCondition: _villageNumberErrorCondition,
-        errorTextMessage: misc.thErrorMessage(model.villageNoSubject),
+        errorTextMessage: misc.thErrorTextFieldMessage(model.villageNoSubject),
         subject: model.villageNoSubject,
         filterPattern: model.numberfilter,
-        onchangedFunction: (value) {
-          if (value.isNotEmpty) {
-            print('not empty: $value');
-            setState(() {
-              registeredAddress.villageNumber = value;
-            });
-          }
+        onsubmittedFunction: (value) {
+          setState(() {
+            registeredAddress.controller.villageNumber.text = value;
+          });
         },
         onTabFunction: () {
-          if (rHomeNumberController.text.isNotEmpty) {
+          if (registeredAddress.controller.homenumber.text.isNotEmpty) {
             setState(() {
               registeredAddress.condition.homenumber = false;
             });
@@ -264,171 +612,912 @@ class _PersonalInformationState extends State<PersonalInformation> {
           }
         },
         isimportant: false);
-    final villageNameTextField = misc.importantTextField(
-        textController: rVillageNameController,
+    final rVillageNameTextField = misc.importantTextField(
+        textController: registeredAddress.controller.villageName,
         errorTextCondition: _villageNameErrorCondition,
-        errorTextMessage: misc.thErrorMessage(model.villageNameSubject),
+        errorTextMessage:
+            misc.thErrorTextFieldMessage(model.villageNameSubject),
         subject: model.villageNameSubject,
         filterPattern: model.allfilter,
-        onchangedFunction: (value) {
-          if (value.isNotEmpty) {
-            print('not empty: $value');
+        onsubmittedFunction: (value) {
+          setState(() {
+            registeredAddress.controller.villageName.text = value;
+          });
+        },
+        onTabFunction: () {
+          if (registeredAddress.controller.homenumber.text.isNotEmpty) {
             setState(() {
-              registeredAddress.villageName = value;
+              registeredAddress.condition.homenumber = false;
+            });
+          } else {
+            setState(() {
+              registeredAddress.condition.homenumber = true;
             });
           }
         },
         isimportant: false);
-    final subStreetNameTextField = misc.importantTextField(
-        textController: rSubStreetNameController,
+    final rSubStreetNameTextField = misc.importantTextField(
+        textController: registeredAddress.controller.subStreetName,
         errorTextCondition: _subStreetNameErrorCondition,
-        errorTextMessage: misc.thErrorMessage(model.subStreetSubject),
+        errorTextMessage: misc.thErrorTextFieldMessage(model.subStreetSubject),
         subject: model.subStreetSubject,
         filterPattern: model.allfilter,
-        onchangedFunction: (value) {
-          if (value.isNotEmpty) {
-            print('not empty: $value');
+        onsubmittedFunction: (value) {
+          setState(() {
+            registeredAddress.controller.subStreetName.text = value;
+          });
+        },
+        onTabFunction: () {
+          if (registeredAddress.controller.homenumber.text.isNotEmpty) {
             setState(() {
-              registeredAddress.subStreetName = value;
+              registeredAddress.condition.homenumber = false;
+            });
+          } else {
+            setState(() {
+              registeredAddress.condition.homenumber = true;
             });
           }
         },
         isimportant: false);
-    final streetNameTextField = misc.importantTextField(
-        textController: rStreetNameController,
+    final rStreetNameTextField = misc.importantTextField(
+        textController: registeredAddress.controller.streetName,
         errorTextCondition: _streetNameErrorCondition,
-        errorTextMessage: misc.thErrorMessage(model.streetSubject),
+        errorTextMessage: misc.thErrorTextFieldMessage(model.streetSubject),
         subject: model.streetSubject,
         filterPattern: model.allfilter,
-        onchangedFunction: (value) {
-          if (value.isNotEmpty) {
-            print('not empty: $value');
+        onsubmittedFunction: (value) {
+          setState(() {
+            registeredAddress.controller.streetName.text = value;
+          });
+        },
+        onTabFunction: () {
+          if (registeredAddress.controller.homenumber.text.isNotEmpty) {
             setState(() {
-              registeredAddress.streetName = value;
+              registeredAddress.condition.homenumber = false;
+            });
+          } else {
+            setState(() {
+              registeredAddress.condition.homenumber = true;
             });
           }
         },
         isimportant: false);
-    final tambonDropdown = misc.dropdownButtonBuilderFunction(
+    final rTambonDropdown = misc.dropdownButtonBuilderFunction(
       value: thTambonValue,
       label1: thTambonLable,
       label2: model.markImportant,
       items: tambonItems,
       condition: registeredAddress.condition.subdistrict,
-      errorText: misc.thErrorMessage(thTambonLable),
+      errorText: misc.thErrorTextFieldMessage(thTambonLable),
       onChanged: tambonChangedFunction(),
-      // onChanged: (value) {
-      //   if (value!.isEmpty) {
-      //     setState(() {
-      //       registeredAddress.condition.subdistrict = true;
-      //     });
-      //   } else {
-      //     setState(() {
-      //       registeredAddress.subDistrictName = value;
-      //       thTambonValue = value;
-      //       registeredAddress.condition.subdistrict = false;
-      //       getCurrentZipcode();
-      //     });
-      //   }
-      //   if (_loadingZipcode) {
-      //     return const CircularProgressIndicator();
-      //   }
-      // },
     );
 
-    final amphureDropdown = dropdownButtonBuilderFunction(
-      value: thAmphureValue,
-      label: thAmphureLable,
-      items: amphureItems,
-      condition: registeredAddress.condition.district,
-      errorText: misc.thErrorMessage(thAmphureLable),
-      onChanged: (String? value) {
-        if (value!.isEmpty) {
-          registeredAddress.condition.district = true;
-        } else {
-          registeredAddress.condition.district = false;
-          setState(() {
-            registeredAddress.districtName = value;
-            thAmphureValue = value;
-            thTambonValue = null;
-            getCurrentTambon();
-            // if (thTambonValue!.isNotEmpty) {thTambonValue = null;}
-          });
-        }
-        if (_loadingTambon) {
-          return const CircularProgressIndicator();
-        }
-      },
-    );
+    final rAmphureDropdown = misc.dropdownButtonBuilderFunction(
+        value: thAmphureValue,
+        label1: thAmphureLable,
+        label2: model.markImportant,
+        items: amphureItems,
+        condition: registeredAddress.condition.district,
+        errorText: misc.thErrorTextFieldMessage(thAmphureLable),
+        onChanged: amphureChangedFunction());
 
-    final provinceDropdown = dropdownButtonBuilderFunction(
-      value: thProvinceValue,
-      label: thProvinceLable,
-      items: provinceItems,
-      condition: registeredAddress.condition.country,
-      errorText: misc.thErrorMessage(thProvinceLable),
-      onChanged: (String? value) {
-        if (value!.isEmpty) {
-          setState(() {
-            registeredAddress.condition.country = true;
-          });
-        } else {
-          setState(
-            () {
-              registeredAddress.condition.country = false;
-              registeredAddress.provinceName = value;
-              thProvinceValue = value;
-              thAmphureValue = null;
-              thTambonValue = null;
-              getCurrentAmphure();
-            },
-          );
-        }
-        if (_loadingAmphure) {
-          return const CircularProgressIndicator();
-        }
-      },
-    );
+    final rProvinceDropdown = misc.dropdownButtonBuilderFunction(
+        value: thProvinceValue,
+        label1: thProvinceLable,
+        label2: model.markImportant,
+        items: provinceItems,
+        condition: registeredAddress.condition.province,
+        errorText: misc.thErrorTextFieldMessage(thProvinceLable),
+        onChanged: provinceChangedFunction());
 
-    final zipcodeTextField = misc.importantTextField(
-        textController: rZipCodeController,
-        errorTextCondition: zipcodeErrorCondition,
-        errorTextMessage: misc.thErrorMessage(model.zipcodeSubject),
+    final rZipcodeTextField = misc.importantTextField(
+        textController: registeredAddress.controller.zipcode,
+        errorTextCondition: registeredAddress.condition.zipcode,
+        errorTextMessage: misc.thErrorTextFieldMessage(model.zipcodeSubject),
         subject: model.zipcodeSubject,
+        onsubmittedFunction: (value) {
+          registeredAddress.controller.zipcode.text = value;
+        },
         onchangedFunction: (value) {
           if (value.isNotEmpty) {
-            print('not empty: $value');
             setState(() {
-              registeredAddress.zipcode = int.parse(value);
-              zipcodeErrorCondition = false;
+              registeredAddress.condition.zipcode = false;
             });
           } else {
             setState(() {
-              zipcodeErrorCondition = true;
+              registeredAddress.condition.zipcode = true;
             });
           }
         },
         filterPattern: model.numberfilter);
 
-    final rcountryTextField = misc.importantTextField(
-        textController: rCountryController,
-        errorTextCondition: countryErrorCondition,
-        errorTextMessage: misc.thErrorMessage(model.countrySubject),
+    final rCountryTextField = misc.importantTextField(
+        textController: registeredAddress.controller.country,
+        errorTextCondition: registeredAddress.condition.country,
+        errorTextMessage: misc.thErrorTextFieldMessage(model.countrySubject),
         subject: model.countrySubject,
+        onsubmittedFunction: (value) {
+          registeredAddress.controller.country.text = value;
+        },
         onchangedFunction: (value) {
           if (value.isNotEmpty) {
-            print('not empty: $value');
             setState(() {
-              registeredAddress.countryName = value;
-              countryErrorCondition = false;
+              registeredAddress.condition.country = false;
             });
           } else {
             setState(() {
-              countryErrorCondition = true;
+              registeredAddress.condition.country = true;
             });
           }
         },
         filterPattern: model.allfilter);
+
+    // current address variables
+
+    final cHomeNumberTextField = misc.importantTextField(
+        textController: currentAddress.controller.homenumber,
+        errorTextCondition: currentAddress.condition.homenumber,
+        errorTextMessage: misc.thErrorTextFieldMessage(model.homeNumberSubject),
+        subject: model.homeNumberSubject,
+        filterPattern: RegExp(r'[0-9/-]'),
+        onsubmittedFunction: (value) {
+          currentAddress.controller.homenumber.text = value;
+        },
+        onchangedFunction: (value) {
+          if (value.isNotEmpty) {
+            setState(() {
+              currentAddress.condition.homenumber = false;
+            });
+          } else {
+            setState(() {
+              currentAddress.condition.homenumber = true;
+            });
+          }
+        });
+
+    final cVillageNumberTextField = misc.importantTextField(
+        textController: currentAddress.controller.villageNumber,
+        errorTextCondition: _villageNumberErrorCondition,
+        errorTextMessage: misc.thErrorTextFieldMessage(model.villageNoSubject),
+        subject: model.villageNoSubject,
+        filterPattern: model.numberfilter,
+        onsubmittedFunction: (value) {
+          setState(() {
+            currentAddress.controller.villageNumber.text = value;
+          });
+        },
+        onTabFunction: () {
+          if (currentAddress.controller.homenumber.text.isNotEmpty) {
+            setState(() {
+              currentAddress.condition.homenumber = false;
+            });
+          } else {
+            setState(() {
+              currentAddress.condition.homenumber = true;
+            });
+          }
+        },
+        isimportant: false);
+    final cVillageNameTextField = misc.importantTextField(
+        textController: currentAddress.controller.villageName,
+        errorTextCondition: _villageNameErrorCondition,
+        errorTextMessage:
+            misc.thErrorTextFieldMessage(model.villageNameSubject),
+        subject: model.villageNameSubject,
+        filterPattern: model.allfilter,
+        onsubmittedFunction: (value) {
+          setState(() {
+            currentAddress.controller.villageName.text = value;
+          });
+        },
+        onTabFunction: () {
+          if (currentAddress.controller.homenumber.text.isNotEmpty) {
+            setState(() {
+              currentAddress.condition.homenumber = false;
+            });
+          } else {
+            setState(() {
+              currentAddress.condition.homenumber = true;
+            });
+          }
+        },
+        isimportant: false);
+    final cSubStreetNameTextField = misc.importantTextField(
+        textController: currentAddress.controller.subStreetName,
+        errorTextCondition: _subStreetNameErrorCondition,
+        errorTextMessage: misc.thErrorTextFieldMessage(model.subStreetSubject),
+        subject: model.subStreetSubject,
+        filterPattern: model.allfilter,
+        onsubmittedFunction: (value) {
+          setState(() {
+            currentAddress.controller.subStreetName.text = value;
+          });
+        },
+        onTabFunction: () {
+          if (currentAddress.controller.homenumber.text.isNotEmpty) {
+            setState(() {
+              currentAddress.condition.homenumber = false;
+            });
+          } else {
+            setState(() {
+              currentAddress.condition.homenumber = true;
+            });
+          }
+        },
+        isimportant: false);
+    final cStreetNameTextField = misc.importantTextField(
+        textController: currentAddress.controller.streetName,
+        errorTextCondition: _streetNameErrorCondition,
+        errorTextMessage: misc.thErrorTextFieldMessage(model.streetSubject),
+        subject: model.streetSubject,
+        filterPattern: model.allfilter,
+        onsubmittedFunction: (value) {
+          setState(() {
+            currentAddress.controller.streetName.text = value;
+          });
+        },
+        onTabFunction: () {
+          if (currentAddress.controller.homenumber.text.isNotEmpty) {
+            setState(() {
+              currentAddress.condition.homenumber = false;
+            });
+          } else {
+            setState(() {
+              currentAddress.condition.homenumber = true;
+            });
+          }
+        },
+        isimportant: false);
+    final cTambonDropdown = misc.dropdownButtonBuilderFunction(
+      value: cThTambonValue,
+      label1: thTambonLable,
+      label2: model.markImportant,
+      items: cTambonItems,
+      condition: currentAddress.condition.subdistrict,
+      errorText: misc.thErrorTextFieldMessage(thTambonLable),
+      onChanged: cTambonChangedFunction(),
+    );
+
+    final cAmphureDropdown = misc.dropdownButtonBuilderFunction(
+        value: cThAmphureValue,
+        label1: thAmphureLable,
+        label2: model.markImportant,
+        items: cAmphureItems,
+        condition: currentAddress.condition.district,
+        errorText: misc.thErrorTextFieldMessage(thAmphureLable),
+        onChanged: cAmphureChangedFunction());
+
+    final cProvinceDropdown = misc.dropdownButtonBuilderFunction(
+        value: cThProvinceValue,
+        label1: thProvinceLable,
+        label2: model.markImportant,
+        items: cProvinceItems,
+        condition: currentAddress.condition.province,
+        errorText: misc.thErrorTextFieldMessage(thProvinceLable),
+        onChanged: cProvinceChangedFunction());
+
+    final cZipcodeTextField = misc.importantTextField(
+        textController: currentAddress.controller.zipcode,
+        errorTextCondition: currentAddress.condition.zipcode,
+        errorTextMessage: misc.thErrorTextFieldMessage(model.zipcodeSubject),
+        subject: model.zipcodeSubject,
+        onsubmittedFunction: (value) {
+          currentAddress.controller.zipcode.text = value;
+        },
+        onchangedFunction: (value) {
+          if (value.isNotEmpty) {
+            setState(() {
+              currentAddress.condition.zipcode = false;
+            });
+          } else {
+            setState(() {
+              currentAddress.condition.zipcode = true;
+            });
+          }
+        },
+        filterPattern: model.numberfilter);
+
+    final cCountryTextField = misc.importantTextField(
+        textController: currentAddress.controller.country,
+        errorTextCondition: currentAddress.condition.country,
+        errorTextMessage: misc.thErrorTextFieldMessage(model.countrySubject),
+        subject: model.countrySubject,
+        onsubmittedFunction: (value) {
+          currentAddress.controller.country.text = value;
+        },
+        onchangedFunction: (value) {
+          if (value.isNotEmpty) {
+            setState(() {
+              currentAddress.condition.country = false;
+            });
+          } else {
+            setState(() {
+              currentAddress.condition.country = true;
+            });
+          }
+        },
+        filterPattern: model.allfilter);
+
+    var current = misc.addressFunction(
+        titleWidget: '',
+        homeWidget: cHomeNumberTextField,
+        villegeNumberWidget: cVillageNumberTextField,
+        villegeNameWidget: cVillageNameTextField,
+        subStreetNameWidget: cSubStreetNameTextField,
+        streetNameWidget: cStreetNameTextField,
+        subDistrictNameWidget: cTambonDropdown,
+        districtNameWidget: cAmphureDropdown,
+        provinceNameWidget: cProvinceDropdown,
+        zipCodeWidget: cZipcodeTextField,
+        countryWidget: cCountryTextField);
+
+    // Widget regist() {
+    //   if (registeredAddress.controller.zipcode.text.isNotEmpty) {
+    //   currentAddress = registeredAddress;
+    //   }
+    //   return const Column();
+    // }
+
+    final registeredAddressListTile = ListTile(
+      title: const Text(model.registeredAddressSubject),
+      leading: Radio<SelectedAddressEnum>(
+        value: SelectedAddressEnum.registered,
+        groupValue: currentAddressEnum,
+        onChanged: (value) {
+          setState(() {
+            currentAddressEnum = value;
+            // currentAddress.typeOfAddress = 'registered_address';
+          });
+        },
+      ),
+    );
+
+    final otherAddressListTile = ListTile(
+      title: const Text(model.otherAddressSubject),
+      leading: Radio<SelectedAddressEnum>(
+        value: SelectedAddressEnum.current,
+        groupValue: currentAddressEnum,
+        onChanged: (SelectedAddressEnum? value) {
+          setState(() {
+            currentAddressEnum = value;
+            currentAddress = currentAddress;
+            // currentAddress.typeOfAddress = 'current_address';
+            cGetCurrentProvince();
+          });
+        },
+      ),
+    );
+
+    // office address variables
+
+    final oHomeNumberTextField = misc.importantTextField(
+        textController: officeAddress.controller.homenumber,
+        errorTextCondition: officeAddress.condition.homenumber,
+        errorTextMessage: misc.thErrorTextFieldMessage(model.homeNumberSubject),
+        subject: model.homeNumberSubject,
+        filterPattern: RegExp(r'[0-9/-]'),
+        onsubmittedFunction: (value) {
+          officeAddress.controller.homenumber.text = value;
+        },
+        onchangedFunction: (value) {
+          if (value.isNotEmpty) {
+            setState(() {
+              officeAddress.condition.homenumber = false;
+            });
+          } else {
+            setState(() {
+              officeAddress.condition.homenumber = true;
+            });
+          }
+        });
+
+    final oVillageNumberTextField = misc.importantTextField(
+        textController: officeAddress.controller.villageNumber,
+        errorTextCondition: _villageNumberErrorCondition,
+        errorTextMessage: misc.thErrorTextFieldMessage(model.villageNoSubject),
+        subject: model.villageNoSubject,
+        filterPattern: model.numberfilter,
+        onsubmittedFunction: (value) {
+          setState(() {
+            officeAddress.controller.villageNumber.text = value;
+          });
+        },
+        onTabFunction: () {
+          if (officeAddress.controller.homenumber.text.isNotEmpty) {
+            setState(() {
+              officeAddress.condition.homenumber = false;
+            });
+          } else {
+            setState(() {
+              officeAddress.condition.homenumber = true;
+            });
+          }
+        },
+        isimportant: false);
+    final oVillageNameTextField = misc.importantTextField(
+        textController: officeAddress.controller.villageName,
+        errorTextCondition: _villageNameErrorCondition,
+        errorTextMessage:
+            misc.thErrorTextFieldMessage(model.villageNameSubject),
+        subject: model.villageNameSubject,
+        filterPattern: model.allfilter,
+        onsubmittedFunction: (value) {
+          setState(() {
+            officeAddress.controller.villageName.text = value;
+          });
+        },
+        onTabFunction: () {
+          if (officeAddress.controller.homenumber.text.isNotEmpty) {
+            setState(() {
+              officeAddress.condition.homenumber = false;
+            });
+          } else {
+            setState(() {
+              officeAddress.condition.homenumber = true;
+            });
+          }
+        },
+        isimportant: false);
+    final oSubStreetNameTextField = misc.importantTextField(
+        textController: officeAddress.controller.subStreetName,
+        errorTextCondition: _subStreetNameErrorCondition,
+        errorTextMessage: misc.thErrorTextFieldMessage(model.subStreetSubject),
+        subject: model.subStreetSubject,
+        filterPattern: model.allfilter,
+        onsubmittedFunction: (value) {
+          setState(() {
+            officeAddress.controller.subStreetName.text = value;
+          });
+        },
+        onTabFunction: () {
+          if (officeAddress.controller.homenumber.text.isNotEmpty) {
+            setState(() {
+              officeAddress.condition.homenumber = false;
+            });
+          } else {
+            setState(() {
+              officeAddress.condition.homenumber = true;
+            });
+          }
+        },
+        isimportant: false);
+    final oStreetNameTextField = misc.importantTextField(
+        textController: officeAddress.controller.streetName,
+        errorTextCondition: _streetNameErrorCondition,
+        errorTextMessage: misc.thErrorTextFieldMessage(model.streetSubject),
+        subject: model.streetSubject,
+        filterPattern: model.allfilter,
+        onsubmittedFunction: (value) {
+          setState(() {
+            officeAddress.controller.streetName.text = value;
+          });
+        },
+        onTabFunction: () {
+          if (officeAddress.controller.homenumber.text.isNotEmpty) {
+            setState(() {
+              officeAddress.condition.homenumber = false;
+            });
+          } else {
+            setState(() {
+              officeAddress.condition.homenumber = true;
+            });
+          }
+        },
+        isimportant: false);
+    final oTambonDropdown = misc.dropdownButtonBuilderFunction(
+      value: oThTambonValue,
+      label1: thTambonLable,
+      label2: model.markImportant,
+      items: oTambonItems,
+      condition: officeAddress.condition.subdistrict,
+      errorText: misc.thErrorTextFieldMessage(thTambonLable),
+      onChanged: oTambonChangedFunction(),
+    );
+
+    final oAmphureDropdown = misc.dropdownButtonBuilderFunction(
+        value: oThAmphureValue,
+        label1: thAmphureLable,
+        label2: model.markImportant,
+        items: oAmphureItems,
+        condition: officeAddress.condition.district,
+        errorText: misc.thErrorTextFieldMessage(thAmphureLable),
+        onChanged: oAmphureChangedFunction());
+
+    final oProvinceDropdown = misc.dropdownButtonBuilderFunction(
+        value: oThProvinceValue,
+        label1: thProvinceLable,
+        label2: model.markImportant,
+        items: oProvinceItems,
+        condition: officeAddress.condition.province,
+        errorText: misc.thErrorTextFieldMessage(thProvinceLable),
+        onChanged: oProvinceChangedFunction());
+
+    final oZipcodeTextField = misc.importantTextField(
+        textController: officeAddress.controller.zipcode,
+        errorTextCondition: officeAddress.condition.zipcode,
+        errorTextMessage: misc.thErrorTextFieldMessage(model.zipcodeSubject),
+        subject: model.zipcodeSubject,
+        onsubmittedFunction: (value) {
+          officeAddress.controller.zipcode.text = value;
+        },
+        onchangedFunction: (value) {
+          if (value.isNotEmpty) {
+            setState(() {
+              officeAddress.condition.zipcode = false;
+            });
+          } else {
+            setState(() {
+              officeAddress.condition.zipcode = true;
+            });
+          }
+        },
+        filterPattern: model.numberfilter);
+
+    final oCountryTextField = misc.importantTextField(
+        textController: officeAddress.controller.country,
+        errorTextCondition: officeAddress.condition.country,
+        errorTextMessage: misc.thErrorTextFieldMessage(model.countrySubject),
+        subject: model.countrySubject,
+        onsubmittedFunction: (value) {
+          officeAddress.controller.country.text = value;
+        },
+        onchangedFunction: (value) {
+          if (value.isNotEmpty) {
+            setState(() {
+              officeAddress.condition.country = false;
+            });
+          } else {
+            setState(() {
+              officeAddress.condition.country = true;
+            });
+          }
+        },
+        filterPattern: model.allfilter);
+
+    var office = misc.addressFunction(
+        titleWidget: '',
+        homeWidget: oHomeNumberTextField,
+        villegeNumberWidget: oVillageNumberTextField,
+        villegeNameWidget: oVillageNameTextField,
+        subStreetNameWidget: oSubStreetNameTextField,
+        streetNameWidget: oStreetNameTextField,
+        subDistrictNameWidget: oTambonDropdown,
+        districtNameWidget: oAmphureDropdown,
+        provinceNameWidget: oProvinceDropdown,
+        zipCodeWidget: oZipcodeTextField,
+        countryWidget: oCountryTextField);
+
+    // Widget regist() {
+    //   if (registeredAddress.controller.zipcode.text.isNotEmpty) {
+    //   officeAddress = registeredAddress;
+    //   }
+    //   return const Column();
+    // }
+
+    final registeredOfficeAddressListTile = ListTile(
+      title: const Text(model.registeredAddressSubject),
+      leading: Radio<SelectedAddressEnum>(
+        value: SelectedAddressEnum.registered,
+        groupValue: officeAddressEnum,
+        onChanged: (value) {
+          setState(() {
+            officeAddressEnum = value;
+            // officeAddress.typeOfAddress = 'registered_address';
+          });
+        },
+      ),
+    );
+
+    final currentOfficeAddressListTile = ListTile(
+      title: const Text(model.currentAddressSubject),
+      leading: Radio<SelectedAddressEnum>(
+        value: SelectedAddressEnum.current,
+        groupValue: officeAddressEnum,
+        onChanged: (value) {
+          setState(() {
+            officeAddressEnum = value;
+            // officeAddress.typeOfAddress = 'registered_address';
+          });
+        },
+      ),
+    );
+
+    final otherOfficeAddressListTile = ListTile(
+      title: const Text(model.otherAddressSubject),
+      leading: Radio<SelectedAddressEnum>(
+        value: SelectedAddressEnum.office,
+        groupValue: officeAddressEnum,
+        onChanged: (SelectedAddressEnum? value) {
+          setState(() {
+            officeAddressEnum = value;
+            officeAddress = officeAddress;
+            // officeAddress.typeOfAddress = 'current_address';
+            oGetCurrentProvince();
+          });
+        },
+      ),
+    );
+
+    String? sourceOfIncomeValue;
+    String? currentOccupationValue;
+    Widget? officeNameValue;
+    String? typeOfBusinessValue;
+    Widget? positionValue;
+    String? salaryRangeValue;
+    const space = SizedBox(width: 10);
+    final sourceOfIncome = misc.dropdownButtonBuilderFunction(
+        value: sourceOfIncomeValue,
+        label1: model.sourceOfIncomeSubject,
+        label2: model.markImportant,
+        items: _sourceOfIncomeItems,
+        condition: sourceOfIncomeCondition,
+        errorText: misc.thErrorDropdownMessage(model.sourceOfIncomeSubject),
+        onChanged: (value) {
+          if (value == null) {
+            setState(() {
+              sourceOfIncomeCondition = true;
+            });
+          } else {
+            setState(() {
+              sourceOfIncomeCondition = false;
+              occupation.sourceOfIncome = value;
+              sourceOfIncomeValue = value;
+            });
+          }
+        });
+
+    final currentOccupation = misc.dropdownButtonBuilderFunction(
+        value: currentOccupationValue,
+        label1: model.currentOccupationSubject,
+        label2: model.markImportant,
+        items: _sourceOfIncomeItems,
+        condition: currentOccupationCondition,
+        errorText: misc.thErrorDropdownMessage(model.currentOccupationSubject),
+        onChanged: (value) {
+          if (value == null) {
+            setState(() {
+              currentOccupationCondition = true;
+            });
+          } else {
+            setState(() {
+              currentOccupationCondition = false;
+              occupation.currentOccupation = value;
+              currentOccupationValue = value;
+            });
+          }
+        });
+
+    officeNameValue = misc.importantTextField(
+        textController: officeNameController,
+        errorTextCondition: officeNameCondition,
+        errorTextMessage: misc.thErrorTextFieldMessage(model.officeNameSubject),
+        subject: model.officeNameSubject,
+        onsubmittedFunction: (value) {
+          occupation.officeName = value;
+          officeNameController.text = value;
+        },
+        onchangedFunction: (value) {
+          if (value.isEmpty) {
+            setState(() {
+              officeNameCondition = true;
+            });
+          } else {
+            setState(() {
+              officeNameCondition = false;
+            });
+          }
+        },
+        filterPattern: model.allfilter);
+
+    final typeOfBusiness = misc.dropdownButtonBuilderFunction(
+        value: typeOfBusinessValue,
+        label1: model.typeOfBusinessSubject,
+        label2: model.markImportant,
+        items: _typeOfBusinessItems,
+        condition: typeOfBusinessCondition,
+        errorText: misc.thErrorDropdownMessage(model.typeOfBusinessSubject),
+        onChanged: (value) {
+          if (value == null) {
+            setState(() {
+              typeOfBusinessCondition = true;
+            });
+          } else {
+            setState(() {
+              typeOfBusinessCondition = false;
+              occupation.typeOfBusiness = value;
+              typeOfBusinessValue = value;
+            });
+          }
+        });
+
+    positionValue = misc.importantTextField(
+        textController: positionNameController,
+        errorTextCondition: positionNameCondition,
+        errorTextMessage: misc.thErrorTextFieldMessage(model.positionSubject),
+        subject: model.positionSubject,
+        onsubmittedFunction: (value) {
+          setState(() {
+            occupation.positionName = value;
+            positionNameController.text = value;
+          });
+        },
+        onchangedFunction: (value) {
+          if (value.isEmpty) {
+            setState(() {
+              positionNameCondition = true;
+            });
+          } else {
+            setState(() {
+              positionNameCondition = false;
+            });
+          }
+        },
+        filterPattern: model.allfilter);
+
+    final salary = misc.dropdownButtonBuilderFunction(
+        value: salaryRangeValue,
+        label1: model.salarySubject,
+        label2: model.markImportant,
+        items: _salaryItems,
+        condition: salaryRangeCondition,
+        errorText: misc.thErrorDropdownMessage(model.salarySubject),
+        onChanged: (value) {
+          if (value == null) {
+            setState(() {
+              salaryRangeCondition = true;
+            });
+          } else {
+            setState(() {
+              salaryRangeCondition = false;
+              occupation.salaryRange = value;
+              salaryRangeValue = value;
+            });
+          }
+        });
+
+// bank accounts
+    final firstBankNameDropdown = misc.dropdownButtonBuilderFunction(
+      value: firstBankNameValue,
+      label1: model.bankNameSubject,
+      label2: model.markImportant,
+      items: bankNameItems,
+      condition: firstBankNameCondition,
+      errorText: misc.thErrorTextFieldMessage(model.bankNameSubject),
+      onChanged: (value) {
+        if (value == null) {
+          setState(() {
+            firstBankNameCondition = true;
+          });
+        } else {
+          setState(() {
+            firstBankNameCondition = false;
+            firstBankNameValue = value;
+          });
+        }
+      },
+    );
+
+    final firstBankBranchNameDropDown = misc.dropdownButtonBuilderFunction(
+      value: firstBankBranchNameValue,
+      label1: model.bankBranchNameSubject,
+      label2: model.markImportant,
+      items: bankBranchNameItems,
+      condition: firstBankBranchNameCondition,
+      errorText: misc.thErrorTextFieldMessage(model.bankBranchNameSubject),
+      onChanged: (value) {
+        if (value == null) {
+          setState(() {
+            firstBankBranchNameCondition = true;
+          });
+        } else {
+          setState(() {
+            firstBankBranchNameCondition = false;
+            firstBankBranchNameValue = value;
+          });
+        }
+      },
+    );
+
+    final firstBankBranchNumberTextField = misc.importantTextField(
+        textController: _firstbankAccountNumberController,
+        errorTextCondition: firstBankAccountNumberCondition,
+        errorTextMessage:
+            misc.thErrorTextFieldMessage(model.bankAccountNumberSubject),
+        subject: model.bankAccountNumberSubject,
+        filterPattern: model.numberfilter,
+        onchangedFunction: (value) {
+          if (value.isEmpty) {
+            setState(() {
+              firstBankAccountNumberCondition = true;
+            });
+          } else {
+            setState(() {
+              firstBankAccountNumberCondition = false;
+              _firstbankAccountNumberController.text = value;
+            });
+          }
+        });
+
+    final secondBankNameDropdown = misc.dropdownButtonBuilderFunction(
+      value: secondBankNameValue,
+      label1: model.bankNameSubject,
+      label2: model.markImportant,
+      items: bankNameItems,
+      condition: secondBankNameCondition,
+      errorText: misc.thErrorTextFieldMessage(model.bankNameSubject),
+      onChanged: (value) {
+        if (value == null) {
+          setState(() {
+            secondBankNameCondition = true;
+          });
+        } else {
+          setState(() {
+            secondBankNameCondition = false;
+            secondBankNameValue = value;
+          });
+        }
+      },
+    );
+
+    final secondBankBranchNameDropDown = misc.dropdownButtonBuilderFunction(
+      value: secondBankBranchNameValue,
+      label1: model.bankBranchNameSubject,
+      label2: model.markImportant,
+      items: bankBranchNameItems,
+      condition: secondBankBranchNameCondition,
+      errorText: misc.thErrorTextFieldMessage(model.bankBranchNameSubject),
+      onChanged: (value) {
+        if (value == null) {
+          setState(() {
+            secondBankBranchNameCondition = true;
+          });
+        } else {
+          setState(() {
+            secondBankBranchNameCondition = false;
+            secondBankBranchNameValue = value;
+          });
+        }
+      },
+    );
+
+    final secondBankBranchNumberTextField = misc.importantTextField(
+        textController: _secondbankAccountNumberController,
+        errorTextCondition: secondBankAccountNumberCondition,
+        errorTextMessage:
+            misc.thErrorTextFieldMessage(model.bankAccountNumberSubject),
+        subject: model.bankAccountNumberSubject,
+        filterPattern: model.numberfilter,
+        onchangedFunction: (value) {
+          if (value.isEmpty) {
+            setState(() {
+              secondBankAccountNumberCondition = true;
+            });
+          } else {
+            setState(() {
+              secondBankAccountNumberCondition = false;
+              _secondbankAccountNumberController.text = value;
+            });
+          }
+        });
+
+    var firstBank = Row(
+      children: [
+        Expanded(flex: 1, child: firstBankNameDropdown),
+        const SizedBox(width: 10),
+        Expanded(flex: 1, child: firstBankBranchNameDropDown),
+        const SizedBox(width: 10),
+        Expanded(child: firstBankBranchNumberTextField),
+      ],
+    );
+    var secondBank = Row(
+      children: [
+        Expanded(flex: 1, child: secondBankNameDropdown),
+        const SizedBox(width: 10),
+        Expanded(flex: 1, child: secondBankBranchNameDropDown),
+        const SizedBox(width: 10),
+        Expanded(child: secondBankBranchNumberTextField),
+      ],
+    );
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -441,8 +1530,8 @@ class _PersonalInformationState extends State<PersonalInformation> {
                 HighSpace(height: height),
                 const PersonalInformationHeader(),
                 HighSpace(height: height),
-
                 const SizedBox(height: 20),
+                // registered address path
                 Container(
                   padding: const EdgeInsets.all(50),
                   decoration: BoxDecoration(
@@ -450,47 +1539,202 @@ class _PersonalInformationState extends State<PersonalInformation> {
                       borderRadius:
                           const BorderRadius.all(Radius.circular(10))),
                   child: Column(children: [
-                    Row(children: [
-                      const Icon(Icons.home),
-                      misc.subjectRichText(
-                          subject: model.registeredAddressSubject, fontsize: 25)
-                    ]),
-                    Row(children: [
-                      Expanded(flex: 3, child: homeNumberTextField),
-                      const SizedBox(width: 10),
-                      Expanded(flex: 1, child: villageNumberTextField),
-                      const SizedBox(width: 10),
-                      Expanded(flex: 3, child: villageNameTextField),
-                      const SizedBox(width: 10),
-                      Expanded(flex: 3, child: subStreetNameTextField),
-                      const SizedBox(width: 10),
-                      Expanded(flex: 3, child: streetNameTextField),
-                    ]),
-                    const SizedBox(height: 20),
-                    Row(children: [
-                      Expanded(flex: 3, child: tambonDropdown),
-                      const SizedBox(width: 10),
-                      Expanded(flex: 3, child: amphureDropdown),
-                      const SizedBox(width: 10),
-                      Expanded(flex: 3, child: provinceDropdown),
-                      const SizedBox(width: 10),
-                      Expanded(flex: 3, child: zipcodeTextField),
-                      const SizedBox(width: 10),
-                      Expanded(flex: 3, child: rcountryTextField),
-                    ]),
+                    misc.addressFunction(
+                        titleWidget: model.registeredAddressSubject,
+                        homeWidget: rHomeNumberTextField,
+                        villegeNumberWidget: rVillageNumberTextField,
+                        villegeNameWidget: rVillageNameTextField,
+                        subStreetNameWidget: rSubStreetNameTextField,
+                        streetNameWidget: rStreetNameTextField,
+                        subDistrictNameWidget: rTambonDropdown,
+                        districtNameWidget: rAmphureDropdown,
+                        provinceNameWidget: rProvinceDropdown,
+                        zipCodeWidget: rZipcodeTextField,
+                        countryWidget: rCountryTextField)
                   ]),
                 ),
-
                 HighSpace(height: height),
-                const PersonalInformationCurrentAddress(),
+                Container(
+                  width: MediaQuery.of(context).size.width * displayWidth,
+                  padding: const EdgeInsets.all(50),
+                  decoration: BoxDecoration(
+                      color: Colors.lightBlue.withOpacity(.3),
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(10))),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.location_on),
+                          misc.subjectRichText(
+                              subject: model.currentAddressSubject,
+                              fontsize: 25,
+                              color: Colors.black),
+                          const Expanded(flex: 1, child: SizedBox()),
+                          Expanded(flex: 1, child: registeredAddressListTile),
+                          Expanded(flex: 1, child: otherAddressListTile),
+                        ],
+                      ),
+                      (currentAddressEnum == SelectedAddressEnum.current)
+                          ? current
+                          : const Column()
+                    ],
+                  ),
+                ),
                 HighSpace(height: height),
-                const PersonalInformationOccupation(),
+                // const PersonalInformationOccupation(),
+                Container(
+                  width: MediaQuery.of(context).size.width * displayWidth,
+                  padding: const EdgeInsets.all(50),
+                  decoration: BoxDecoration(
+                      color: Colors.lightBlue.withOpacity(
+                        .3,
+                      ),
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(10))),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          RichText(
+                            text: const TextSpan(
+                              text: 'อาชีพปัจจุบันแลหะแหล่งที่มาของเงินลงทุน',
+                              style: TextStyle(
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black),
+                              children: [
+                                TextSpan(
+                                  text: '*',
+                                  style: TextStyle(
+                                    color: Colors.red,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const HighSpace(height: 20),
+                      Row(
+                        children: [
+                          Expanded(flex: 1, child: sourceOfIncome),
+                          space,
+                          Expanded(flex: 1, child: currentOccupation)
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(flex: 1, child: officeNameValue),
+                          const SizedBox(width: 10),
+                          Expanded(flex: 1, child: typeOfBusiness),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(flex: 1, child: positionValue),
+                          const SizedBox(width: 10),
+                          Expanded(flex: 1, child: salary),
+                        ],
+                      ),
+                      const HighSpace(height: 20),
+                      Row(
+                        children: [
+                          const Icon(Icons.location_on),
+                          misc.subjectRichText(
+                              subject: model.officeLocation, fontsize: 25),
+                          const Expanded(flex: 1, child: SizedBox()),
+                          Expanded(
+                              flex: 2, child: registeredOfficeAddressListTile),
+                          Expanded(
+                              flex: 2, child: currentOfficeAddressListTile),
+                          Expanded(flex: 2, child: otherOfficeAddressListTile),
+                        ],
+                      ),
+                      (officeAddressEnum == SelectedAddressEnum.office)
+                          ? office
+                          : const Column()
+                    ],
+                  ),
+                ),
                 HighSpace(height: height),
-                const PersonalInformationBankAccount(),
+                // bankAccount
+                Container(
+                  width: MediaQuery.of(context).size.width * displayWidth,
+                  padding: const EdgeInsets.all(50),
+                  decoration: BoxDecoration(
+                      color: Colors.lightBlue.withOpacity(.3),
+                      borderRadius: const BorderRadius.all(
+                        Radius.circular(10),
+                      )),
+                  child: Column(
+                    children: [
+                      const Row(
+                        children: [
+                          Icon(Icons.location_on),
+                          Text(model.bankHeaderSubject,
+                              style: TextStyle(
+                                  fontSize: 25, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                      const Row(children: [Text(model.firstBankSubject)]),
+                      firstBank,
+                      const SizedBox(height: 50),
+                      Row(
+                        children: [
+                          const Icon(Icons.location_on),
+                          const Text(model.secondBankSubject,
+                              style: TextStyle(
+                                  fontSize: 25, fontWeight: FontWeight.bold)),
+                          const Expanded(flex: 3, child: SizedBox()),
+                          Expanded(
+                            flex: 1,
+                            child: ListTile(
+                              title: const Text('ใช้'),
+                              leading: Radio<isAddedBankAccountsEnum>(
+                                value: isAddedBankAccountsEnum.yes,
+                                groupValue: isAddedBankAccount,
+                                onChanged: (isAddedBankAccountsEnum? value) {
+                                  setState(() {
+                                    isAddedBankAccount = value;
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: ListTile(
+                              title: const Text('ไม่ใช้'),
+                              leading: Radio<isAddedBankAccountsEnum>(
+                                value: isAddedBankAccountsEnum.no,
+                                groupValue: isAddedBankAccount,
+                                onChanged: (isAddedBankAccountsEnum? value) {
+                                  setState(() {
+                                    isAddedBankAccount = value;
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      (isAddedBankAccount == isAddedBankAccountsEnum.yes)
+                          ? Column(
+                              children: [
+                                const Row(
+                                  children: [
+                                    Text('กรุณาระบุชื่อธนาคารก่อนกรอกชื่อสาขา'),
+                                  ],
+                                ),
+                                secondBank
+                              ],
+                            )
+                          : const Column(),
+                    ],
+                  ),
+                ),
                 HighSpace(height: height),
-                // const PersonalInformationAdvisors(),
-                // HighSpace(height: height),
-                // PersonalInformationBottom(id: userid),
                 Row(
                   children: [
                     Expanded(
@@ -547,15 +1791,152 @@ class _PersonalInformationState extends State<PersonalInformation> {
                             // print('1st bank account: ${page.firstBank.bankAccountID}, ${page.firstBank.bankName}, ${page.firstBank.bankBranchName}, ${page.firstBank.serviceType}');
                             // print('2st bank account: ${page.secondBank.bankAccountID}, ${page.secondBank.bankName}, ${page.secondBank.bankBranchName}, ${page.secondBank.serviceType}');
 
-                            if (registeredAddress.homenumber.isEmpty) {
+                            if (registeredAddress
+                                .controller.homenumber.text.isEmpty) {
                               setState(() {
                                 registeredAddress.condition.homenumber = true;
                               });
-                            } else if (registeredAddress.countryName.isEmpty) {
+                            } else if (registeredAddress.provinceName == null) {
                               setState(() {
-                                registeredAddress.condition.country = true;
+                                registeredAddress.condition.province = true;
                               });
+                            } else if (registeredAddress.districtName == null) {
+                              setState(() {
+                                registeredAddress.condition.district = true;
+                              });
+                            } else if (registeredAddress.subDistrictName ==
+                                null) {
+                              setState(() {
+                                registeredAddress.condition.subdistrict = true;
+                              });
+                            } else if (currentAddressEnum ==
+                                SelectedAddressEnum.current) {
+                              if (currentAddress
+                                  .controller.homenumber.text.isEmpty) {
+                                setState(() {
+                                  currentAddress.condition.homenumber = true;
+                                });
+                              } else if (currentAddress.provinceName == null) {
+                                setState(() {
+                                  currentAddress.condition.province = true;
+                                });
+                              } else if (currentAddress.districtName == null) {
+                                setState(() {
+                                  currentAddress.condition.district = true;
+                                });
+                              } else if (currentAddress.subDistrictName ==
+                                  null) {
+                                setState(() {
+                                  currentAddress.condition.subdistrict = true;
+                                });
+                              }
+                            } else if (occupation.sourceOfIncome.isEmpty) {
+                              setState(() {
+                                sourceOfIncomeCondition = true;
+                              });
+                            } else if (occupation.currentOccupation.isEmpty) {
+                              setState(() {
+                                currentOccupationCondition = true;
+                              });
+                            } else if (officeNameController.text.isEmpty) {
+                              setState(() {
+                                officeNameCondition = true;
+                              });
+                            } else if (occupation.typeOfBusiness.isEmpty) {
+                              setState(() {
+                                typeOfBusinessCondition = true;
+                              });
+                            } else if (positionNameController.text.isEmpty) {
+                              setState(() {
+                                positionNameCondition = true;
+                              });
+                            } else if (occupation.salaryRange.isEmpty) {
+                              setState(() {
+                                salaryRangeCondition = true;
+                              });
+                            } else if (officeAddressEnum ==
+                                SelectedAddressEnum.office) {
+                              if (officeAddress
+                                  .controller.homenumber.text.isEmpty) {
+                                setState(() {
+                                  officeAddress.condition.homenumber = true;
+                                });
+                              } else if (officeAddress.provinceName == null) {
+                                setState(() {
+                                  officeAddress.condition.province = true;
+                                });
+                              } else if (officeAddress.districtName == null) {
+                                setState(() {
+                                  officeAddress.condition.district = true;
+                                });
+                              } else if (officeAddress.subDistrictName ==
+                                  null) {
+                                setState(() {
+                                  officeAddress.condition.subdistrict = true;
+                                });
+                              }
+                            } else if (firstBankNameValue == null) {
+                              setState(() {
+                                firstBankNameCondition = true;
+                              });
+                            } else if (firstBankBranchNameValue == null) {
+                              setState(() {
+                                firstBankNameCondition = true;
+                              });
+                            } else if (_firstbankAccountNumberController
+                                .text.isEmpty) {
+                              setState(() {
+                                firstBankNameCondition = true;
+                              });
+                            } else if (isAddedBankAccount ==
+                                isAddedBankAccountsEnum.yes) {
+                              if (secondBankNameValue == null) {
+                                setState(() {
+                                  secondBankNameCondition = true;
+                                });
+                              } else if (secondBankBranchNameValue == null) {
+                                setState(() {
+                                  secondBankNameCondition = true;
+                                });
+                              } else if (_secondbankAccountNumberController
+                                  .text.isEmpty) {
+                                setState(() {
+                                  secondBankNameCondition = true;
+                                });
+                              }
                             }
+
+                            print(
+                                'registered address: ${registeredAddress.controller.homenumber.text} ${registeredAddress.controller.villageNumber.text} ${registeredAddress.controller.villageName.text} ${registeredAddress.controller.subStreetName.text} ${registeredAddress.controller.streetName.text} ${registeredAddress.subDistrictName} ${registeredAddress.districtName} ${registeredAddress.provinceName} ${registeredAddress.controller.zipcode.text} ${registeredAddress.controller.country.text}}');
+                            print(
+                                'current address: ${currentAddress.controller.homenumber.text} ${currentAddress.controller.villageNumber.text} ${currentAddress.controller.villageName.text} ${currentAddress.controller.subStreetName.text} ${currentAddress.controller.streetName.text} ${currentAddress.subDistrictName} ${currentAddress.districtName} ${currentAddress.provinceName} ${currentAddress.controller.zipcode.text} ${currentAddress.controller.country.text}}');
+                            print(
+                                'office address: ${officeAddress.controller.homenumber.text} ${officeAddress.controller.villageNumber.text} ${officeAddress.controller.villageName.text} ${officeAddress.controller.subStreetName.text} ${officeAddress.controller.streetName.text} ${officeAddress.subDistrictName} ${officeAddress.districtName} ${officeAddress.provinceName} ${officeAddress.controller.zipcode.text} ${officeAddress.controller.country.text}}');
+                            final personalInformation =
+                                modelPI.PersonalInformationModel(
+                                    registeredAddress: registeredAddress,
+                                    occupation: occupation,
+                                    firstBankAccount: modelPI.BankAccountModel(
+                                        bankName: firstBankNameValue!,
+                                        bankAccountID:
+                                            _firstbankAccountNumberController
+                                                .text,
+                                        serviceType: 'dw'));
+                            personalInformation.firstBankAccount
+                                .bankBranchName = firstBankBranchNameValue;
+                            personalInformation.currentAddress = currentAddress;
+                            personalInformation.officeAddress = officeAddress;
+                            personalInformation.secondBankAccount =
+                                modelPI.BankAccountModel(
+                                    bankName: secondBankNameValue!,
+                                    bankAccountID:
+                                        _secondbankAccountNumberController.text,
+                                    serviceType: 'd');
+                            personalInformation.secondBankAccount!
+                                .bankBranchName = secondBankBranchNameValue;
+                            // if (ca.currentAddress == ca.CurrentAddress.others) {
+                            //   if (ca.PersonalInformationCurrentAddress]) {}
+                            // }
 
                             // print(_lasercodestr);
                             // if (registered.homeNumberController.text.isNotEmpty) {
@@ -579,7 +1960,6 @@ class _PersonalInformationState extends State<PersonalInformation> {
                     ),
                   ],
                 ),
-
                 HighSpace(height: height),
               ],
             ),

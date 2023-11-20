@@ -204,7 +204,7 @@ class _PersonalInformationOccupationState
     officeNameValue = misc.importantTextField(
         textController: officeNameController,
         errorTextCondition: _officeNameCondition,
-        errorTextMessage: misc.thErrorMessage(model.officeNameSubject),
+        errorTextMessage: misc.thErrorTextFieldMessage(model.officeNameSubject),
         subject: model.officeNameSubject,
         onchangedFunction: (value) {
           setState(() {
@@ -226,7 +226,7 @@ class _PersonalInformationOccupationState
     positionValue = misc.importantTextField(
         textController: positionNameController,
         errorTextCondition: _positionNameCondition,
-        errorTextMessage: misc.thErrorMessage(model.positionSubject),
+        errorTextMessage: misc.thErrorTextFieldMessage(model.positionSubject),
         subject: model.positionSubject,
         onchangedFunction: (value) {
           setState(() {
@@ -296,48 +296,48 @@ class _PersonalInformationOccupationState
     final zipcodeTextField = misc.importantTextField(
         textController: zipCodeController,
         errorTextCondition: _zipcodeErrorCondition,
-        errorTextMessage: misc.thErrorMessage(model.zipcodeSubject),
+        errorTextMessage: misc.thErrorTextFieldMessage(model.zipcodeSubject),
         subject: model.zipcodeSubject,
         filterPattern: model.numberfilter);
 
     final countryTextField = misc.importantTextField(
         textController: countryController,
         errorTextCondition: _countryErrorCondition,
-        errorTextMessage: misc.thErrorMessage(model.countrySubject),
+        errorTextMessage: misc.thErrorTextFieldMessage(model.countrySubject),
         subject: model.countrySubject,
         filterPattern: model.allfilter);
 
     final homeNumberTextField = misc.importantTextField(
         textController: homeNumberController,
         errorTextCondition: _homeNumberErrorCondition,
-        errorTextMessage: misc.thErrorMessage(model.homeNumberSubject),
+        errorTextMessage: misc.thErrorTextFieldMessage(model.homeNumberSubject),
         subject: model.homeNumberSubject,
         filterPattern: RegExp(r'[0-9/-]'));
     final villageNumberTextField = misc.importantTextField(
         textController: villageNumberController,
         errorTextCondition: _villageNumberErrorCondition,
-        errorTextMessage: misc.thErrorMessage(model.villageNoSubject),
+        errorTextMessage: misc.thErrorTextFieldMessage(model.villageNoSubject),
         subject: model.villageNoSubject,
         filterPattern: model.numberfilter,
         isimportant: false);
     final villageNameTextField = misc.importantTextField(
         textController: villageNameController,
         errorTextCondition: _villageNameErrorCondition,
-        errorTextMessage: misc.thErrorMessage(model.villageNameSubject),
+        errorTextMessage: misc.thErrorTextFieldMessage(model.villageNameSubject),
         subject: model.villageNameSubject,
         filterPattern: model.allfilter,
         isimportant: false);
     final subStreetNameTextField = misc.importantTextField(
         textController: subStreetNameController,
         errorTextCondition: _subStreetNameErrorCondition,
-        errorTextMessage: misc.thErrorMessage(model.subStreetSubject),
+        errorTextMessage: misc.thErrorTextFieldMessage(model.subStreetSubject),
         subject: model.subStreetSubject,
         filterPattern: model.allfilter,
         isimportant: false);
     final streetNameTextField = misc.importantTextField(
         textController: streetNameController,
         errorTextCondition: _streetNameErrorCondition,
-        errorTextMessage: misc.thErrorMessage(model.streetSubject),
+        errorTextMessage: misc.thErrorTextFieldMessage(model.streetSubject),
         subject: model.streetSubject,
         filterPattern: model.allfilter,
         isimportant: false);
@@ -414,7 +414,7 @@ class _PersonalInformationOccupationState
                     onChanged: (OfficeAddress? value) {
                       setState(() {
                         _currentAddress = value;
-                        othersAddress.typeOfAddress = 'r';
+                        // othersAddress.typeOfAddress = 'r';
                       });
                     },
                   ),
@@ -430,7 +430,7 @@ class _PersonalInformationOccupationState
                     onChanged: (OfficeAddress? value) {
                       setState(() {
                         _currentAddress = value;
-                        othersAddress.typeOfAddress = 'c';
+                        // othersAddress.typeOfAddress = 'c';
                       });
                     },
                   ),
@@ -446,7 +446,7 @@ class _PersonalInformationOccupationState
                     onChanged: (OfficeAddress? value) {
                       setState(() {
                         _currentAddress = value;
-                        othersAddress.typeOfAddress = 'o';
+                        // othersAddress.typeOfAddress = 'o';
                         getCurrentProvince();
                       });
                     },

@@ -74,12 +74,12 @@ class _PersonalInformationBottomState extends State<PersonalInformationBottom> {
                     shape: const CircleBorder(),
                     backgroundColor: Colors.orange,
                     onPressed: () {
-                      print('registered home number: ${page.registeredAddress.homenumber} ${page.registeredAddress.villageName} ${page.registeredAddress.subStreetName} ${page.registeredAddress.streetName}, ${page.registeredAddress.typeOfAddress}');
-                      print('current home number: ${page.currentAddress.homenumber}, ${page.currentAddress.typeOfAddress}');
-                      print('others home number: ${page.othersAddress.homenumber}, ${page.othersAddress.typeOfAddress}');
-                      print('occupation: ${page.occupation.sourceOfIncome}, ${page.occupation.currentOccupation}, ${page.occupation.officeName}, ${page.occupation.typeOfBusiness}, ${page.occupation.positionName}, ${page.occupation.salaryRange}');
-                      print('1st bank account: ${page.firstBank.bankAccountID}, ${page.firstBank.bankName}, ${page.firstBank.bankBranchName}, ${page.firstBank.serviceType}');
-                      print('2st bank account: ${page.secondBank.bankAccountID}, ${page.secondBank.bankName}, ${page.secondBank.bankBranchName}, ${page.secondBank.serviceType}');
+                      // print('registered home number: ${page.registeredAddress.homenumber} ${page.registeredAddress.villageName} ${page.registeredAddress.subStreetName} ${page.registeredAddress.streetName}, ${page.registeredAddress.typeOfAddress}');
+                      // print('current home number: ${page.currentAddress.homenumber}, ${page.currentAddress.typeOfAddress}');
+                      // print('others home number: ${page.othersAddress.homenumber}, ${page.othersAddress.typeOfAddress}');
+                      // print('occupation: ${page.occupation.sourceOfIncome}, ${page.occupation.currentOccupation}, ${page.occupation.officeName}, ${page.occupation.typeOfBusiness}, ${page.occupation.positionName}, ${page.occupation.salaryRange}');
+                      // print('1st bank account: ${page.firstBank.bankAccountID}, ${page.firstBank.bankName}, ${page.firstBank.bankBranchName}, ${page.firstBank.serviceType}');
+                      // print('2st bank account: ${page.secondBank.bankAccountID}, ${page.secondBank.bankName}, ${page.secondBank.bankBranchName}, ${page.secondBank.serviceType}');
                       
                       // if (page.registeredAddress.homenumber.isEmpty) {
                       //   setState(() {
