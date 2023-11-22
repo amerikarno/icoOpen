@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 
 class PersonalInformationModel {
   PersonalInformationModel({
+    required this.customerID,
     required this.registeredAddress,
     required this.occupation,
     required this.firstBankAccount,
     // required this.currentType,
     // required this.officeType,
   });
-
+  final String customerID;
   final AddressModel registeredAddress;
   final OccupationModel occupation;
   final BankAccountModel firstBankAccount;
@@ -38,6 +39,7 @@ class AddressModel {
   String? subDistrictName;
   String? districtName;
   String? provinceName;
+  String? typeOfAddress;
   // int zipcode;
   // String countryName;
   // String typeOfAddress;
@@ -54,7 +56,7 @@ class BankAccountModel {
   String bankName;
   String? bankBranchName;
   String bankAccountID;
-  final String serviceType;
+  String serviceType;
 }
 
 class OccupationModel {

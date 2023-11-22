@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 
 import 'package:ico_open/config/config.dart';
@@ -12,6 +14,7 @@ import 'package:ico_open/personal_info/registered_address.dart';
 import 'package:ico_open/personal_info/current_address.dart' as ca;
 import 'package:ico_open/personal_info/registered_address_widget.dart';
 import 'package:ico_open/personal_info/widgets.dart';
+import 'package:logger/logger.dart';
 
 // enum CurrentAddress { registered, others }
 
@@ -1425,6 +1428,9 @@ class _PersonalInformationState extends State<PersonalInformation> {
             misc.thErrorTextFieldMessage(model.bankAccountNumberSubject),
         subject: model.bankAccountNumberSubject,
         filterPattern: model.numberfilter,
+        onsubmittedFunction: (value) {
+          _firstbankAccountNumberController.text = value;
+        },
         onchangedFunction: (value) {
           if (value.isEmpty) {
             setState(() {
@@ -1433,7 +1439,6 @@ class _PersonalInformationState extends State<PersonalInformation> {
           } else {
             setState(() {
               firstBankAccountNumberCondition = false;
-              _firstbankAccountNumberController.text = value;
             });
           }
         });
@@ -1487,6 +1492,9 @@ class _PersonalInformationState extends State<PersonalInformation> {
             misc.thErrorTextFieldMessage(model.bankAccountNumberSubject),
         subject: model.bankAccountNumberSubject,
         filterPattern: model.numberfilter,
+        onsubmittedFunction: (value) {
+          _secondbankAccountNumberController.text = value;
+        },
         onchangedFunction: (value) {
           if (value.isEmpty) {
             setState(() {
@@ -1495,7 +1503,6 @@ class _PersonalInformationState extends State<PersonalInformation> {
           } else {
             setState(() {
               secondBankAccountNumberCondition = false;
-              _secondbankAccountNumberController.text = value;
             });
           }
         });
@@ -1881,12 +1888,12 @@ class _PersonalInformationState extends State<PersonalInformation> {
                               });
                             } else if (firstBankBranchNameValue == null) {
                               setState(() {
-                                firstBankNameCondition = true;
+                                firstBankBranchNameCondition = true;
                               });
                             } else if (_firstbankAccountNumberController
                                 .text.isEmpty) {
                               setState(() {
-                                firstBankNameCondition = true;
+                                firstBankAccountNumberCondition = true;
                               });
                             } else if (isAddedBankAccount ==
                                 isAddedBankAccountsEnum.yes) {
@@ -1914,6 +1921,7 @@ class _PersonalInformationState extends State<PersonalInformation> {
                                 'office address: ${officeAddress.controller.homenumber.text} ${officeAddress.controller.villageNumber.text} ${officeAddress.controller.villageName.text} ${officeAddress.controller.subStreetName.text} ${officeAddress.controller.streetName.text} ${officeAddress.subDistrictName} ${officeAddress.districtName} ${officeAddress.provinceName} ${officeAddress.controller.zipcode.text} ${officeAddress.controller.country.text}}');
                             final personalInformation =
                                 modelPI.PersonalInformationModel(
+                                  customerID: widget.id,
                                     registeredAddress: registeredAddress,
                                     occupation: occupation,
                                     firstBankAccount: modelPI.BankAccountModel(
@@ -1924,16 +1932,80 @@ class _PersonalInformationState extends State<PersonalInformation> {
                                         serviceType: 'dw'));
                             personalInformation.firstBankAccount
                                 .bankBranchName = firstBankBranchNameValue;
-                            personalInformation.currentAddress = currentAddress;
-                            personalInformation.officeAddress = officeAddress;
-                            personalInformation.secondBankAccount =
-                                modelPI.BankAccountModel(
-                                    bankName: secondBankNameValue!,
-                                    bankAccountID:
-                                        _secondbankAccountNumberController.text,
-                                    serviceType: 'd');
-                            personalInformation.secondBankAccount!
-                                .bankBranchName = secondBankBranchNameValue;
+                                personalInformation.occupation.officeName = officeNameController.text;
+                                personalInformation.occupation.positionName = positionNameController.text;
+                                personalInformation.registeredAddress.typeOfAddress = 'r';
+                            if (currentAddressEnum ==
+                                SelectedAddressEnum.current) {
+                              personalInformation.currentAddress =
+                                  currentAddress;
+                                  personalInformation.currentAddress!.typeOfAddress = 'c';
+                            } else if (currentAddressEnum ==
+                                SelectedAddressEnum.registered) {
+                              personalInformation.currentAddress =
+                                  registeredAddress;
+                                  personalInformation.currentAddress!.typeOfAddress = 'r';
+                            }
+
+                            if (officeAddressEnum ==
+                                    SelectedAddressEnum.registered) {
+                              personalInformation.officeAddress =
+                                  registeredAddress;
+                                  personalInformation.registeredAddress.typeOfAddress = 'r';
+                                  personalInformation.currentAddress!.typeOfAddress = 'r';
+                                  personalInformation.officeAddress!.typeOfAddress = 'r';
+                                      print('registeredAddress: ${registeredAddress.provinceName}, ${personalInformation.officeAddress!.provinceName}');
+                            } else if (officeAddressEnum ==
+                                SelectedAddressEnum.current &&
+                                currentAddressEnum ==
+                                    SelectedAddressEnum.registered) {
+                              personalInformation.officeAddress =
+                                  registeredAddress; personalInformation.registeredAddress.typeOfAddress = 'r';
+                                  personalInformation.currentAddress!.typeOfAddress = 'r';
+                                  personalInformation.officeAddress!.typeOfAddress = 'c';
+                            } else if (officeAddressEnum ==
+                                SelectedAddressEnum.current) {
+                              personalInformation.officeAddress =
+                                  currentAddress;
+                                   personalInformation.registeredAddress.typeOfAddress = 'r';
+                                  personalInformation.currentAddress!.typeOfAddress = 'c';
+                                  personalInformation.officeAddress!.typeOfAddress = 'c';
+                            } else if (officeAddressEnum ==
+                                SelectedAddressEnum.office) {
+                              personalInformation.officeAddress = officeAddress;
+                               personalInformation.registeredAddress.typeOfAddress = 'r';
+                                  personalInformation.currentAddress!.typeOfAddress = 'c';
+                                  personalInformation.officeAddress!.typeOfAddress = 'o';
+                            }
+
+print('''personal: ${personalInformation.registeredAddress.typeOfAddress}
+current: ${personalInformation.currentAddress!.typeOfAddress}
+office: ${personalInformation.officeAddress!.typeOfAddress}''');
+                            // personalInformation.officeAddress = officeAddress;
+                            if (secondBankNameValue != null &&
+                                secondBankBranchNameValue != null &&
+                                _secondbankAccountNumberController
+                                    .text.isNotEmpty) {
+                              personalInformation.secondBankAccount =
+                                  modelPI.BankAccountModel(
+                                      bankName: secondBankNameValue!,
+                                      bankAccountID:
+                                          _secondbankAccountNumberController
+                                              .text,
+                                      serviceType: 'd');
+                              personalInformation.secondBankAccount!
+                                  .bankBranchName = secondBankBranchNameValue;
+                            // } else {
+                            //   personalInformation.secondBankAccount!.bankName = '';
+                            //   personalInformation.secondBankAccount!.bankBranchName = '';
+                            //   personalInformation.secondBankAccount!.bankAccountID = '';
+                            //   personalInformation.secondBankAccount!.serviceType = 'd';
+                            }
+
+                            var logger = Logger();
+                            logger.d('current: $currentAddressEnum, office: $officeAddressEnum');
+                            inspect(personalInformation);
+                            api.postPersonalInfo(personalInformation);
                             // if (ca.currentAddress == ca.CurrentAddress.others) {
                             //   if (ca.PersonalInformationCurrentAddress]) {}
                             // }
