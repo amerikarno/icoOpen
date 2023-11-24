@@ -93,9 +93,11 @@ Widget dropdownButtonBuilderFunction(
     required List<String> items,
     required bool condition,
     required String errorText,
+    double? itemHeight,
     Function(String?)? onChanged,
     Function()? onTabFunction}) {
   return DropdownButtonFormField(
+    itemHeight: itemHeight!,
     value: value,
     decoration: InputDecoration(
       errorText: condition ? errorText : null,
@@ -134,7 +136,6 @@ Widget addressFunction(
     required Widget provinceNameWidget,
     required Widget zipCodeWidget,
     required Widget countryWidget}) {
-      
   return Column(children: [
     Row(children: [
       if (titleWidget.isNotEmpty) const Icon(Icons.home),
@@ -165,4 +166,30 @@ Widget addressFunction(
     ])
   ]);
 }
+
+Widget containerWidget(
+    Widget customerRiskDropdownWidget, Widget suitableTestWidget, double paddingValue, double displayWidth, BuildContext context) {
+  return Container(
+    width: MediaQuery.of(context).size.width * displayWidth,
+    padding: EdgeInsets.all(paddingValue),
+    decoration: BoxDecoration(
+        color: Colors.lightBlue.withOpacity(
+          .3,
+        ),
+        borderRadius: const BorderRadius.all(Radius.circular(10))),
+    child: Column(
+      children: [
+        Row(
+          children: [
+            Expanded(flex: 1, child: customerRiskDropdownWidget),
+            const SizedBox(width: 5),
+            suitableTestWidget,
+            const Expanded(flex: 1, child: SizedBox()),
+          ],
+        ),
+      ],
+    ),
+  );
+}
+
 

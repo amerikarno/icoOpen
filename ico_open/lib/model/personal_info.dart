@@ -4,6 +4,8 @@ class PersonalInformationModel {
   PersonalInformationModel({
     required this.customerID,
     required this.registeredAddress,
+    required this.currentAddress,
+    required this.officeAddress,
     required this.occupation,
     required this.firstBankAccount,
     // required this.currentType,
@@ -15,8 +17,8 @@ class PersonalInformationModel {
   final BankAccountModel firstBankAccount;
   // final String currentType;
   // final String officeType;
-  AddressModel? currentAddress;
-  AddressModel? officeAddress;
+  AddressModel currentAddress;
+  AddressModel officeAddress;
   BankAccountModel? secondBankAccount;
 }
 

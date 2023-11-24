@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 
 import 'package:ico_open/config/config.dart';
+import 'package:ico_open/misc/misc.dart' as misc;
+import 'package:ico_open/model/model.dart' as model;
 import 'package:ico_open/customer_evaluate/agreement.dart';
 import 'package:ico_open/customer_evaluate/evaluate.dart';
 import 'package:ico_open/customer_evaluate/evaluate_result.dart';
 import 'package:ico_open/customer_evaluate/fatca.dart';
 import 'package:ico_open/customer_evaluate/bottom.dart';
+import 'package:ico_open/model/sute_test.dart';
+import 'package:ico_open/questions/sute_test.dart';
+import 'package:simple_circular_progress_bar/simple_circular_progress_bar.dart';
 
 // enum CurrentAddress { registered, others }
 
@@ -19,13 +24,581 @@ class CustomerEvaluate extends StatefulWidget {
   State<StatefulWidget> createState() => _CustomerEvaluateState();
 }
 
+enum AnswerEnum { first, second, third, forth }
+
 class _CustomerEvaluateState extends State<CustomerEvaluate> {
-  // CurrentAddress? _currentAddress = CurrentAddress.registered;
-  // final TextEditingController _homeNumber = TextEditingController();
-  // final TextEditingController _thsurname = TextEditingController();
+  double suitableSumPoints = 0;
+
+  bool is4_1checked = false,
+      is4_2checked = false,
+      is4_3checked = false,
+      is4_4checked = false;
+
+  List<String> customerRiskItems = <String>[
+    'เสี่ยงต่ำ',
+    'เสี่ยงปานกลางค่อนข้างต่ำ',
+    'เสี่ยงปานกลางค่อนข้างสูง',
+    'เสี่ยงสูง',
+    'เสี่ยงสูงมาก',
+  ];
+
+  String? riskLevelValue;
+  bool riskLevelErrorTestCondition = false;
+
+  AnswerEnum? _firstQuestion;
+  AnswerEnum? _secondQuestion;
+  AnswerEnum? _thirdQuestion;
+  AnswerEnum? _forthQuestion;
+  AnswerEnum? _fifthQuestion;
+  AnswerEnum? _sixthQuestion;
+  AnswerEnum? _seventhQuestion;
+  AnswerEnum? _eigthQuestion;
+  AnswerEnum? _ninthQuestion;
+  AnswerEnum? _tenthQuestion;
+
+  double convertAnserEnumToInt(AnswerEnum? enumPoint) {
+    if (enumPoint != null) {
+      if (enumPoint == AnswerEnum.first) {
+        return 1;
+      }
+      if (enumPoint == AnswerEnum.second) {
+        return 2;
+      }
+      if (enumPoint == AnswerEnum.third) {
+        return 3;
+      }
+      if (enumPoint == AnswerEnum.forth) {
+        return 4;
+      }
+    }
+    return 0;
+  }
+
+  Widget editSuitableEvaluteTextButton() {
+    // int questionNumber = 0;
+    // final currentSuitQuestion = suiteQuestions[questionNumber];
+    return ElevatedButton(
+        onPressed: () => showDialog(
+              context: context,
+              builder: (BuildContext context) => AlertDialog(
+                title: const Text(model.suitableDialogTitle),
+                actionsAlignment: MainAxisAlignment.center,
+                content: _questionsWidget(suiteQuestions),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      setState(() {
+                        suitableSumPoints = convertAnserEnumToInt(_firstQuestion) +
+                                  convertAnserEnumToInt(_secondQuestion) +
+                                  convertAnserEnumToInt(_thirdQuestion) +
+                                  convertAnserEnumToInt(_forthQuestion) +
+                                  convertAnserEnumToInt(_fifthQuestion) +
+                                  convertAnserEnumToInt(_sixthQuestion) +
+                                  convertAnserEnumToInt(_seventhQuestion) +
+                                  convertAnserEnumToInt(_eigthQuestion) +
+                                  convertAnserEnumToInt(_ninthQuestion) +
+                                  convertAnserEnumToInt(_tenthQuestion);
+                      });
+                      if (
+                        _firstQuestion == null ||
+                        _secondQuestion == null ||
+                        _thirdQuestion == null ||
+                        _forthQuestion == null ||
+                        _fifthQuestion == null ||
+                        _sixthQuestion == null ||
+                        _seventhQuestion == null ||
+                        _eigthQuestion == null ||
+                        _ninthQuestion == null ||
+                        _tenthQuestion == null 
+                      ) {
+                        showDialog(context: context, builder: (BuildContext context) {
+                          return const AlertDialog(title: Text('รบกวนทำให้ครบทุกข้อ', style: TextStyle(color: Colors.red),),);
+                        });
+                      } else {
+                        Navigator.pop(context, suitableSumPoints);
+                      }
+                    },
+                    child: const Text(
+                      'OK',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        style: const ButtonStyle(
+            backgroundColor: MaterialStatePropertyAll(Colors.transparent),
+            foregroundColor: MaterialStatePropertyAll(Colors.transparent),
+            shadowColor: MaterialStatePropertyAll(Colors.transparent),
+            surfaceTintColor: MaterialStatePropertyAll(Colors.transparent),
+            overlayColor: MaterialStatePropertyAll(Colors.transparent),
+            iconColor: MaterialStatePropertyAll(Colors.transparent)),
+        child: const Text(
+          model.studyOrEditSuitableLevel,
+          style: TextStyle(
+              color: Colors.orange, decoration: TextDecoration.underline),
+        ));
+  }
+
+  Widget _answerListTile(
+      SuitQuestion currentQuestion,
+      int index,
+      AnswerEnum? selectedGroup,
+      AnswerEnum selectedAnswer,
+      Function(AnswerEnum?) func) {
+    return ListTile(
+      minLeadingWidth: 0,
+      title: Text(
+        currentQuestion.answers[index],
+        style: const TextStyle(fontSize: 12),
+      ),
+      leading: Radio<AnswerEnum>(
+          value: selectedAnswer, groupValue: selectedGroup, onChanged: func),
+    );
+  }
+
+  Widget _answerCheckBox(
+    bool ischeck,
+    Function(bool?) func,
+    SuitQuestion currentQuestion,
+    int index,
+  ) {
+    return CheckboxListTile(
+        title: Text(currentQuestion.answers[index]),
+        value: ischeck,
+        onChanged: func,
+        controlAffinity: ListTileControlAffinity.leading,);
+  }
+
+  Widget _questionsWidget(List<SuitQuestion> suitQuestions) {
+    final firstSuitQuestion = suiteQuestions[0];
+    final secondSuitQuestion = suiteQuestions[1];
+    final thirdSuitQuestion = suiteQuestions[2];
+    final forthSuitQuestion = suiteQuestions[3];
+    final fifthSuitQuestion = suiteQuestions[4];
+    final sixthSuitQuestion = suiteQuestions[5];
+    final seventhSuitQuestion = suiteQuestions[6];
+    final eigthSuitQuestion = suiteQuestions[7];
+    final ninthSuitQuestion = suiteQuestions[8];
+    final tenthSuitQuestion = suiteQuestions[9];
+    return StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+      return SingleChildScrollView(
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Padding(
+              padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+              child: Text(firstSuitQuestion.text,
+                  style: const TextStyle(fontSize: 15))),
+          Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
+              child: Column(
+                children: [
+                  _answerListTile(
+                      firstSuitQuestion, 0, _firstQuestion, AnswerEnum.first,
+                      (value) {
+                    setState(() {
+                      _firstQuestion = value;
+                    });
+                  }),
+                  _answerListTile(
+                      firstSuitQuestion, 1, _firstQuestion, AnswerEnum.second,
+                      (value) {
+                    setState(() {
+                      _firstQuestion = value;
+                    });
+                  }),
+                  _answerListTile(
+                      firstSuitQuestion, 2, _firstQuestion, AnswerEnum.third,
+                      (value) {
+                    setState(() {
+                      _firstQuestion = value;
+                    });
+                  }),
+                  _answerListTile(
+                      firstSuitQuestion, 3, _firstQuestion, AnswerEnum.forth,
+                      (value) {
+                    setState(() {
+                      _firstQuestion = value;
+                    });
+                  }),
+                ],
+              )),
+          Padding(
+              padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+              child: Text(secondSuitQuestion.text,
+                  style: const TextStyle(fontSize: 15))),
+          Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
+              child: Column(
+                children: [
+                  _answerListTile(
+                      secondSuitQuestion, 0, _secondQuestion, AnswerEnum.first,
+                      (value) {
+                    setState(() {
+                      _secondQuestion = value;
+                    });
+                  }),
+                  _answerListTile(
+                      secondSuitQuestion, 1, _secondQuestion, AnswerEnum.second,
+                      (value) {
+                    setState(() {
+                      _secondQuestion = value;
+                    });
+                  }),
+                  _answerListTile(
+                      secondSuitQuestion, 2, _secondQuestion, AnswerEnum.third,
+                      (value) {
+                    setState(() {
+                      _secondQuestion = value;
+                    });
+                  }),
+                  _answerListTile(
+                      secondSuitQuestion, 3, _secondQuestion, AnswerEnum.forth,
+                      (value) {
+                    setState(() {
+                      _secondQuestion = value;
+                    });
+                  }),
+                ],
+              )),
+          Padding(
+              padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+              child: Text(thirdSuitQuestion.text,
+                  style: const TextStyle(fontSize: 15))),
+          Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
+              child: Column(
+                children: [
+                  _answerListTile(
+                      thirdSuitQuestion, 0, _thirdQuestion, AnswerEnum.first,
+                      (value) {
+                    setState(() {
+                      _thirdQuestion = value;
+                    });
+                  }),
+                  _answerListTile(
+                      thirdSuitQuestion, 1, _thirdQuestion, AnswerEnum.second,
+                      (value) {
+                    setState(() {
+                      _thirdQuestion = value;
+                    });
+                  }),
+                  _answerListTile(
+                      thirdSuitQuestion, 2, _thirdQuestion, AnswerEnum.third,
+                      (value) {
+                    setState(() {
+                      _thirdQuestion = value;
+                    });
+                  }),
+                  _answerListTile(
+                      thirdSuitQuestion, 3, _thirdQuestion, AnswerEnum.forth,
+                      (value) {
+                    setState(() {
+                      _thirdQuestion = value;
+                    });
+                  }),
+                ],
+              )),
+          Padding(
+              padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+              child: Text(forthSuitQuestion.text,
+                  style: const TextStyle(fontSize: 15))),
+          Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
+              child: Column(
+                children: [
+                  _answerCheckBox(is4_1checked, (value) {
+                    if (!(is4_2checked || is4_3checked || is4_4checked)) {
+                      setState(() {
+                        _forthQuestion = AnswerEnum.first;
+                      });
+                    }
+                      setState(() {
+                        is4_1checked = !is4_1checked;
+                      });
+                  }, forthSuitQuestion, 0),
+                  _answerCheckBox(is4_2checked, (value) {
+                    if (!(is4_3checked || is4_4checked)) {
+                      setState(() {
+                        _forthQuestion = AnswerEnum.second;
+                      });
+                    }
+                      setState(() {
+                        is4_2checked = !is4_2checked;
+                      });
+                  }, forthSuitQuestion, 0),
+                  _answerCheckBox(is4_3checked, (value) {
+                    if (!is4_4checked) {
+                      setState(() {
+                        _forthQuestion = AnswerEnum.third;
+                      });
+                    }
+                      setState(() {
+                        is4_3checked = !is4_3checked;
+                      });
+                  }, forthSuitQuestion, 0),
+                  _answerCheckBox(is4_4checked, (value) {
+                    setState(() {
+                      _forthQuestion = AnswerEnum.forth;
+                        is4_4checked = !is4_4checked;
+                    });
+                  }, forthSuitQuestion, 3),
+                ],
+              )),
+          Padding(
+              padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+              child: Text(fifthSuitQuestion.text,
+                  style: const TextStyle(fontSize: 15))),
+          Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
+              child: Column(
+                children: [
+                  _answerListTile(
+                      fifthSuitQuestion, 0, _fifthQuestion, AnswerEnum.first,
+                      (value) {
+                    setState(() {
+                      _fifthQuestion = value;
+                    });
+                  }),
+                  _answerListTile(
+                      fifthSuitQuestion, 1, _fifthQuestion, AnswerEnum.second,
+                      (value) {
+                    setState(() {
+                      _fifthQuestion = value;
+                    });
+                  }),
+                  _answerListTile(
+                      fifthSuitQuestion, 2, _fifthQuestion, AnswerEnum.third,
+                      (value) {
+                    setState(() {
+                      _fifthQuestion = value;
+                    });
+                  }),
+                  _answerListTile(
+                      fifthSuitQuestion, 3, _fifthQuestion, AnswerEnum.forth,
+                      (value) {
+                    setState(() {
+                      _fifthQuestion = value;
+                    });
+                  }),
+                ],
+              )),
+          Padding(
+              padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+              child: Text(sixthSuitQuestion.text,
+                  style: const TextStyle(fontSize: 15))),
+          Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
+              child: Column(
+                children: [
+                  _answerListTile(
+                      sixthSuitQuestion, 0, _sixthQuestion, AnswerEnum.first,
+                      (value) {
+                    setState(() {
+                      _sixthQuestion = value;
+                    });
+                  }),
+                  _answerListTile(
+                      sixthSuitQuestion, 1, _sixthQuestion, AnswerEnum.second,
+                      (value) {
+                    setState(() {
+                      _sixthQuestion = value;
+                    });
+                  }),
+                  _answerListTile(
+                      sixthSuitQuestion, 2, _sixthQuestion, AnswerEnum.third,
+                      (value) {
+                    setState(() {
+                      _sixthQuestion = value;
+                    });
+                  }),
+                  _answerListTile(
+                      sixthSuitQuestion, 3, _sixthQuestion, AnswerEnum.forth,
+                      (value) {
+                    setState(() {
+                      _sixthQuestion = value;
+                    });
+                  }),
+                ],
+              )),
+          Padding(
+              padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+              child: Text(seventhSuitQuestion.text,
+                  style: const TextStyle(fontSize: 15))),
+          Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
+              child: Column(
+                children: [
+                  _answerListTile(seventhSuitQuestion, 0, _seventhQuestion,
+                      AnswerEnum.first, (value) {
+                    setState(() {
+                      _seventhQuestion = value;
+                    });
+                  }),
+                  _answerListTile(seventhSuitQuestion, 1, _seventhQuestion,
+                      AnswerEnum.second, (value) {
+                    setState(() {
+                      _seventhQuestion = value;
+                    });
+                  }),
+                  _answerListTile(seventhSuitQuestion, 2, _seventhQuestion,
+                      AnswerEnum.third, (value) {
+                    setState(() {
+                      _seventhQuestion = value;
+                    });
+                  }),
+                  _answerListTile(seventhSuitQuestion, 3, _seventhQuestion,
+                      AnswerEnum.forth, (value) {
+                    setState(() {
+                      _seventhQuestion = value;
+                    });
+                  }),
+                ],
+              )),
+          Padding(
+              padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+              child: Text(eigthSuitQuestion.text,
+                  style: const TextStyle(fontSize: 15))),
+          Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
+              child: Column(
+                children: [
+                  _answerListTile(
+                      eigthSuitQuestion, 0, _eigthQuestion, AnswerEnum.first,
+                      (value) {
+                    setState(() {
+                      _eigthQuestion = value;
+                    });
+                  }),
+                  _answerListTile(
+                      eigthSuitQuestion, 1, _eigthQuestion, AnswerEnum.second,
+                      (value) {
+                    setState(() {
+                      _eigthQuestion = value;
+                    });
+                  }),
+                  _answerListTile(
+                      eigthSuitQuestion, 2, _eigthQuestion, AnswerEnum.third,
+                      (value) {
+                    setState(() {
+                      _eigthQuestion = value;
+                    });
+                  }),
+                  _answerListTile(
+                      eigthSuitQuestion, 3, _eigthQuestion, AnswerEnum.forth,
+                      (value) {
+                    setState(() {
+                      _eigthQuestion = value;
+                    });
+                  }),
+                ],
+              )),
+          Padding(
+              padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+              child: Text(ninthSuitQuestion.text,
+                  style: const TextStyle(fontSize: 15))),
+          Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
+              child: Column(
+                children: [
+                  _answerListTile(
+                      ninthSuitQuestion, 0, _ninthQuestion, AnswerEnum.first,
+                      (value) {
+                    setState(() {
+                      _ninthQuestion = value;
+                    });
+                  }),
+                  _answerListTile(
+                      ninthSuitQuestion, 1, _ninthQuestion, AnswerEnum.second,
+                      (value) {
+                    setState(() {
+                      _ninthQuestion = value;
+                    });
+                  }),
+                  _answerListTile(
+                      ninthSuitQuestion, 2, _ninthQuestion, AnswerEnum.third,
+                      (value) {
+                    setState(() {
+                      _ninthQuestion = value;
+                    });
+                  }),
+                  _answerListTile(
+                      ninthSuitQuestion, 3, _ninthQuestion, AnswerEnum.forth,
+                      (value) {
+                    setState(() {
+                      _ninthQuestion = value;
+                    });
+                  }),
+                ],
+              )),
+          Padding(
+              padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+              child: Text(tenthSuitQuestion.text,
+                  style: const TextStyle(fontSize: 15))),
+          Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
+              child: Column(
+                children: [
+                  _answerListTile(
+                      tenthSuitQuestion, 0, _tenthQuestion, AnswerEnum.first,
+                      (value) {
+                    setState(() {
+                      _tenthQuestion = value;
+                    });
+                  }),
+                  _answerListTile(
+                      tenthSuitQuestion, 1, _tenthQuestion, AnswerEnum.second,
+                      (value) {
+                    setState(() {
+                      _tenthQuestion = value;
+                    });
+                  }),
+                  _answerListTile(
+                      tenthSuitQuestion, 2, _tenthQuestion, AnswerEnum.third,
+                      (value) {
+                    setState(() {
+                      _tenthQuestion = value;
+                    });
+                  }),
+                  _answerListTile(
+                      tenthSuitQuestion, 3, _tenthQuestion, AnswerEnum.forth,
+                      (value) {
+                    setState(() {
+                      _tenthQuestion = value;
+                    });
+                  }),
+                ],
+              )),
+        ]),
+      );
+    });
+  }
+
+  Widget sutableCircularProgressBar(double suitableSumPoints) {
+    return SimpleCircularProgressBar(
+      progressStrokeWidth: 10,
+      progressColors: const [Colors.orange],
+      backStrokeWidth: 10,
+      backColor: Colors.grey,
+      maxValue: 46,
+      // valueNotifier: ValueNotifier(10),
+      valueNotifier: ValueNotifier(suitableSumPoints),
+      mergeMode: true,
+      onGetText: (double value) {
+        return Text(
+          '${value.toInt()}',
+          style: const TextStyle(
+            fontSize: 30,
+            fontWeight: FontWeight.bold,
+            color: Colors.orange,
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    // currentQuestion = suiteQuestions[0];
     final userid = widget.id;
     double height = 50;
     return Scaffold(
@@ -36,9 +609,109 @@ class _CustomerEvaluateState extends State<CustomerEvaluate> {
               HighSpace(height: height),
               const CustomerEvaluateHeader(),
               HighSpace(height: height),
-              const CustomerEvaluateScores(),
+              misc.containerWidget(
+                  misc.dropdownButtonBuilderFunction(
+                      value: riskLevelValue,
+                      itemHeight: 50,
+                      label1: model.pleaseSelectedYourRiskLevel,
+                      label2: '',
+                      items: customerRiskItems,
+                      condition: riskLevelErrorTestCondition,
+                      onChanged: (value) {
+                        if (value == customerRiskItems[0]) {
+                          setState(() {
+                            _firstQuestion = AnswerEnum.first;
+                            _secondQuestion = AnswerEnum.first;
+                            _thirdQuestion = AnswerEnum.first;
+                            _forthQuestion = AnswerEnum.first;
+                            _fifthQuestion = AnswerEnum.first;
+                            _sixthQuestion = AnswerEnum.first;
+                            _seventhQuestion = AnswerEnum.first;
+                            _eigthQuestion = AnswerEnum.first;
+                            _ninthQuestion = AnswerEnum.first;
+                            _tenthQuestion = AnswerEnum.first;
+                          });
+                        }
+                        if (value == customerRiskItems[1]) {
+                          setState(() {
+                            _firstQuestion = AnswerEnum.second;
+                            _secondQuestion = AnswerEnum.second;
+                            _thirdQuestion = AnswerEnum.second;
+                            _forthQuestion = AnswerEnum.second;
+                            _fifthQuestion = AnswerEnum.second;
+                            _sixthQuestion = AnswerEnum.second;
+                            _seventhQuestion = AnswerEnum.second;
+                            _eigthQuestion = AnswerEnum.second;
+                            _ninthQuestion = AnswerEnum.second;
+                            _tenthQuestion = AnswerEnum.second;
+                          });
+                        }
+                        if (value == customerRiskItems[2]) {
+                          setState(() {
+                            _firstQuestion = AnswerEnum.third;
+                            _secondQuestion = AnswerEnum.third;
+                            _thirdQuestion = AnswerEnum.third;
+                            _forthQuestion = AnswerEnum.third;
+                            _fifthQuestion = AnswerEnum.third;
+                            _sixthQuestion = AnswerEnum.third;
+                            _seventhQuestion = AnswerEnum.third;
+                            _eigthQuestion = AnswerEnum.third;
+                            _ninthQuestion = AnswerEnum.third;
+                            _tenthQuestion = AnswerEnum.first;
+                          });
+                        }
+                        if (value == customerRiskItems[3]) {
+                          setState(() {
+                            _firstQuestion = AnswerEnum.third;
+                            _secondQuestion = AnswerEnum.third;
+                            _thirdQuestion = AnswerEnum.third;
+                            _forthQuestion = AnswerEnum.third;
+                            _fifthQuestion = AnswerEnum.third;
+                            _sixthQuestion = AnswerEnum.third;
+                            _seventhQuestion = AnswerEnum.third;
+                            _eigthQuestion = AnswerEnum.third;
+                            _ninthQuestion = AnswerEnum.third;
+                            _tenthQuestion = AnswerEnum.third;
+                          });
+                        }
+                        if (value == customerRiskItems[4]) {
+                          setState(() {
+                            _firstQuestion = AnswerEnum.forth;
+                            _secondQuestion = AnswerEnum.forth;
+                            _thirdQuestion = AnswerEnum.forth;
+                            _forthQuestion = AnswerEnum.forth;
+                            _fifthQuestion = AnswerEnum.forth;
+                            _sixthQuestion = AnswerEnum.forth;
+                            _seventhQuestion = AnswerEnum.forth;
+                            _eigthQuestion = AnswerEnum.forth;
+                            _ninthQuestion = AnswerEnum.forth;
+                            _tenthQuestion = AnswerEnum.forth;
+                          });
+                        }
+                        setState(() {
+                          riskLevelValue = value;
+                          suitableSumPoints =
+                              convertAnserEnumToInt(_firstQuestion) +
+                                  convertAnserEnumToInt(_secondQuestion) +
+                                  convertAnserEnumToInt(_thirdQuestion) +
+                                  convertAnserEnumToInt(_forthQuestion) +
+                                  convertAnserEnumToInt(_fifthQuestion) +
+                                  convertAnserEnumToInt(_sixthQuestion) +
+                                  convertAnserEnumToInt(_seventhQuestion) +
+                                  convertAnserEnumToInt(_eigthQuestion) +
+                                  convertAnserEnumToInt(_ninthQuestion) +
+                                  convertAnserEnumToInt(_tenthQuestion);
+                        });
+                        print(suitableSumPoints);
+                      },
+                      errorText: misc.thErrorDropdownMessage(
+                          model.pleaseSelectedYourRiskLevel)),
+                  editSuitableEvaluteTextButton(),
+                  paddingValue,
+                  displayWidth,
+                  context),
               HighSpace(height: height),
-              const CustomerEvaluateResults(),
+              CustomerEvaluateResults(points: suitableSumPoints),
               HighSpace(height: height),
               const CustomerFATCA(),
               HighSpace(height: height),
@@ -46,7 +719,7 @@ class _CustomerEvaluateState extends State<CustomerEvaluate> {
               HighSpace(height: height),
               // CustomerEvaluateAdvisors(),
               // HighSpace(height: 50),
-              CustomerEvaluateBottom(id:userid),
+              CustomerEvaluateBottom(id: userid),
               HighSpace(height: height),
             ],
           ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:simple_circular_progress_bar/simple_circular_progress_bar.dart';
 
 import 'package:ico_open/config/config.dart';
 import 'package:ico_open/personal_info/page.dart';
@@ -6,7 +7,8 @@ import 'package:ico_open/personal_info/page.dart';
 enum CurrentAddress { registered, others }
 
 class CustomerEvaluateResults extends StatefulWidget {
-  const CustomerEvaluateResults({super.key});
+  final double points;
+  const CustomerEvaluateResults({super.key, required this.points});
 
   @override
   State<CustomerEvaluateResults> createState() =>
@@ -16,9 +18,54 @@ class CustomerEvaluateResults extends StatefulWidget {
 class _CustomerEvaluateResultsState extends State<CustomerEvaluateResults> {
   // CurrentAddress? _currentAddress = CurrentAddress.registered;
   // final TextEditingController _homeNumber = TextEditingController();
+  double suitableSumPoints = 0;
+  double suitableMaxPoints = 40;
+  String? investerType;
+  String? digitatAssetInvestmentRatios;
+  void updateSuitableSumPoints() {
+    setState(() {
+      suitableSumPoints = widget.points;
+    });
+  }
+
+  void setInvestorType(double points) {
+    if (points < 15) {
+      setState(() {
+        investerType = customerRiskLists[0];
+        digitatAssetInvestmentRatios = '<5%';
+      });
+    }
+    if (points >= 15 && points <= 21) {
+      setState(() {
+        investerType = customerRiskLists[1];
+        digitatAssetInvestmentRatios = '<10%';
+      });
+    }
+    if (points >= 22 && points <= 29) {
+      setState(() {
+        investerType = customerRiskLists[2];
+        digitatAssetInvestmentRatios = '<10%';
+      });
+    }
+    if (points >= 30 && points <= 36) {
+      setState(() {
+        investerType = customerRiskLists[3];
+        digitatAssetInvestmentRatios = '<20%';
+      });
+    }
+    if (points >= 37) {
+      setState(() {
+        investerType = customerRiskLists[4];
+        digitatAssetInvestmentRatios = '<30%';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    updateSuitableSumPoints();
+    setInvestorType(suitableSumPoints);
+    print('func: $suitableSumPoints');
     return Container(
       width: MediaQuery.of(context).size.width * displayWidth,
       padding: const EdgeInsets.all(paddingValue),
@@ -27,10 +74,10 @@ class _CustomerEvaluateResultsState extends State<CustomerEvaluateResults> {
             .3,
           ),
           borderRadius: const BorderRadius.all(Radius.circular(10))),
-      child: const Column(
+      child: Column(
         // crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          const Row(
             children: [
               Expanded(
                 flex: 1,
@@ -50,12 +97,12 @@ class _CustomerEvaluateResultsState extends State<CustomerEvaluateResults> {
               ),
             ],
           ),
-          HighSpace(height: 20),
+          const HighSpace(height: 20),
           SizedBox(
             height: 150,
             child: Row(
               children: [
-                VerticalDivider(
+                const VerticalDivider(
                   width: 20,
                   thickness: 1,
                   indent: 20,
@@ -67,7 +114,7 @@ class _CustomerEvaluateResultsState extends State<CustomerEvaluateResults> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'ผลคะแนนที่ท่านทำได้',
                         style: TextStyle(
                           fontSize: 12,
@@ -75,10 +122,46 @@ class _CustomerEvaluateResultsState extends State<CustomerEvaluateResults> {
                         ),
                         textAlign: TextAlign.left,
                       ),
+                      // const Text('ตราสารหนี้'),
+                      // const Text('ตราสารทุนบางส่วน'),
+                      // const Text('ตราสารอนุพันธ์'),
+                      // const Text('หน่วยลงทุนที่มีความเสี่ยง ระดับ 1-5'),
+                      // Text('สินทรัพย์ดิจิตอลสัดส่วน$digitatAssetInvestmentRatios'),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 20, 0, 0),
+                        child: SizedBox(
+                          width: 120,
+                          height: 100,
+                          child: Stack(children: [
+                            Center(
+                              child: Container(
+                                width: 100,
+                                height: 100,
+                                child: CircularProgressIndicator(
+                                  value: suitableSumPoints / suitableMaxPoints,
+                                  // color: Colors.orange,
+                                  valueColor:
+                                      const AlwaysStoppedAnimation<Color>(
+                                          Colors.orange),
+                                  backgroundColor: Colors.grey,
+                                  strokeWidth: 12,
+                                  semanticsValue: suitableSumPoints.toString(),
+                                ),
+                              ),
+                            ),
+                            Center(
+                              child: Text(
+                                suitableSumPoints.toString(),
+                                style: const TextStyle(fontSize: 20),
+                              ),
+                            )
+                          ]),
+                        ),
+                      )
                     ],
                   ),
                 ),
-                VerticalDivider(
+                const VerticalDivider(
                   width: 20,
                   thickness: 1,
                   indent: 20,
@@ -90,24 +173,27 @@ class _CustomerEvaluateResultsState extends State<CustomerEvaluateResults> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'วิเคราะห์ผล',
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.grey,
                         ),
                       ),
-                      Text(
+                      const Spacer(),
+                      const Text(
                         'ท่านเป็นนักลงทุนประเภท',
                         style: TextStyle(
                           fontSize: 20,
                           color: Colors.blueAccent,
                         ),
                       ),
+                      Text(investerType ?? ''),
+                      const Spacer(),
                     ],
                   ),
                 ),
-                VerticalDivider(
+                const VerticalDivider(
                   width: 20,
                   thickness: 1,
                   indent: 20,
@@ -119,17 +205,24 @@ class _CustomerEvaluateResultsState extends State<CustomerEvaluateResults> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'ผลคะแนนที่ท่านทำได้',
+                      const Text(
+                        'ประเภททรัพย์สินที่สามารถลงทุนได้',
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.grey,
                         ),
                       ),
+                      const Spacer(),
+                      const Text('ตราสารหนี้'),
+                      const Text('ตราสารทุนบางส่วน'),
+                      const Text('ตราสารอนุพันธ์'),
+                      const Text('หน่วยลงทุนที่มีความเสี่ยง ระดับ 1-5'),
+                      Text(
+                          'สินทรัพย์ดิจิตอลสัดส่วน$digitatAssetInvestmentRatios'),
                     ],
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 5,
                 ),
               ],

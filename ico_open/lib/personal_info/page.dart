@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 
 import 'package:ico_open/config/config.dart';
+import 'package:ico_open/customer_evaluate/page.dart';
 import 'package:ico_open/idcard/page.dart';
 import 'package:ico_open/model/personal_info.dart' as modelPI;
 import 'package:ico_open/model/model.dart' as model;
@@ -116,9 +117,11 @@ var secondBank = modelPI.BankAccountModel(
   serviceType: 'd',
 );
 
-enum SelectedAddressEnum { registered, current, office }
+enum SelectedCurrentAddressEnum { registered, current }
 
-enum isAddedBankAccountsEnum { yes, no }
+enum SelectedOfficeAddressEnum { registered, current, office }
+
+enum IsAddedBankAccountsEnum { yes, no }
 
 class _PersonalInformationState extends State<PersonalInformation> {
   @override
@@ -264,7 +267,8 @@ class _PersonalInformationState extends State<PersonalInformation> {
   }
 
   // current address configuration
-  SelectedAddressEnum? currentAddressEnum = SelectedAddressEnum.registered;
+  SelectedCurrentAddressEnum? currentAddressEnum =
+      SelectedCurrentAddressEnum.registered;
   String? cThProvinceValue;
   String? cThAmphureValue;
   String? cThTambonValue;
@@ -372,7 +376,8 @@ class _PersonalInformationState extends State<PersonalInformation> {
   bool currentOccupationCondition = false;
   bool typeOfBusinessCondition = false;
   bool salaryRangeCondition = false;
-  SelectedAddressEnum? officeAddressEnum = SelectedAddressEnum.registered;
+  SelectedOfficeAddressEnum? officeAddressEnum =
+      SelectedOfficeAddressEnum.registered;
   String? oThProvinceValue;
   String? oThAmphureValue;
   String? oThTambonValue;
@@ -520,7 +525,7 @@ class _PersonalInformationState extends State<PersonalInformation> {
   ];
 
   //bank accounts configure
-  isAddedBankAccountsEnum? isAddedBankAccount = isAddedBankAccountsEnum.no;
+  IsAddedBankAccountsEnum? isAddedBankAccount = IsAddedBankAccountsEnum.no;
   String? firstBankNameValue;
   String? firstBankBranchNameValue;
   String? secondBankNameValue;
@@ -557,20 +562,10 @@ class _PersonalInformationState extends State<PersonalInformation> {
   bool firstBankAccountNumberCondition = false;
   bool secondBankAccountNumberCondition = false;
 
-  // modelPI.BankAccountModel? bank;
-  // void _loadBank() {
-  //   switch (widget.bankNo) {
-  //     case '1':
-  //       bank = firstBank;
-  //       break;
-  //     case '2':
-  //       bank = secondBank;
-  //       break;
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
+
     final rHomeNumberTextField = misc.importantTextField(
         textController: registeredAddress.controller.homenumber,
         errorTextCondition: registeredAddress.condition.homenumber,
@@ -963,12 +958,13 @@ class _PersonalInformationState extends State<PersonalInformation> {
 
     final registeredAddressListTile = ListTile(
       title: const Text(model.registeredAddressSubject),
-      leading: Radio<SelectedAddressEnum>(
-        value: SelectedAddressEnum.registered,
+      leading: Radio<SelectedCurrentAddressEnum>(
+        value: SelectedCurrentAddressEnum.registered,
         groupValue: currentAddressEnum,
         onChanged: (value) {
           setState(() {
             currentAddressEnum = value;
+            currentAddress.typeOfAddress = value.toString();
             // currentAddress.typeOfAddress = 'registered_address';
           });
         },
@@ -977,13 +973,14 @@ class _PersonalInformationState extends State<PersonalInformation> {
 
     final otherAddressListTile = ListTile(
       title: const Text(model.otherAddressSubject),
-      leading: Radio<SelectedAddressEnum>(
-        value: SelectedAddressEnum.current,
+      leading: Radio<SelectedCurrentAddressEnum>(
+        value: SelectedCurrentAddressEnum.current,
         groupValue: currentAddressEnum,
-        onChanged: (SelectedAddressEnum? value) {
+        onChanged: (value) {
           setState(() {
             currentAddressEnum = value;
-            currentAddress = currentAddress;
+            currentAddress.typeOfAddress = value.toString();
+            // currentAddress = currentAddress;
             // currentAddress.typeOfAddress = 'current_address';
             cGetCurrentProvince();
           });
@@ -1199,12 +1196,13 @@ class _PersonalInformationState extends State<PersonalInformation> {
 
     final registeredOfficeAddressListTile = ListTile(
       title: const Text(model.registeredAddressSubject),
-      leading: Radio<SelectedAddressEnum>(
-        value: SelectedAddressEnum.registered,
+      leading: Radio<SelectedOfficeAddressEnum>(
+        value: SelectedOfficeAddressEnum.registered,
         groupValue: officeAddressEnum,
         onChanged: (value) {
           setState(() {
             officeAddressEnum = value;
+            officeAddress.typeOfAddress = value.toString();
             // officeAddress.typeOfAddress = 'registered_address';
           });
         },
@@ -1213,12 +1211,13 @@ class _PersonalInformationState extends State<PersonalInformation> {
 
     final currentOfficeAddressListTile = ListTile(
       title: const Text(model.currentAddressSubject),
-      leading: Radio<SelectedAddressEnum>(
-        value: SelectedAddressEnum.current,
+      leading: Radio<SelectedOfficeAddressEnum>(
+        value: SelectedOfficeAddressEnum.current,
         groupValue: officeAddressEnum,
         onChanged: (value) {
           setState(() {
             officeAddressEnum = value;
+            officeAddress.typeOfAddress = value.toString();
             // officeAddress.typeOfAddress = 'registered_address';
           });
         },
@@ -1227,13 +1226,14 @@ class _PersonalInformationState extends State<PersonalInformation> {
 
     final otherOfficeAddressListTile = ListTile(
       title: const Text(model.otherAddressSubject),
-      leading: Radio<SelectedAddressEnum>(
-        value: SelectedAddressEnum.office,
+      leading: Radio<SelectedOfficeAddressEnum>(
+        value: SelectedOfficeAddressEnum.office,
         groupValue: officeAddressEnum,
-        onChanged: (SelectedAddressEnum? value) {
+        onChanged: (value) {
           setState(() {
             officeAddressEnum = value;
-            officeAddress = officeAddress;
+            officeAddress.typeOfAddress = value.toString();
+            // officeAddress = officeAddress;
             // officeAddress.typeOfAddress = 'current_address';
             oGetCurrentProvince();
           });
@@ -1582,7 +1582,7 @@ class _PersonalInformationState extends State<PersonalInformation> {
                           Expanded(flex: 1, child: otherAddressListTile),
                         ],
                       ),
-                      (currentAddressEnum == SelectedAddressEnum.current)
+                      (currentAddressEnum == SelectedCurrentAddressEnum.current)
                           ? current
                           : const Column()
                     ],
@@ -1658,7 +1658,7 @@ class _PersonalInformationState extends State<PersonalInformation> {
                           Expanded(flex: 2, child: otherOfficeAddressListTile),
                         ],
                       ),
-                      (officeAddressEnum == SelectedAddressEnum.office)
+                      (officeAddressEnum == SelectedOfficeAddressEnum.office)
                           ? office
                           : const Column()
                     ],
@@ -1698,10 +1698,10 @@ class _PersonalInformationState extends State<PersonalInformation> {
                             flex: 1,
                             child: ListTile(
                               title: const Text('ใช้'),
-                              leading: Radio<isAddedBankAccountsEnum>(
-                                value: isAddedBankAccountsEnum.yes,
+                              leading: Radio<IsAddedBankAccountsEnum>(
+                                value: IsAddedBankAccountsEnum.yes,
                                 groupValue: isAddedBankAccount,
-                                onChanged: (isAddedBankAccountsEnum? value) {
+                                onChanged: (IsAddedBankAccountsEnum? value) {
                                   setState(() {
                                     isAddedBankAccount = value;
                                   });
@@ -1713,10 +1713,10 @@ class _PersonalInformationState extends State<PersonalInformation> {
                             flex: 1,
                             child: ListTile(
                               title: const Text('ไม่ใช้'),
-                              leading: Radio<isAddedBankAccountsEnum>(
-                                value: isAddedBankAccountsEnum.no,
+                              leading: Radio<IsAddedBankAccountsEnum>(
+                                value: IsAddedBankAccountsEnum.no,
                                 groupValue: isAddedBankAccount,
-                                onChanged: (isAddedBankAccountsEnum? value) {
+                                onChanged: (IsAddedBankAccountsEnum? value) {
                                   setState(() {
                                     isAddedBankAccount = value;
                                   });
@@ -1726,7 +1726,7 @@ class _PersonalInformationState extends State<PersonalInformation> {
                           ),
                         ],
                       ),
-                      (isAddedBankAccount == isAddedBankAccountsEnum.yes)
+                      (isAddedBankAccount == IsAddedBankAccountsEnum.yes)
                           ? Column(
                               children: [
                                 const Row(
@@ -1817,7 +1817,7 @@ class _PersonalInformationState extends State<PersonalInformation> {
                                 registeredAddress.condition.subdistrict = true;
                               });
                             } else if (currentAddressEnum ==
-                                SelectedAddressEnum.current) {
+                                SelectedCurrentAddressEnum.current) {
                               if (currentAddress
                                   .controller.homenumber.text.isEmpty) {
                                 setState(() {
@@ -1862,7 +1862,7 @@ class _PersonalInformationState extends State<PersonalInformation> {
                                 salaryRangeCondition = true;
                               });
                             } else if (officeAddressEnum ==
-                                SelectedAddressEnum.office) {
+                                SelectedOfficeAddressEnum.office) {
                               if (officeAddress
                                   .controller.homenumber.text.isEmpty) {
                                 setState(() {
@@ -1896,7 +1896,7 @@ class _PersonalInformationState extends State<PersonalInformation> {
                                 firstBankAccountNumberCondition = true;
                               });
                             } else if (isAddedBankAccount ==
-                                isAddedBankAccountsEnum.yes) {
+                                IsAddedBankAccountsEnum.yes) {
                               if (secondBankNameValue == null) {
                                 setState(() {
                                   secondBankNameCondition = true;
@@ -1914,15 +1914,17 @@ class _PersonalInformationState extends State<PersonalInformation> {
                             }
 
                             print(
-                                'registered address: ${registeredAddress.controller.homenumber.text} ${registeredAddress.controller.villageNumber.text} ${registeredAddress.controller.villageName.text} ${registeredAddress.controller.subStreetName.text} ${registeredAddress.controller.streetName.text} ${registeredAddress.subDistrictName} ${registeredAddress.districtName} ${registeredAddress.provinceName} ${registeredAddress.controller.zipcode.text} ${registeredAddress.controller.country.text}}');
+                                'registered address: ${registeredAddress.controller.homenumber.text} ${registeredAddress.controller.villageNumber.text} ${registeredAddress.controller.villageName.text} ${registeredAddress.controller.subStreetName.text} ${registeredAddress.controller.streetName.text} ${registeredAddress.subDistrictName} ${registeredAddress.districtName} ${registeredAddress.provinceName} ${registeredAddress.controller.zipcode.text} ${registeredAddress.controller.country.text} ${registeredAddress.typeOfAddress}}');
                             print(
                                 'current address: ${currentAddress.controller.homenumber.text} ${currentAddress.controller.villageNumber.text} ${currentAddress.controller.villageName.text} ${currentAddress.controller.subStreetName.text} ${currentAddress.controller.streetName.text} ${currentAddress.subDistrictName} ${currentAddress.districtName} ${currentAddress.provinceName} ${currentAddress.controller.zipcode.text} ${currentAddress.controller.country.text}}');
                             print(
                                 'office address: ${officeAddress.controller.homenumber.text} ${officeAddress.controller.villageNumber.text} ${officeAddress.controller.villageName.text} ${officeAddress.controller.subStreetName.text} ${officeAddress.controller.streetName.text} ${officeAddress.subDistrictName} ${officeAddress.districtName} ${officeAddress.provinceName} ${officeAddress.controller.zipcode.text} ${officeAddress.controller.country.text}}');
                             final personalInformation =
                                 modelPI.PersonalInformationModel(
-                                  customerID: widget.id,
+                                    customerID: widget.id,
                                     registeredAddress: registeredAddress,
+                                    currentAddress: currentAddress,
+  officeAddress: officeAddress,
                                     occupation: occupation,
                                     firstBankAccount: modelPI.BankAccountModel(
                                         bankName: firstBankNameValue!,
@@ -1932,55 +1934,140 @@ class _PersonalInformationState extends State<PersonalInformation> {
                                         serviceType: 'dw'));
                             personalInformation.firstBankAccount
                                 .bankBranchName = firstBankBranchNameValue;
-                                personalInformation.occupation.officeName = officeNameController.text;
-                                personalInformation.occupation.positionName = positionNameController.text;
-                                personalInformation.registeredAddress.typeOfAddress = 'r';
+                            personalInformation.occupation.officeName =
+                                officeNameController.text;
+                            personalInformation.occupation.positionName =
+                                positionNameController.text;
                             if (currentAddressEnum ==
-                                SelectedAddressEnum.current) {
-                              personalInformation.currentAddress =
-                                  currentAddress;
-                                  personalInformation.currentAddress!.typeOfAddress = 'c';
+                                SelectedCurrentAddressEnum.current) {
+                              // personalInformation.currentAddress =
+                              //     currentAddress;
+                              setState(() {
+                              personalInformation.currentAddress.controller.homenumber.text = currentAddress.controller.homenumber.text;
+                              personalInformation.currentAddress.controller.villageNumber.text = currentAddress.controller.villageNumber.text;
+                              personalInformation.currentAddress.controller.villageName.text = currentAddress.controller.villageName.text;
+                              personalInformation.currentAddress.controller.subStreetName.text = currentAddress.controller.subStreetName.text;
+                              personalInformation.currentAddress.controller.streetName.text = currentAddress.controller.streetName.text;
+                              personalInformation.currentAddress.subDistrictName = currentAddress.subDistrictName;
+                              personalInformation.currentAddress.districtName = currentAddress.districtName;
+                              personalInformation.currentAddress.provinceName = currentAddress.provinceName;
+                              personalInformation.currentAddress.controller.zipcode.text = currentAddress.controller.zipcode.text;
+                              personalInformation.currentAddress.controller.country.text = currentAddress.controller.country.text;
+                                
+                              personalInformation.currentAddress.typeOfAddress = currentAddressEnum.toString();
+                              });
                             } else if (currentAddressEnum ==
-                                SelectedAddressEnum.registered) {
-                              personalInformation.currentAddress =
-                                  registeredAddress;
-                                  personalInformation.currentAddress!.typeOfAddress = 'r';
+                                SelectedCurrentAddressEnum.registered) {
+                                  // personalInformation.currentAddress = registeredAddress;
+                              setState(() {
+                              personalInformation.currentAddress.controller.homenumber.text = registeredAddress.controller.homenumber.text;
+                              personalInformation.currentAddress.controller.villageNumber.text = registeredAddress.controller.villageNumber.text;
+                              personalInformation.currentAddress.controller.villageName.text = registeredAddress.controller.villageName.text;
+                              personalInformation.currentAddress.controller.subStreetName.text = registeredAddress.controller.subStreetName.text;
+                              personalInformation.currentAddress.controller.streetName.text = registeredAddress.controller.streetName.text;
+                              personalInformation.currentAddress.subDistrictName = registeredAddress.subDistrictName;
+                              personalInformation.currentAddress.districtName = registeredAddress.districtName;
+                              personalInformation.currentAddress.provinceName = registeredAddress.provinceName;
+                              personalInformation.currentAddress.controller.zipcode.text = registeredAddress.controller.zipcode.text;
+                              personalInformation.currentAddress.controller.country.text = registeredAddress.controller.country.text;
+                                
+                              personalInformation.currentAddress.typeOfAddress = currentAddressEnum.toString();
+                              });
+                              // personalInformation.currentAddress!.typeOfAddress = currentAddressEnum.toString();
                             }
 
                             if (officeAddressEnum ==
-                                    SelectedAddressEnum.registered) {
-                              personalInformation.officeAddress =
-                                  registeredAddress;
-                                  personalInformation.registeredAddress.typeOfAddress = 'r';
-                                  personalInformation.currentAddress!.typeOfAddress = 'r';
-                                  personalInformation.officeAddress!.typeOfAddress = 'r';
-                                      print('registeredAddress: ${registeredAddress.provinceName}, ${personalInformation.officeAddress!.provinceName}');
+                                SelectedOfficeAddressEnum.registered) {
+                                   setState(() {
+                              personalInformation.officeAddress.controller.homenumber.text = registeredAddress.controller.homenumber.text;
+                              personalInformation.officeAddress.controller.villageNumber.text = registeredAddress.controller.villageNumber.text;
+                              personalInformation.officeAddress.controller.villageName.text = registeredAddress.controller.villageName.text;
+                              personalInformation.officeAddress.controller.subStreetName.text = registeredAddress.controller.subStreetName.text;
+                              personalInformation.officeAddress.controller.streetName.text = registeredAddress.controller.streetName.text;
+                              personalInformation.officeAddress.subDistrictName = registeredAddress.subDistrictName;
+                              personalInformation.officeAddress.districtName = registeredAddress.districtName;
+                              personalInformation.officeAddress.provinceName = registeredAddress.provinceName;
+                              personalInformation.officeAddress.controller.zipcode.text = registeredAddress.controller.zipcode.text;
+                              personalInformation.officeAddress.controller.country.text = registeredAddress.controller.country.text;
+                                
+                              personalInformation.officeAddress.typeOfAddress = officeAddressEnum.toString();
+                              });
+                              // personalInformation.officeAddress =
+                              //     registeredAddress;
+                              print(
+                                  'registeredAddress: ${registeredAddress.provinceName}, ${personalInformation.officeAddress!.provinceName}');
                             } else if (officeAddressEnum ==
-                                SelectedAddressEnum.current &&
+                                    SelectedOfficeAddressEnum.current &&
                                 currentAddressEnum ==
-                                    SelectedAddressEnum.registered) {
-                              personalInformation.officeAddress =
-                                  registeredAddress; personalInformation.registeredAddress.typeOfAddress = 'r';
-                                  personalInformation.currentAddress!.typeOfAddress = 'r';
-                                  personalInformation.officeAddress!.typeOfAddress = 'c';
+                                    SelectedCurrentAddressEnum.registered) {
+                              setState(() {
+                              personalInformation.officeAddress.controller.homenumber.text = registeredAddress.controller.homenumber.text;
+                              personalInformation.officeAddress.controller.villageNumber.text = registeredAddress.controller.villageNumber.text;
+                              personalInformation.officeAddress.controller.villageName.text = registeredAddress.controller.villageName.text;
+                              personalInformation.officeAddress.controller.subStreetName.text = registeredAddress.controller.subStreetName.text;
+                              personalInformation.officeAddress.controller.streetName.text = registeredAddress.controller.streetName.text;
+                              personalInformation.officeAddress.subDistrictName = registeredAddress.subDistrictName;
+                              personalInformation.officeAddress.districtName = registeredAddress.districtName;
+                              personalInformation.officeAddress.provinceName = registeredAddress.provinceName;
+                              personalInformation.officeAddress.controller.zipcode.text = registeredAddress.controller.zipcode.text;
+                              personalInformation.officeAddress.controller.country.text = registeredAddress.controller.country.text;
+                                
+                              personalInformation.officeAddress.typeOfAddress = officeAddressEnum.toString();
+                              });
                             } else if (officeAddressEnum ==
-                                SelectedAddressEnum.current) {
-                              personalInformation.officeAddress =
-                                  currentAddress;
-                                   personalInformation.registeredAddress.typeOfAddress = 'r';
-                                  personalInformation.currentAddress!.typeOfAddress = 'c';
-                                  personalInformation.officeAddress!.typeOfAddress = 'c';
+                                SelectedOfficeAddressEnum.current) {
+                              setState(() {
+                              personalInformation.officeAddress.controller.homenumber.text = currentAddress.controller.homenumber.text;
+                              personalInformation.officeAddress.controller.villageNumber.text = currentAddress.controller.villageNumber.text;
+                              personalInformation.officeAddress.controller.villageName.text = currentAddress.controller.villageName.text;
+                              personalInformation.officeAddress.controller.subStreetName.text = currentAddress.controller.subStreetName.text;
+                              personalInformation.officeAddress.controller.streetName.text = currentAddress.controller.streetName.text;
+                              personalInformation.officeAddress.subDistrictName = currentAddress.subDistrictName;
+                              personalInformation.officeAddress.districtName = currentAddress.districtName;
+                              personalInformation.officeAddress.provinceName = currentAddress.provinceName;
+                              personalInformation.officeAddress.controller.zipcode.text = currentAddress.controller.zipcode.text;
+                              personalInformation.officeAddress.controller.country.text = currentAddress.controller.country.text;
+                                
+                              personalInformation.officeAddress.typeOfAddress = officeAddressEnum.toString();
+                              });
                             } else if (officeAddressEnum ==
-                                SelectedAddressEnum.office) {
-                              personalInformation.officeAddress = officeAddress;
-                               personalInformation.registeredAddress.typeOfAddress = 'r';
-                                  personalInformation.currentAddress!.typeOfAddress = 'c';
-                                  personalInformation.officeAddress!.typeOfAddress = 'o';
+                                SelectedOfficeAddressEnum.office) {
+                              setState(() {
+                              personalInformation.officeAddress.controller.homenumber.text = officeAddress.controller.homenumber.text;
+                              personalInformation.officeAddress.controller.villageNumber.text = officeAddress.controller.villageNumber.text;
+                              personalInformation.officeAddress.controller.villageName.text = officeAddress.controller.villageName.text;
+                              personalInformation.officeAddress.controller.subStreetName.text = officeAddress.controller.subStreetName.text;
+                              personalInformation.officeAddress.controller.streetName.text = officeAddress.controller.streetName.text;
+                              personalInformation.officeAddress.subDistrictName = officeAddress.subDistrictName;
+                              personalInformation.officeAddress.districtName = officeAddress.districtName;
+                              personalInformation.officeAddress.provinceName = officeAddress.provinceName;
+                              personalInformation.officeAddress.controller.zipcode.text = officeAddress.controller.zipcode.text;
+                              personalInformation.officeAddress.controller.country.text = officeAddress.controller.country.text;
+                                
+                              personalInformation.officeAddress.typeOfAddress = officeAddressEnum.toString();
+                              });
                             }
 
-print('''personal: ${personalInformation.registeredAddress.typeOfAddress}
-current: ${personalInformation.currentAddress!.typeOfAddress}
-office: ${personalInformation.officeAddress!.typeOfAddress}''');
+                            //  personalInformation.registeredAddress.typeOfAddress = SelectedAddressEnum.registered.toString();
+                            print(
+                                "1 ${personalInformation.currentAddress.typeOfAddress}");
+                            print(
+                                "3 ${personalInformation.officeAddress.typeOfAddress}");
+                            setState(() {
+                              personalInformation
+                                      .currentAddress.typeOfAddress =
+                                  currentAddressEnum.toString();
+                              personalInformation.officeAddress.typeOfAddress =
+                                  officeAddressEnum.toString();
+                            });
+                            print(
+                                "4 ${personalInformation.officeAddress.typeOfAddress}");
+                            print(
+                                "2 ${personalInformation.currentAddress.typeOfAddress}");
+                            print(
+                                '''personal: ${personalInformation.registeredAddress.typeOfAddress}
+current: ${personalInformation.currentAddress.typeOfAddress}
+office: ${personalInformation.officeAddress.typeOfAddress}''');
                             // personalInformation.officeAddress = officeAddress;
                             if (secondBankNameValue != null &&
                                 secondBankBranchNameValue != null &&
@@ -1995,17 +2082,24 @@ office: ${personalInformation.officeAddress!.typeOfAddress}''');
                                       serviceType: 'd');
                               personalInformation.secondBankAccount!
                                   .bankBranchName = secondBankBranchNameValue;
-                            // } else {
-                            //   personalInformation.secondBankAccount!.bankName = '';
-                            //   personalInformation.secondBankAccount!.bankBranchName = '';
-                            //   personalInformation.secondBankAccount!.bankAccountID = '';
-                            //   personalInformation.secondBankAccount!.serviceType = 'd';
+                              // } else {
+                              //   personalInformation.secondBankAccount!.bankName = '';
+                              //   personalInformation.secondBankAccount!.bankBranchName = '';
+                              //   personalInformation.secondBankAccount!.bankAccountID = '';
+                              //   personalInformation.secondBankAccount!.serviceType = 'd';
                             }
 
                             var logger = Logger();
-                            logger.d('current: $currentAddressEnum, office: $officeAddressEnum');
+                            logger.d(
+                                'current: $currentAddressEnum, office: $officeAddressEnum');
                             inspect(personalInformation);
+                            bool isNextPage = false;
+                            try {
                             api.postPersonalInfo(personalInformation);
+                            isNextPage = true;
+                            } catch (e) {
+                              isNextPage = false;
+                            }
                             // if (ca.currentAddress == ca.CurrentAddress.others) {
                             //   if (ca.PersonalInformationCurrentAddress]) {}
                             // }
@@ -2021,6 +2115,16 @@ office: ${personalInformation.officeAddress!.typeOfAddress}''');
                             //     ),
                             //   );
                             // }
+                            if (isNextPage) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) {
+                                    return CustomerEvaluate(id: widget.id);
+                                  },
+                                ),
+                              );
+                            }
                           },
                           child: const Icon(
                             Icons.arrow_circle_right,

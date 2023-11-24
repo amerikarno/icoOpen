@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ico_open/customer_evaluate/page.dart';
 import 'package:ico_open/idcard/page.dart';
 import 'package:ico_open/model/preinfo.dart';
 import 'package:ico_open/personal_info/page.dart';
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       // home:  MyHomePage()
-      home: PersonalInformation(id: '056a008b-6524-4468-83a5-ba54f67c13df')
+      home: CustomerEvaluate(id: 'd555f123-231f-44e7-80bc-96422727e7e6')
     );
   }
 }

@@ -86,9 +86,7 @@ class _CustomerRisksDropdownButtonState
           ),
         ),
       ),
-      iconSize: 0,
       alignment: Alignment.centerLeft,
-      elevation: 16,
       style: const TextStyle(color: Colors.deepPurple),
       onChanged: (String? value) {
         setState(() {
