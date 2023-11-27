@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
 
 import 'package:ico_open/config/config.dart';
+import 'package:ico_open/misc/misc.dart' as misc;
 import 'package:ico_open/personal_info/page.dart';
+import 'package:ico_open/questions/fatca_information.dart';
 
 enum IsFATCA { yes, no }
 
 class CustomerFATCA extends StatefulWidget {
-  const CustomerFATCA({super.key});
+  final Widget fatcaInformationWidget;
+  final bool usPerson;
+  const CustomerFATCA(
+      {super.key,
+      required this.fatcaInformationWidget,
+      required this.usPerson});
 
   @override
   State<CustomerFATCA> createState() => _CustomerFATCAState();
@@ -14,7 +21,17 @@ class CustomerFATCA extends StatefulWidget {
 
 class _CustomerFATCAState extends State<CustomerFATCA> {
   IsFATCA? _isFATCA = IsFATCA.no;
+  Widget fatcaInformationWidget = const Column();
+  bool usPerson = false;
   // final TextEditingController _homeNumber = TextEditingController();
+
+  void loadFatcaInfomationWidget() {
+    setState(() {
+      fatcaInformationWidget = widget.fatcaInformationWidget;
+      usPerson = widget.usPerson;
+      // fatcaInformationWidget = Row(children: [Text('test')],);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,46 +89,63 @@ class _CustomerFATCAState extends State<CustomerFATCA> {
               color: Colors.black,
             ),
           ),
-          Row(
-            children: [
-              Expanded(
-                flex: 1,
-                child: ListTile(
-                  title: const Text('ใช่', style: TextStyle(fontSize: 13,),),
-                  leading: Radio<IsFATCA>(
-                    value: IsFATCA.yes,
-                    groupValue: _isFATCA,
-                    onChanged: (IsFATCA? value) {
-                      setState(() {
-                        _isFATCA = value;
-                      });
-                    },
+          SizedBox(
+            height: 50,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              verticalDirection: VerticalDirection.up,
+              children: [
+                Expanded(
+                  flex: 1,
+                  child: ListTile(
+                    title: const Text(
+                      'ใช่',
+                      style: TextStyle(
+                        fontSize: 13,
+                      ),
+                    ),
+                    leading: Radio<IsFATCA>(
+                      value: IsFATCA.yes,
+                      groupValue: _isFATCA,
+                      onChanged: (IsFATCA? value) {
+                        setState(() {
+                          _isFATCA = value;
+                          loadFatcaInfomationWidget();
+                        });
+                      },
+                    ),
                   ),
                 ),
-              ),
-              Expanded(
-                flex: 1,
-                child: ListTile(
-                  title: const Text('ไม่ใช่',),
-                  titleAlignment: ListTileTitleAlignment.center,
-                  titleTextStyle: const TextStyle(fontSize: 13,),
-                  leading: Radio<IsFATCA>(
-                    value: IsFATCA.no,
-                    groupValue: _isFATCA,
-                    onChanged: (IsFATCA? value) {
-                      setState(() {
-                        _isFATCA = value;
-                      });
-                    },
+                Expanded(
+                  flex: 1,
+                  child: ListTile(
+                    title: const Text(
+                      'ไม่ใช่',
+                    ),
+                    titleAlignment: ListTileTitleAlignment.center,
+                    titleTextStyle: const TextStyle(
+                      fontSize: 13,
+                    ),
+                    leading: Radio<IsFATCA>(
+                      value: IsFATCA.no,
+                      groupValue: _isFATCA,
+                      onChanged: (IsFATCA? value) {
+                        setState(() {
+                          _isFATCA = value;
+                        });
+                      },
+                    ),
                   ),
                 ),
-              ),
-              const Expanded(
-                flex: 8,
-                child: SizedBox(),
-              ),
-            ],
+                const Expanded(
+                  flex: 8,
+                  child: SizedBox(),
+                ),
+              ],
+            ),
           ),
+          (_isFATCA == IsFATCA.yes) ? fatcaInformationWidget : const Column(),
+          // const W9FormTable(),
           const Text(
             'ข้าพเจ้าเข้าใจว่าเมื่อข้อมูลข้างต้นเปลี่ยนแปลง ข้าพเจ้าจะแจ้งบริษัทฯในทันที',
             style: TextStyle(
@@ -222,3 +256,27 @@ class SuitableTest extends StatelessWidget {
 }
 
 const String agreement = "agreement";
+
+class W9FormTable extends StatelessWidget {
+  const W9FormTable({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: MediaQuery.of(context).size.width * displayWidth,
+      padding: const EdgeInsets.all(paddingValue),
+      decoration: BoxDecoration(
+          color: Colors.lightBlue.withOpacity(
+            .3,
+          ),
+          borderRadius: const BorderRadius.all(Radius.circular(10))),
+          child: const SingleChildScrollView(
+            child: Column(
+              children: [
+                Row(),
+              ],
+            ),
+          ),
+    );
+  }
+}
