@@ -23,12 +23,13 @@ Widget importantTextField({
               ? RichText(
                   text: TextSpan(
                     text: subject,
+                    style: const TextStyle(fontSize: 12),
                     children: const [
                       TextSpan(text: '*', style: TextStyle(color: Colors.red)),
                     ],
                   ),
                 )
-              : Text(subject)),
+              : Text(subject, style:const TextStyle(fontSize: 13),)),
       inputFormatters: [
         FilteringTextInputFormatter.allow(filterPattern),
       ],
@@ -97,8 +98,9 @@ Widget dropdownButtonBuilderFunction(
     Function(String?)? onChanged,
     Function()? onTabFunction}) {
   return DropdownButtonFormField(
-    itemHeight: itemHeight!,
+    itemHeight: itemHeight?? 50,
     value: value,
+    style: const TextStyle(fontSize: 12),
     decoration: InputDecoration(
       errorText: condition ? errorText : null,
       label: RichText(
@@ -139,30 +141,30 @@ Widget addressFunction(
   return Column(children: [
     Row(children: [
       if (titleWidget.isNotEmpty) const Icon(Icons.home),
-      misc.subjectRichText(subject: titleWidget, fontsize: 25)
+      misc.subjectRichText(subject: titleWidget, fontsize: 15)
     ]),
     Row(children: [
       Expanded(flex: 3, child: homeWidget),
-      const SizedBox(width: 10),
+      const SizedBox(width: 5),
       Expanded(flex: 1, child: villegeNumberWidget),
-      const SizedBox(width: 10),
+      const SizedBox(width: 5),
       Expanded(flex: 3, child: villegeNameWidget),
-      const SizedBox(width: 10),
+      const SizedBox(width: 5),
       Expanded(flex: 3, child: subStreetNameWidget),
-      const SizedBox(width: 10),
+      const SizedBox(width: 5),
       Expanded(flex: 3, child: streetNameWidget),
     ]),
-    const SizedBox(height: 20),
+    const SizedBox(height: 10),
     Row(children: [
-      Expanded(flex: 3, child: subDistrictNameWidget),
-      const SizedBox(width: 10),
-      Expanded(flex: 3, child: districtNameWidget),
-      const SizedBox(width: 10),
-      Expanded(flex: 3, child: provinceNameWidget),
-      const SizedBox(width: 10),
-      Expanded(flex: 3, child: zipCodeWidget),
-      const SizedBox(width: 10),
-      Expanded(flex: 3, child: countryWidget),
+      Expanded(flex: 4, child: subDistrictNameWidget),
+      const SizedBox(width: 5),
+      Expanded(flex: 4, child: districtNameWidget),
+      const SizedBox(width: 5),
+      Expanded(flex: 4, child: provinceNameWidget),
+      const SizedBox(width: 5),
+      Expanded(flex: 2, child: zipCodeWidget),
+      const SizedBox(width: 5),
+      Expanded(flex: 2, child: countryWidget),
     ])
   ]);
 }

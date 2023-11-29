@@ -130,7 +130,7 @@ class _PersonalInformationState extends State<PersonalInformation> {
     getCurrentProvince();
   }
 
-  double height = 50;
+  double height = 10;
   // modelPI.AddressModel? registeredAddress;
 
   String? thProvinceValue;
@@ -957,7 +957,7 @@ class _PersonalInformationState extends State<PersonalInformation> {
     // }
 
     final registeredAddressListTile = ListTile(
-      title: const Text(model.registeredAddressSubject),
+      title: const Text(model.registeredAddressSubject, style: TextStyle(fontSize: 11),),
       leading: Radio<SelectedCurrentAddressEnum>(
         value: SelectedCurrentAddressEnum.registered,
         groupValue: currentAddressEnum,
@@ -972,7 +972,7 @@ class _PersonalInformationState extends State<PersonalInformation> {
     );
 
     final otherAddressListTile = ListTile(
-      title: const Text(model.otherAddressSubject),
+      title: const Text(model.otherAddressSubject, style: TextStyle(fontSize: 11),),
       leading: Radio<SelectedCurrentAddressEnum>(
         value: SelectedCurrentAddressEnum.current,
         groupValue: currentAddressEnum,
@@ -1195,7 +1195,7 @@ class _PersonalInformationState extends State<PersonalInformation> {
     // }
 
     final registeredOfficeAddressListTile = ListTile(
-      title: const Text(model.registeredAddressSubject),
+      title: const Text(model.registeredAddressSubject, style: TextStyle(fontSize: 11),),
       leading: Radio<SelectedOfficeAddressEnum>(
         value: SelectedOfficeAddressEnum.registered,
         groupValue: officeAddressEnum,
@@ -1210,7 +1210,7 @@ class _PersonalInformationState extends State<PersonalInformation> {
     );
 
     final currentOfficeAddressListTile = ListTile(
-      title: const Text(model.currentAddressSubject),
+      title: const Text(model.currentAddressSubject, style: TextStyle(fontSize: 11)),
       leading: Radio<SelectedOfficeAddressEnum>(
         value: SelectedOfficeAddressEnum.current,
         groupValue: officeAddressEnum,
@@ -1225,7 +1225,7 @@ class _PersonalInformationState extends State<PersonalInformation> {
     );
 
     final otherOfficeAddressListTile = ListTile(
-      title: const Text(model.otherAddressSubject),
+      title: const Text(model.otherAddressSubject, style: TextStyle(fontSize: 11)),
       leading: Radio<SelectedOfficeAddressEnum>(
         value: SelectedOfficeAddressEnum.office,
         groupValue: officeAddressEnum,
@@ -1530,7 +1530,7 @@ class _PersonalInformationState extends State<PersonalInformation> {
       body: SingleChildScrollView(
         child: Center(
           child: SizedBox(
-            width: MediaQuery.of(context).size.width * displayWidth,
+            width: 500,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -1540,7 +1540,7 @@ class _PersonalInformationState extends State<PersonalInformation> {
                 const SizedBox(height: 20),
                 // registered address path
                 Container(
-                  padding: const EdgeInsets.all(50),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                       color: Colors.lightBlue.withOpacity(.3),
                       borderRadius:
@@ -1562,8 +1562,9 @@ class _PersonalInformationState extends State<PersonalInformation> {
                 ),
                 HighSpace(height: height),
                 Container(
-                  width: MediaQuery.of(context).size.width * displayWidth,
-                  padding: const EdgeInsets.all(50),
+                  width: 500,
+                  // width: MediaQuery.of(context).size.width * displayWidth,
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                       color: Colors.lightBlue.withOpacity(.3),
                       borderRadius:
@@ -1575,11 +1576,12 @@ class _PersonalInformationState extends State<PersonalInformation> {
                           const Icon(Icons.location_on),
                           misc.subjectRichText(
                               subject: model.currentAddressSubject,
-                              fontsize: 25,
+                              fontsize: 15,
                               color: Colors.black),
-                          const Expanded(flex: 1, child: SizedBox()),
-                          Expanded(flex: 1, child: registeredAddressListTile),
-                          Expanded(flex: 1, child: otherAddressListTile),
+                          // const Expanded(flex: 1, child: SizedBox()),
+                          const SizedBox(width: 20,),
+                          Expanded(flex: 5, child: registeredAddressListTile),
+                          Expanded(flex: 5, child: otherAddressListTile),
                         ],
                       ),
                       (currentAddressEnum == SelectedCurrentAddressEnum.current)
@@ -1591,8 +1593,8 @@ class _PersonalInformationState extends State<PersonalInformation> {
                 HighSpace(height: height),
                 // const PersonalInformationOccupation(),
                 Container(
-                  width: MediaQuery.of(context).size.width * displayWidth,
-                  padding: const EdgeInsets.all(50),
+                  width: 500,
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                       color: Colors.lightBlue.withOpacity(
                         .3,
@@ -1607,7 +1609,7 @@ class _PersonalInformationState extends State<PersonalInformation> {
                             text: const TextSpan(
                               text: 'อาชีพปัจจุบันแลหะแหล่งที่มาของเงินลงทุน',
                               style: TextStyle(
-                                  fontSize: 25,
+                                  fontSize: 15,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.black),
                               children: [
@@ -1622,7 +1624,7 @@ class _PersonalInformationState extends State<PersonalInformation> {
                           ),
                         ],
                       ),
-                      const HighSpace(height: 20),
+                      const HighSpace(height: 10),
                       Row(
                         children: [
                           Expanded(flex: 1, child: sourceOfIncome),
@@ -1644,13 +1646,13 @@ class _PersonalInformationState extends State<PersonalInformation> {
                           Expanded(flex: 1, child: salary),
                         ],
                       ),
-                      const HighSpace(height: 20),
+                      const HighSpace(height: 10),
                       Row(
                         children: [
                           const Icon(Icons.location_on),
                           misc.subjectRichText(
-                              subject: model.officeLocation, fontsize: 25),
-                          const Expanded(flex: 1, child: SizedBox()),
+                              subject: model.officeLocation, fontsize: 15),
+                          // const Expanded(flex: 1, child: SizedBox()),
                           Expanded(
                               flex: 2, child: registeredOfficeAddressListTile),
                           Expanded(
@@ -1667,8 +1669,8 @@ class _PersonalInformationState extends State<PersonalInformation> {
                 HighSpace(height: height),
                 // bankAccount
                 Container(
-                  width: MediaQuery.of(context).size.width * displayWidth,
-                  padding: const EdgeInsets.all(50),
+                  width: 500,
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                       color: Colors.lightBlue.withOpacity(.3),
                       borderRadius: const BorderRadius.all(
@@ -1681,23 +1683,23 @@ class _PersonalInformationState extends State<PersonalInformation> {
                           Icon(Icons.location_on),
                           Text(model.bankHeaderSubject,
                               style: TextStyle(
-                                  fontSize: 25, fontWeight: FontWeight.bold)),
+                                  fontSize: 15, fontWeight: FontWeight.bold)),
                         ],
                       ),
                       const Row(children: [Text(model.firstBankSubject)]),
                       firstBank,
-                      const SizedBox(height: 50),
+                      const SizedBox(height: 10),
                       Row(
                         children: [
                           const Icon(Icons.location_on),
                           const Text(model.secondBankSubject,
                               style: TextStyle(
-                                  fontSize: 25, fontWeight: FontWeight.bold)),
-                          const Expanded(flex: 3, child: SizedBox()),
+                                  fontSize: 15, fontWeight: FontWeight.bold)),
+                          // const Expanded(flex: 2, child: SizedBox()),
                           Expanded(
                             flex: 1,
                             child: ListTile(
-                              title: const Text('ใช้'),
+                              title: const Text('ใช้', style: TextStyle(fontSize: 11)),
                               leading: Radio<IsAddedBankAccountsEnum>(
                                 value: IsAddedBankAccountsEnum.yes,
                                 groupValue: isAddedBankAccount,
@@ -1712,7 +1714,7 @@ class _PersonalInformationState extends State<PersonalInformation> {
                           Expanded(
                             flex: 1,
                             child: ListTile(
-                              title: const Text('ไม่ใช้'),
+                              title: const Text('ไม่ใช้', style: TextStyle(fontSize: 11)),
                               leading: Radio<IsAddedBankAccountsEnum>(
                                 value: IsAddedBankAccountsEnum.no,
                                 groupValue: isAddedBankAccount,
@@ -1731,7 +1733,7 @@ class _PersonalInformationState extends State<PersonalInformation> {
                               children: [
                                 const Row(
                                   children: [
-                                    Text('กรุณาระบุชื่อธนาคารก่อนกรอกชื่อสาขา'),
+                                    Text('กรุณาระบุชื่อธนาคารก่อนกรอกชื่อสาขา', style: TextStyle(fontSize: 8)),
                                   ],
                                 ),
                                 secondBank
@@ -1745,7 +1747,7 @@ class _PersonalInformationState extends State<PersonalInformation> {
                 Row(
                   children: [
                     Expanded(
-                      flex: 1,
+                      flex: 2,
                       child: FloatingActionButton(
                         shape: const CircleBorder(),
                         onPressed: () {
@@ -1784,7 +1786,7 @@ class _PersonalInformationState extends State<PersonalInformation> {
                       width: 5,
                     ),
                     Expanded(
-                      flex: 1,
+                      flex: 2,
                       child: FittedBox(
                         alignment: Alignment.bottomRight,
                         child: FloatingActionButton(
@@ -2163,10 +2165,10 @@ class PersonalInformationHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
+    // final width = MediaQuery.of(context).size.width;
     return Container(
-      width: width * displayWidth,
-      padding: const EdgeInsets.all(50),
+      width: 500,
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
           color: Colors.lightGreen.withOpacity(
             .3,
@@ -2175,7 +2177,7 @@ class PersonalInformationHeader extends StatelessWidget {
       child: const Text(
         'กรอกข้อมูลส่วนตัว',
         style: TextStyle(
-          fontSize: 25,
+          fontSize: 15,
           fontWeight: FontWeight.bold,
         ),
       ),

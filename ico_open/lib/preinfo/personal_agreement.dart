@@ -25,7 +25,7 @@ class _CheckboxPersonalAggreementState
     }
 
     return CheckboxListTile(
-      contentPadding: const EdgeInsets.all(0),
+      // contentPadding: const EdgeInsets.all(0),
       activeColor: Colors.transparent,
       hoverColor: Colors.transparent,
       splashRadius: 0,

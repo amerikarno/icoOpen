@@ -46,6 +46,7 @@ class _IDCardPageState extends State<IDCardPage> {
     _createYearLists();
   }
 
+  final widthspace = const SizedBox(width: 20,);
   void _postIDCardInfo(IDcardModel idCard) async {
     userid = await api.postIDCard(idCard);
     setState(() {
@@ -146,29 +147,34 @@ class _IDCardPageState extends State<IDCardPage> {
       required String label,
       required List<String> items,
       required Function(String?) onChanged}) {
-    return DropdownButtonFormField(
-      value: value,
-      decoration: InputDecoration(
-        label: Text(
-          label,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: Colors.black,
-            fontSize: 15,
+    return Transform.scale(
+      scale: .9,
+      child: DropdownButtonFormField(
+        iconSize: 20,
+        value: value,
+        menuMaxHeight: 250,
+        decoration: InputDecoration(
+          label: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Colors.black,
+              fontSize: 16,
+            ),
           ),
         ),
+        onChanged: (String? value) {
+          setState(() {
+            onChanged(value);
+          });
+        },
+        items: items.map<DropdownMenuItem<String>>((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+          );
+        }).toList(),
       ),
-      onChanged: (String? value) {
-        setState(() {
-          onChanged(value);
-        });
-      },
-      items: items.map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList(),
     );
   }
 
@@ -213,273 +219,384 @@ class _IDCardPageState extends State<IDCardPage> {
     // print('preInfo: ${widget.preinfo!.mobile}');
 
     return Scaffold(
-      body: Container(
-        padding: const EdgeInsets.all(50),
-        child: Column(
-          children: [
-            Container(
-              height: 100,
-              decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.circular(10)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.blueGrey.withOpacity(0.3),
-                      spreadRadius: 0.3,
-                    )
-                  ]),
-              child: const Row(
-                children: [
-                  SizedBox(
-                    width: 100,
-                  ),
-                  Text(
-                    'กรอกข้อมูลบัตรประชาชน',
-                    style: TextStyle(
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
+      body: Center(
+        child: SizedBox(
+          // padding: const EdgeInsets.all(50),
+          width: 500,
+          child: Column(
+            children: [
+              Container(
+                height: 100,
+                decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(Radius.circular(10)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.blueGrey.withOpacity(0.3),
+                        spreadRadius: 0.3,
+                      )
+                    ]),
+                child: const Row(
+                  children: [
+                    SizedBox(
+                      width: 50,
                     ),
-                  ),
-                  SizedBox(
-                    width: 50,
-                  ),
-                ],
+                    Text(
+                      'กรอกข้อมูลบัตรประชาชน',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(
+                      width: 50,
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Container(
-              height: 100,
-              decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.circular(10)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.lightBlue.withOpacity(0.3),
-                      spreadRadius: 0.3,
-                    )
-                  ]),
-              // color: Colors.lightBlue,
-              child: Row(
-                children: [
-                  const SizedBox(
-                    width: 50,
-                  ),
-                  SizedBox(
-                    width: 300,
-                    child: misc.subjectRichText(subject: 'วัน/เดือน/ปี เกิด'),
-                  ),
-                  const Expanded(
-                    flex: 5,
-                    child: SizedBox(),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: dateFeild,
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: monthField,
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: yearField,
-                  ),
-                  const Expanded(
-                    flex: 1,
-                    child: SizedBox(),
-                  ),
-                ],
+              const SizedBox(
+                height: 20,
               ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Container(
-              height: 100,
-              decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.circular(10)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.lightBlue.withOpacity(0.3),
-                      spreadRadius: 0.3,
-                    )
-                  ]),
-              child: Row(
-                children: [
-                  const SizedBox(
-                    width: 50,
-                  ),
-                  SizedBox(
-                    width: 300,
-                    child: RichText(
-                      text: const TextSpan(
-                        text: 'สถานะ',
-                        style: TextStyle(
-                          fontSize: 20,
-                        ),
-                        children: [
-                          TextSpan(
-                            text: '*',
-                            style: TextStyle(
-                              color: Colors.red,
-                            ),
+              Container(
+                height: 100,
+                decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(Radius.circular(10)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.lightBlue.withOpacity(0.3),
+                        spreadRadius: 0.3,
+                      )
+                    ]),
+                // color: Colors.lightBlue,
+                child: Row(
+                  children: [
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    SizedBox(
+                      width: 100,
+                      child: misc.subjectRichText(subject: 'วัน/เดือน/ปี เกิด', fontsize: 14),
+                    ),
+                    const Expanded(
+                      flex: 1,
+                      child: SizedBox(),
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: dateFeild,
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: monthField,
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: yearField,
+                    ),
+                    const Expanded(
+                      flex: 1,
+                      child: SizedBox(),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              Container(
+                height: 100,
+                decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(Radius.circular(10)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.lightBlue.withOpacity(0.3),
+                        spreadRadius: 0.3,
+                      )
+                    ]),
+                child: Row(
+                  children: [
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    SizedBox(
+                      width: 80,
+                      child: RichText(
+                        text: const TextSpan(
+                          text: 'สถานะ',
+                          style: TextStyle(
+                            fontSize: 15,
                           ),
-                        ],
+                          children: [
+                            TextSpan(
+                              text: '*',
+                              style: TextStyle(
+                                color: Colors.red,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  const Expanded(
-                    flex: 5,
-                    child: SizedBox(),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: ListTile(
-                      title: const Text('โสด'),
-                      leading: Radio<SingingCharacter>(
-                        value: SingingCharacter.single,
-                        groupValue: _marriageStatus,
-                        onChanged: (SingingCharacter? value) {
-                          setState(() {
-                            _marriageStatus = value;
-                          });
-                        },
+                    const Expanded(
+                      flex: 1,
+                      child: SizedBox(),
+                    ),
+                    Expanded(
+                      flex: 2,
+                      child: ListTile(
+                        title: const Text('โสด', style: TextStyle(fontSize: 12),),
+                        leading: Radio<SingingCharacter>(
+                          value: SingingCharacter.single,
+                          groupValue: _marriageStatus,
+                          onChanged: (SingingCharacter? value) {
+                            setState(() {
+                              _marriageStatus = value;
+                            });
+                          },
+                        ),
                       ),
                     ),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: ListTile(
-                      title: const Text('สมรส'),
-                      leading: Radio<SingingCharacter>(
-                        value: SingingCharacter.married,
-                        groupValue: _marriageStatus,
-                        onChanged: (SingingCharacter? value) {
-                          setState(() {
-                            _marriageStatus = value;
-                          });
-                        },
+                    Expanded(
+                      flex: 2,
+                      child: ListTile(
+                        title: const Text('สมรส',style: TextStyle(fontSize: 12)),
+                        leading: Radio<SingingCharacter>(
+                          value: SingingCharacter.married,
+                          groupValue: _marriageStatus,
+                          onChanged: (SingingCharacter? value) {
+                            setState(() {
+                              _marriageStatus = value;
+                            });
+                          },
+                        ),
                       ),
                     ),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: ListTile(
-                      title: const Text('หย่า'),
-                      leading: Radio<SingingCharacter>(
-                        value: SingingCharacter.disvorced,
-                        groupValue: _marriageStatus,
-                        onChanged: (SingingCharacter? value) {
-                          setState(() {
-                            _marriageStatus = value;
-                          });
-                        },
+                    Expanded(
+                      flex: 2,
+                      child: ListTile(
+                        title: const Text('หย่า',style: TextStyle(fontSize: 12)),
+                        leading: Radio<SingingCharacter>(
+                          value: SingingCharacter.disvorced,
+                          groupValue: _marriageStatus,
+                          onChanged: (SingingCharacter? value) {
+                            setState(() {
+                              _marriageStatus = value;
+                            });
+                          },
+                        ),
                       ),
                     ),
-                  ),
-                  const Expanded(
-                    flex: 1,
-                    child: SizedBox(),
-                  ),
-                ],
+                    // const Expanded(
+                    //   flex: 1,
+                    //   child: SizedBox(),
+                    // ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Container(
-              height: 100,
-              decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.circular(10)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.lightBlue.withOpacity(0.3),
-                      spreadRadius: 0.3,
-                    )
-                  ]),
-              child: Row(
+              const SizedBox(
+                height: 20,
+              ),
+              Container(
+                height: 100,
+                decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(Radius.circular(10)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.lightBlue.withOpacity(0.3),
+                        spreadRadius: 0.3,
+                      )
+                    ]),
+                child: Row(
+                  children: [
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    SizedBox(
+                      width: 200,
+                      child: misc.subjectRichText(
+                          subject: 'หมายเลขบัตรประจำตัวประชาชน', fontsize: 15),
+                    ),
+                    const Expanded(
+                      flex: 1,
+                      child: SizedBox(),
+                    ),
+                    Expanded(
+                      flex: 6,
+                      child: misc.importantTextField(
+                          textController: _idcard,
+                          errorTextCondition: _varidatedIDcard,
+                          errorTextMessage:
+                              'กรุณากรอกหมายเลขบัตรประจำตัวประชาชนให้ถูกต้อง',
+                          subject: 'ตัวเลข 13หลัก',
+                          filterPattern: RegExp(r'[0-9]'),
+                          onsubmittedFunction: (value) {
+                            if (value.isEmpty) {
+                              setState(
+                                () {
+                                  _varidatedIDcard = true;
+                                },
+                              );
+                            } else {
+                              _getIsCorrectIDCard(value);
+                              if (!_varidatedIDcard) {
+                                setState(() {
+                                  idCardValue = value;
+                                });
+                              }
+                            }
+                          }),
+                    ),
+                    const Expanded(
+                      flex: 1,
+                      child: SizedBox(),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              Container(
+                height: 100,
+                decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(Radius.circular(10)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.lightBlue.withOpacity(0.3),
+                        spreadRadius: 0.3,
+                      )
+                    ]),
+                child: Row(
+                  children: [
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    SizedBox(
+                        width: 200,
+                        child: misc.subjectRichText(
+                            subject: 'เลขหลังบัตรประชาชน (Laser Code)', fontsize: 13)),
+                    const SizedBox(width: 20,),
+                    Expanded(
+                      flex: 18,
+                      child: misc.importantTextField(
+                          textController: _lasercodestr,
+                          errorTextCondition: _varidatedLaserStr,
+                          errorTextMessage: 'กรุณากรอกข้อมูลให้ถูกต้องครบถ้วย',
+                          subject: 'ตัวอักษร 2หลักแรก',
+                          filterPattern: RegExp(r'[a-zA-Z]'),
+                          onsubmittedFunction: (value) {
+                            if (value.isEmpty || value.length != 2) {
+                              setState(() {
+                                _varidatedLaserStr = true;
+                              });
+                              log('validate laser state: $_varidatedLaserStr');
+                              log('laser state: $_lasercodestr');
+                            } else {
+                              setState(() {
+                                _varidatedLaserStr = false;
+                                laserCodeStrValue = value;
+                              });
+                              log('validate laser state: $_varidatedLaserStr');
+                              log('laser state: $_lasercodestr');
+                            }
+                          }),
+                    ),
+                    const Text('-'),
+                    Expanded(
+                      flex: 18,
+                      child: misc.importantTextField(
+                          textController: _lasercodenum,
+                          errorTextCondition: _varidatedLaserId,
+                          errorTextMessage: 'กรุณากรอกข้อมูลให้ถูกต้องครบถ้วย',
+                          subject: 'ตามด้วยตัวเลข 10หลัก',
+                          filterPattern: RegExp(r'[0-9]'),
+                          onsubmittedFunction: (value) {
+                            if (value.isEmpty || value.length != 10) {
+                              setState(() {
+                                _varidatedLaserId = true;
+                              });
+                              log('validate laser id: $_varidatedLaserId');
+                            } else {
+                              setState(() {
+                                _varidatedLaserId = false;
+                                laserCodeNumValue = value;
+                              });
+                              log('validate laser id: $_varidatedLaserId');
+                            }
+                          }),
+                    ),
+                    const Expanded(
+                      flex: 1,
+                      child: SizedBox(),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              Row(
                 children: [
-                  const SizedBox(
-                    width: 50,
-                  ),
-                  SizedBox(
-                    width: 300,
-                    child: misc.subjectRichText(
-                        subject: 'หมายเลขบัตรประจำตัวประชาชน'),
+                  Expanded(
+                    flex: 3,
+                    child: FittedBox(
+                      alignment: Alignment.bottomLeft,
+                      child: FloatingActionButton(
+                        // backgroundColor: Colors.orange,
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return const preinfo.MyHomePage();
+                              },
+                            ),
+                          );
+                        },
+                        child: const Icon(
+                          Icons.arrow_circle_left,
+                          size: 30,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
                   ),
                   const Expanded(
-                    flex: 5,
+                    flex: 30,
                     child: SizedBox(),
                   ),
                   Expanded(
                     flex: 3,
-                    child: misc.importantTextField(
-                        textController: _idcard,
-                        errorTextCondition: _varidatedIDcard,
-                        errorTextMessage:
-                            'กรุณากรอกหมายเลขบัตรประจำตัวประชาชนให้ถูกต้อง',
-                        subject: 'ตัวเลข 13หลัก',
-                        filterPattern: RegExp(r'[0-9]'),
-                        onsubmittedFunction: (value) {
-                          if (value.isEmpty) {
+                    child: FittedBox(
+                      alignment: Alignment.bottomRight,
+                      child: FloatingActionButton(
+                        backgroundColor: Colors.orange,
+                        onPressed: () {
+                          log('laser code:', name: _lasercodestr.toString());
+                          if (_idcard.text.toString().isEmpty) {
                             setState(
                               () {
                                 _varidatedIDcard = true;
                               },
                             );
                           } else {
-                            _getIsCorrectIDCard(value);
-                            if (!_varidatedIDcard) {
-                              setState(() {
-                                idCardValue = value;
-                              });
-                            }
+                            _getIsCorrectIDCard(_idcard.text.toString());
+                            idCardValue = _idcard.text.toString();
                           }
-                        }),
-                  ),
-                  const Expanded(
-                    flex: 1,
-                    child: SizedBox(),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Container(
-              height: 100,
-              decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.circular(10)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.lightBlue.withOpacity(0.3),
-                      spreadRadius: 0.3,
-                    )
-                  ]),
-              child: Row(
-                children: [
-                  const SizedBox(
-                    width: 50,
-                  ),
-                  SizedBox(
-                      width: 300,
-                      child: misc.subjectRichText(
-                          subject: 'เลขหลังบัตรประชาชน (Laser Code)')),
-                  const Expanded(
-                    flex: 5,
-                    child: SizedBox(),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: misc.importantTextField(
-                        textController: _lasercodestr,
-                        errorTextCondition: _varidatedLaserStr,
-                        errorTextMessage: 'กรุณากรอกข้อมูลให้ถูกต้องครบถ้วย',
-                        subject: 'ตัวอักษร 2หลักแรก',
-                        filterPattern: RegExp(r'[a-zA-Z]'),
-                        onsubmittedFunction: (value) {
-                          if (value.isEmpty || value.length != 2) {
+                          if (_lasercodenum.text.isEmpty ||
+                              _lasercodenum.text.length != 10) {
+                            setState(() {
+                              _varidatedLaserId = true;
+                            });
+                            log('validate laser id: $_varidatedLaserId');
+                          } else {
+                            setState(() {
+                              _varidatedLaserId = false;
+                              laserCodeNumValue = _lasercodenum.text;
+                            });
+                            log('validate laser id: $_varidatedLaserId');
+                          }
+                          if (_lasercodestr.text.isEmpty ||
+                              _lasercodestr.text.length != 2) {
                             setState(() {
                               _varidatedLaserStr = true;
                             });
@@ -488,175 +605,64 @@ class _IDCardPageState extends State<IDCardPage> {
                           } else {
                             setState(() {
                               _varidatedLaserStr = false;
-                              laserCodeStrValue = value;
+                              laserCodeStrValue = _lasercodestr.text;
                             });
                             log('validate laser state: $_varidatedLaserStr');
                             log('laser state: $_lasercodestr');
                           }
-                        }),
-                  ),
-                  const Text('-'),
-                  Expanded(
-                    flex: 2,
-                    child: misc.importantTextField(
-                        textController: _lasercodenum,
-                        errorTextCondition: _varidatedLaserId,
-                        errorTextMessage: 'กรุณากรอกข้อมูลให้ถูกต้องครบถ้วย',
-                        subject: 'ตามด้วยตัวเลข 10หลัก',
-                        filterPattern: RegExp(r'[0-9]'),
-                        onsubmittedFunction: (value) {
-                          if (value.isEmpty || value.length != 10) {
-                            setState(() {
-                              _varidatedLaserId = true;
-                            });
-                            log('validate laser id: $_varidatedLaserId');
-                          } else {
-                            setState(() {
-                              _varidatedLaserId = false;
-                              laserCodeNumValue = value;
-                            });
-                            log('validate laser id: $_varidatedLaserId');
+        
+                          final date = '$dateValue $monthValue $yearValue';
+                          final laser = '$laserCodeStrValue-$laserCodeNumValue';
+                          String marriageStatus = '';
+                          if (_marriageStatus == SingingCharacter.single) {
+                            marriageStatus = 'โสด';
                           }
-                        }),
-                  ),
-                  const Expanded(
-                    flex: 1,
-                    child: SizedBox(),
+                          if (_marriageStatus == SingingCharacter.married) {
+                            marriageStatus = 'สมรส';
+                          }
+                          if (_marriageStatus == SingingCharacter.disvorced) {
+                            marriageStatus = 'หย่า';
+                          }
+                          final postIDCard = IDcardModel(
+                            thtitle: preinfo.thValue!,
+                            thname: preinfo.thname.text,
+                            thsurname: preinfo.thsurname.text,
+                            engtitle: preinfo.engValue!,
+                            engname: preinfo.enname.text,
+                            engsurname: preinfo.ensurname.text,
+                            email: preinfo.email.text,
+                            mobile: preinfo.mobileno.text,
+                            agreement: isPersonalAgreementChecked,
+                            birthdate: date,
+                            status: marriageStatus,
+                            idcard: idCardValue,
+                            laserCode: laser,
+                          );
+                          log('thai: ${postIDCard.thtitle}${postIDCard.thname} ${postIDCard.thsurname}');
+                          log('english: ${postIDCard.engtitle}${postIDCard.engname} ${postIDCard.engsurname}');
+                          log('etc: ${postIDCard.email}${postIDCard.mobile} ${postIDCard.agreement}');
+                          _postIDCardInfo(postIDCard);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return  personalinfo.PersonalInformation(id: userid);
+                              },
+                            ),
+                          );
+                        },
+                        child: const Icon(
+                          Icons.arrow_circle_right,
+                          size: 30,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Row(
-              children: [
-                Expanded(
-                  flex: 1,
-                  child: FittedBox(
-                    alignment: Alignment.bottomLeft,
-                    child: FloatingActionButton(
-                      // backgroundColor: Colors.orange,
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return const preinfo.MyHomePage();
-                            },
-                          ),
-                        );
-                      },
-                      child: const Icon(
-                        Icons.arrow_circle_left,
-                        size: 30,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-                const Expanded(
-                  flex: 30,
-                  child: SizedBox(),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: FittedBox(
-                    alignment: Alignment.bottomRight,
-                    child: FloatingActionButton(
-                      backgroundColor: Colors.orange,
-                      onPressed: () {
-                        log('laser code:', name: _lasercodestr.toString());
-                        if (_idcard.text.toString().isEmpty) {
-                          setState(
-                            () {
-                              _varidatedIDcard = true;
-                            },
-                          );
-                        } else {
-                          _getIsCorrectIDCard(_idcard.text.toString());
-                          idCardValue = _idcard.text.toString();
-                        }
-                        if (_lasercodenum.text.isEmpty ||
-                            _lasercodenum.text.length != 10) {
-                          setState(() {
-                            _varidatedLaserId = true;
-                          });
-                          log('validate laser id: $_varidatedLaserId');
-                        } else {
-                          setState(() {
-                            _varidatedLaserId = false;
-                            laserCodeNumValue = _lasercodenum.text;
-                          });
-                          log('validate laser id: $_varidatedLaserId');
-                        }
-                        if (_lasercodestr.text.isEmpty ||
-                            _lasercodestr.text.length != 2) {
-                          setState(() {
-                            _varidatedLaserStr = true;
-                          });
-                          log('validate laser state: $_varidatedLaserStr');
-                          log('laser state: $_lasercodestr');
-                        } else {
-                          setState(() {
-                            _varidatedLaserStr = false;
-                            laserCodeStrValue = _lasercodestr.text;
-                          });
-                          log('validate laser state: $_varidatedLaserStr');
-                          log('laser state: $_lasercodestr');
-                        }
-
-                        final date = '$dateValue $monthValue $yearValue';
-                        final laser = '$laserCodeStrValue-$laserCodeNumValue';
-                        String marriageStatus = '';
-                        if (_marriageStatus == SingingCharacter.single) {
-                          marriageStatus = 'โสด';
-                        }
-                        if (_marriageStatus == SingingCharacter.married) {
-                          marriageStatus = 'สมรส';
-                        }
-                        if (_marriageStatus == SingingCharacter.disvorced) {
-                          marriageStatus = 'หย่า';
-                        }
-                        final postIDCard = IDcardModel(
-                          thtitle: preinfo.thValue!,
-                          thname: preinfo.thname.text,
-                          thsurname: preinfo.thsurname.text,
-                          engtitle: preinfo.engValue!,
-                          engname: preinfo.enname.text,
-                          engsurname: preinfo.ensurname.text,
-                          email: preinfo.email.text,
-                          mobile: preinfo.mobileno.text,
-                          agreement: isPersonalAgreementChecked,
-                          birthdate: date,
-                          status: marriageStatus,
-                          idcard: idCardValue,
-                          laserCode: laser,
-                        );
-                        log('thai: ${postIDCard.thtitle}${postIDCard.thname} ${postIDCard.thsurname}');
-                        log('english: ${postIDCard.engtitle}${postIDCard.engname} ${postIDCard.engsurname}');
-                        log('etc: ${postIDCard.email}${postIDCard.mobile} ${postIDCard.agreement}');
-                        _postIDCardInfo(postIDCard);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return  personalinfo.PersonalInformation(id: userid);
-                            },
-                          ),
-                        );
-                      },
-                      child: const Icon(
-                        Icons.arrow_circle_right,
-                        size: 30,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

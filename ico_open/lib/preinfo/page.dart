@@ -31,6 +31,9 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
+  final hightspace = const SizedBox(height: 10,);
+  final widthspace = const SizedBox(width: 10,);
+
   var _emailError = 'กรุณาใส่อีเมล';
   var _mobilenoError = 'กรุณาใส่หมายเลขโทรศัพท์มือถือ';
   // FocusNode _focusEmail = FocusNode();
@@ -220,6 +223,8 @@ class _MyHomePageState extends State<MyHomePage> {
           // _loadingEmail = false;
           // isPassedMobileChecked = true;
         });
+      } else {
+
       }
 
       if (data['isInvalidMobileNoFormat']) {
@@ -332,7 +337,7 @@ class _MyHomePageState extends State<MyHomePage> {
           textAlign: TextAlign.center,
           style: const TextStyle(
             color: Colors.black,
-            fontSize: 15,
+            fontSize: 12,
           ),
         ),
       ),
@@ -385,239 +390,221 @@ class _MyHomePageState extends State<MyHomePage> {
       label: engLabel,
       items: engList,
       onChanged: (value) {
-        thValue = value!;
-        engValue = engToTh(value);
+        engValue = value!;
+        thValue = engToTh(value);
       },
       errorCondition: _validateEnTitle,
       errorMessage: 'กรุณาใส่คำนำหน้าชื่อ (ภาษาอังกฤษ)',
     );
 
     return Scaffold(
-      body: Row(
-        children: [
-          SizedBox(
-            width: MediaQuery.of(context).size.width / 2,
-          ),
-          SizedBox(
-            height: MediaQuery.of(context).size.height * 0.8,
-            width: MediaQuery.of(context).size.width / 3,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Spacer(
-                  flex: 5,
-                ),
-                SizedBox(
-                  child: misc.subjectText(
-                      subject: 'กรุณากรอกข้อมูลเพื่อเปิดบัญชี'),
-                ),
-                const Spacer(
-                  flex: 2,
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 7,
-                      child: thField,
-                      // child: THdropdownButton(),
-                    ),
-                    const Spacer(
-                      flex: 13,
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 7,
-                      child: misc.importantTextField(
-                          textController: thname,
-                          errorTextCondition: _validateTHName,
-                          errorTextMessage: 'กรุณาใส่ชื่อ (ภาษาไทย)',
-                          subject: 'ชื่อ (ภาษาไทย)',
-                          filterPattern: RegExp(r'[ก-๛]')),
-                    ),
-                    const Spacer(
-                      flex: 1,
-                    ),
-                    Expanded(
-                      flex: 12,
-                      child: misc.importantTextField(
-                          textController: thsurname,
-                          errorTextCondition: _validateTHSurName,
-                          errorTextMessage: 'กรุณาใส่นามสกุล (ภาษาไทย)',
-                          subject: 'นามสกุล (ภาษาไทย)',
-                          filterPattern: RegExp(r'[ก-๛]')),
-                    ),
-                  ],
-                ),
-                const Spacer(
-                  flex: 1,
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 7,
-                      child: engField,
-                    ),
-                    const Spacer(
-                      flex: 13,
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 7,
-                      child: misc.importantTextField(
-                          textController: enname,
-                          errorTextCondition: _validateEnName,
-                          errorTextMessage: 'กรุณาใส่ชื่อ (ภาษาอังกฤษ)',
-                          subject: 'ชื่อ (ภาษาอังกฤษ)',
-                          filterPattern: RegExp(r'[a-zA-Z]')),
-                    ),
-                    const Spacer(
-                      flex: 1,
-                    ),
-                    Expanded(
-                      flex: 12,
-                      child: misc.importantTextField(
-                          textController: ensurname,
-                          errorTextCondition: _validateEnSurName,
-                          errorTextMessage: 'กรุณาใส่นามสกุล (ภาษาอังกฤษ)',
-                          subject: 'นามสกุล (ภาษาอังกฤษ)',
-                          filterPattern: RegExp(r'[a-zA-Z]')),
-                    ),
-                  ],
-                ),
-                const Spacer(
-                  flex: 3,
-                ),
-                SizedBox(
-                  child: misc.subjectText(
-                    subject:
-                        'ข้อมูลสำหรับรับ Username, Password และเอกสารจากทางบริษัทฯ',
-                    color: Colors.blue,
+      body: Center(
+        child: SizedBox(
+          width: 500,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Spacer(
+                flex: 2,
+              ),
+              SizedBox(
+                child: misc.subjectText(
+                    subject: 'กรุณากรอกข้อมูลเพื่อเปิดบัญชี'),
+              ),
+              hightspace,
+              Row(
+                children: [
+                  Expanded(
+                    flex: 6,
+                    child: thField,
+                    // child: THdropdownButton(),
                   ),
+                  const Spacer(
+                    flex: 14,
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    flex: 6,
+                    child: misc.importantTextField(
+                        textController: thname,
+                        errorTextCondition: _validateTHName,
+                        errorTextMessage: 'กรุณาใส่ชื่อ (ภาษาไทย)',
+                        subject: 'ชื่อ (ภาษาไทย)',
+                        filterPattern: RegExp(r'[ก-๛]')),
+                  ),
+                  const Spacer(
+                    flex: 1,
+                  ),
+                  Expanded(
+                    flex: 13,
+                    child: misc.importantTextField(
+                        textController: thsurname,
+                        errorTextCondition: _validateTHSurName,
+                        errorTextMessage: 'กรุณาใส่นามสกุล (ภาษาไทย)',
+                        subject: 'นามสกุล (ภาษาไทย)',
+                        filterPattern: RegExp(r'[ก-๛]')),
+                  ),
+                ],
+              ),
+              hightspace,
+              Row(
+                children: [
+                  Expanded(
+                    flex: 6,
+                    child: engField,
+                  ),
+                  const Spacer(
+                    flex: 14,
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    flex: 6,
+                    child: misc.importantTextField(
+                        textController: enname,
+                        errorTextCondition: _validateEnName,
+                        errorTextMessage: 'กรุณาใส่ชื่อ (ภาษาอังกฤษ)',
+                        subject: 'ชื่อ (ภาษาอังกฤษ)',
+                        filterPattern: RegExp(r'[a-zA-Z]')),
+                  ),
+                  const Spacer(
+                    flex: 1,
+                  ),
+                  Expanded(
+                    flex: 13,
+                    child: misc.importantTextField(
+                        textController: ensurname,
+                        errorTextCondition: _validateEnSurName,
+                        errorTextMessage: 'กรุณาใส่นามสกุล (ภาษาอังกฤษ)',
+                        subject: 'นามสกุล (ภาษาอังกฤษ)',
+                        filterPattern: RegExp(r'[a-zA-Z]')),
+                  ),
+                ],
+              ),
+              hightspace,
+              hightspace,
+              SizedBox(
+                child: misc.subjectText(
+                  subject:
+                      'ข้อมูลสำหรับรับ Username, Password และเอกสารจากทางบริษัทฯ',
+                  color: Colors.blue,
+                  fontsize: 18
                 ),
-                const Spacer(
-                  flex: 1,
-                ),
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.email,
-                      color: Colors.lightBlue,
+              ),
+              hightspace,
+              Row(
+                children: [
+                  const Icon(
+                    Icons.email,
+                    color: Colors.lightBlue,
+                  ),
+                  Expanded(
+                    flex: 3,
+                    child: misc.importantTextField(
+                      textController: email,
+                      errorTextCondition: _validateEmail,
+                      errorTextMessage: _emailError,
+                      subject: 'อีเมล',
+                      filterPattern: RegExp(r'[a-zA-Z0-9@.]'),
+                      onsubmittedFunction: (value) async {
+                        final isPassed = await _verifyEmail(value);
+                        setState(() {
+                          isPassedEmailChecked = isPassed;
+                        });
+                      },
                     ),
-                    Expanded(
-                      flex: 3,
-                      child: misc.importantTextField(
-                        textController: email,
-                        errorTextCondition: _validateEmail,
-                        errorTextMessage: _emailError,
-                        subject: 'อีเมล',
-                        filterPattern: RegExp(r'[a-zA-Z0-9@.]'),
+                  ),
+                ],
+              ),
+              hightspace,
+              Row(
+                children: [
+                  const Icon(
+                    Icons.phone_iphone,
+                    color: Colors.lightBlue,
+                  ),
+                  Expanded(
+                    flex: 5,
+                    child: misc.importantTextField(
+                        textController: mobileno,
+                        errorTextCondition: _validateMobileNo,
+                        errorTextMessage: _mobilenoError,
+                        subject: 'หมายเลขโทรศัพท์มือถือ',
                         onsubmittedFunction: (value) async {
-                          final isPassed = await _verifyEmail(value);
+                          final isPassed = await _verifyMobileNo(value);
                           setState(() {
-                            isPassedEmailChecked = isPassed;
+                            isPassedMobileChecked = isPassed;
+                            // _isPassedVeridateMobile = true;
                           });
                         },
+                        filterPattern: RegExp(r'[0-9]')),
+                  ),
+                ],
+              ),
+              hightspace,
+              const Row(children: [
+                Expanded(flex: 1, child: CheckboxPersonalAggreement()),
+                Expanded(
+                  flex: 16,
+                  child: Column(
+                    children: [
+                      Wrap(
+                        children: [
+                          Text(
+                            """ข้าพเจ้าได้อ่านและตกลงตามข้อมกำหนดและเงื่อนไขและรับทราบนโยบายความเป็นส่วนตัว ซึ่งระบุวิธีการที่บริษัท ฟินันเซีย ดิจิตทัล แอสแซท จำกัด("บริษัท")""",
+                            maxLines: 5,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          PersonalAgreement(),
+                        ],
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-                const Spacer(
-                  flex: 1,
-                ),
-                Row(
+              ]),
+              hightspace,
+              Expanded(
+                flex: 3,
+                child: Row(
                   children: [
-                    const Icon(
-                      Icons.phone_iphone,
-                      color: Colors.lightBlue,
+                    const Spacer(
+                      flex: 1,
+                    ),
+                    Expanded(
+                      flex: 14,
+                      child: RichText(
+                        text: const TextSpan(
+                          text: '*',
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 12,
+                          ),
+                          children: [
+                            TextSpan(
+                              text: 'ข้อมูลสำคัญกรุณากรอกให้ครบถ้วย',
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                     Expanded(
                       flex: 5,
-                      child: misc.importantTextField(
-                          textController: mobileno,
-                          errorTextCondition: _validateMobileNo,
-                          errorTextMessage: _mobilenoError,
-                          subject: 'หมายเลขโทรศัพท์มือถือ',
-                          onsubmittedFunction: (value) async {
-                            final isPassed = await _verifyMobileNo(value);
-                            setState(() {
-                              isPassedMobileChecked = isPassed;
-                              // _isPassedVeridateMobile = true;
-                            });
-                          },
-                          filterPattern: RegExp(r'[0-9]')),
-                    ),
-                  ],
-                ),
-                const Spacer(
-                  flex: 1,
-                ),
-                const Row(children: [
-                  Expanded(flex: 1, child: CheckboxPersonalAggreement()),
-                  Expanded(
-                    flex: 16,
-                    child: Column(
-                      children: [
-                        Wrap(
-                          children: [
-                            Text(
-                              """ข้าพเจ้าได้อ่านและตกลงตามข้อมกำหนดและเงื่อนไขและรับทราบนโยบายความเป็นส่วนตัว ซึ่งระบุวิธีการที่บริษัท ฟินันเซีย ดิจิตทัล แอสแซท จำกัด("บริษัท")""",
-                              maxLines: 3,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            PersonalAgreement(),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ]),
-                const Spacer(
-                  flex: 1,
-                ),
-                Expanded(
-                  flex: 3,
-                  child: Row(
-                    children: [
-                      const Spacer(
-                        flex: 1,
-                      ),
-                      Expanded(
-                        flex: 14,
-                        child: RichText(
-                          text: const TextSpan(
-                            text: '*',
-                            style: TextStyle(
-                              color: Colors.red,
-                              fontSize: 12,
-                            ),
-                            children: [
-                              TextSpan(
-                                text: 'ข้อมูลสำคัญกรุณากรอกให้ครบถ้วย',
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 5,
+                      child: SizedBox(
+                        height: 40,
                         child: FittedBox(
                           alignment: Alignment.bottomRight,
                           child: FloatingActionButton(
                             backgroundColor: Colors.orange,
                             onPressed: () async {
-                              isPassedEmailMobileChecked =
-                                  await _verifyEmailMobileNo(
-                                      email.text, mobileno.text);
                               if (thname.text.trim().isEmpty) {
                                 _validateTHName = true;
                               }
@@ -630,9 +617,13 @@ class _MyHomePageState extends State<MyHomePage> {
                               if (ensurname.text.trim().isEmpty) {
                                 _validateEnSurName = true;
                               }
+                              isPassedEmailChecked =
+                                  await _verifyEmail(
+                                      email.text);
+                              isPassedMobileChecked = await _verifyMobileNo(mobileno.text);
                               // if (thValue!.isEmpty) {_validateTHTitle = true;}
                               // if (engValue!.isEmpty) {_validateEnTitle = true;}
-
+                                              
                               if (thname.text.trim().isNotEmpty &&
                                   thsurname.text.trim().isNotEmpty &&
                                   enname.text.trim().isNotEmpty &&
@@ -640,29 +631,29 @@ class _MyHomePageState extends State<MyHomePage> {
                                   email.text.trim().isNotEmpty &&
                                   mobileno.text.trim().isNotEmpty &&
                                   isPersonalAgreementChecked &&
-                                  isPassedEmailMobileChecked) {
+                                  isPassedEmailChecked && isPassedMobileChecked) {
                                 log('''title: $thValue name: ${thname.text} surname: ${thsurname.text}
                                 title: $engValue name: ${enname.text} surname: ${ensurname.text}
                                 email: ${email.text}, mobile: ${mobileno.text}, agreement: $isPersonalAgreementChecked''');
-
+                                              
                                 gotoNextPage();
                               }
                             },
                             child: const Icon(
                               Icons.arrow_right_alt,
-                              size: 50,
+                              size: 30,
                               color: Colors.white,
                             ),
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                )
-              ],
-            ),
+                    ),
+                  ],
+                ),
+              )
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

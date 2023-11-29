@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:ico_open/config/config.dart';
+import 'package:ico_open/customer_evaluate/knowledge_test.dart';
 import 'package:ico_open/misc/misc.dart' as misc;
 import 'package:ico_open/model/model.dart' as model;
 import 'package:ico_open/customer_evaluate/agreement.dart';
@@ -10,6 +11,7 @@ import 'package:ico_open/customer_evaluate/fatca.dart';
 import 'package:ico_open/customer_evaluate/bottom.dart';
 import 'package:ico_open/model/sute_test.dart';
 import 'package:ico_open/questions/fatca_information.dart';
+import 'package:ico_open/questions/knowledge_test.dart';
 import 'package:ico_open/questions/sute_test.dart';
 import 'package:simple_circular_progress_bar/simple_circular_progress_bar.dart';
 
@@ -26,6 +28,8 @@ class CustomerEvaluate extends StatefulWidget {
 }
 
 enum AnswerEnum { first, second, third, forth }
+
+enum KnowledgeTestEnum { yes, no }
 
 class _CustomerEvaluateState extends State<CustomerEvaluate> {
   double suitableSumPoints = 0;
@@ -66,6 +70,8 @@ class _CustomerEvaluateState extends State<CustomerEvaluate> {
   AnswerEnum? _eigthQuestion;
   AnswerEnum? _ninthQuestion;
   AnswerEnum? _tenthQuestion;
+
+  KnowledgeTestEnum? knowledgeTestChoice;
 
   double convertAnserEnumToInt(AnswerEnum? enumPoint) {
     if (enumPoint != null) {
@@ -186,6 +192,35 @@ class _CustomerEvaluateState extends State<CustomerEvaluate> {
       controlAffinity: ListTileControlAffinity.leading,
     );
   }
+
+  Widget _knowledgeListTile(String title, KnowledgeTestEnum? selectedGroup,
+      KnowledgeTestEnum selectedAnswer, Function(KnowledgeTestEnum?) func) {
+    return SizedBox(
+        width: 130,
+        child: ListTile(
+            minLeadingWidth: 0,
+            title: Text(title, style: const TextStyle(fontSize: 12)),
+            leading: Radio<KnowledgeTestEnum>(
+                value: selectedAnswer,
+                groupValue: selectedGroup,
+                onChanged: func)));
+  }
+
+ Widget knowledgeTestExam() {
+      if (knowledgeTestChoice == KnowledgeTestEnum.yes) {
+        return Column(
+          children: [
+          Row(children: [Text(knowledgeQuestions[0].text)],),
+          Row(children: [
+            Text(knowledgeQuestions[0].answers[0]),
+            Text(knowledgeQuestions[0].answers[1]),
+          ],),
+          ]
+        );
+      } else {
+        return const Column();
+      }
+    }
 
   Widget _fatcaCheckBox(
     bool ischeck,
@@ -380,28 +415,30 @@ class _CustomerEvaluateState extends State<CustomerEvaluate> {
     // return StatefulBuilder(
     //     builder: (BuildContext context, StateSetter setState) {
     return Column(
-          children: [
-            internalWidget!,
-            Container(
-                decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                    color: Colors.orange),
-                child: TextButton(
-                    style: TextButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.all(10)),
-                    onPressed: () => showDialog(context: context, builder: (BuildContext context) {
+      children: [
+        internalWidget!,
+        Container(
+            decoration: const BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+                color: Colors.orange),
+            child: TextButton(
+                style: TextButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.all(10)),
+                onPressed: () => showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
                       return const AlertDialog(
                         alignment: Alignment.center,
                         content: W9FormTable(),
                       );
                     }),
-                    child: const Text('OK'))),
-            const SizedBox(
-              height: 10,
-            ),
-          ],
-        );
+                child: const Text('OK'))),
+        const SizedBox(
+          height: 10,
+        ),
+      ],
+    );
     // });
   }
 
@@ -837,6 +874,24 @@ class _CustomerEvaluateState extends State<CustomerEvaluate> {
     // currentQuestion = suiteQuestions[0];
     final userid = widget.id;
     double height = 50;
+
+    Widget doKnowledgeNow = _knowledgeListTile(
+        'ทำตอนนี้', knowledgeTestChoice, KnowledgeTestEnum.yes, (value) {
+      setState(() {
+        knowledgeTestChoice = value;
+      });
+    });
+    Widget doKnowledgeAfter = _knowledgeListTile(
+        'ภายหลัง', knowledgeTestChoice, KnowledgeTestEnum.no, (value) {
+      if (knowledgeTestChoice == KnowledgeTestEnum.yes || knowledgeTestChoice == null) {
+        setState(() {
+          knowledgeTestChoice = value;
+        });
+      }
+    });
+
+   
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Center(
@@ -954,10 +1009,11 @@ class _CustomerEvaluateState extends State<CustomerEvaluate> {
                 usPerson: usPerson,
               ),
               HighSpace(height: height),
-              const CustomerAgreement(),
-              HighSpace(height: height),
               // CustomerEvaluateAdvisors(),
-              // HighSpace(height: 50),
+              KnowledgeTestWidget(widget1: doKnowledgeNow, widget2: doKnowledgeAfter, widget3: knowledgeTestExam(),),
+              HighSpace(height: height),
+              const CustomerAgreement(),
+              const HighSpace(height: 50),
               CustomerEvaluateBottom(id: userid),
               HighSpace(height: height),
             ],

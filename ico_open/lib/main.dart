@@ -20,7 +20,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       // home:  MyHomePage()
-      home: CustomerEvaluate(id: 'd555f123-231f-44e7-80bc-96422727e7e6')
+      // home: CustomerEvaluate(id: 'd555f123-231f-44e7-80bc-96422727e7e6')
+      home: PersonalInformation(id: 'd555f123-231f-44e7-80bc-96422727e7e6')
+      // home: IDCardPage()
     );
   }
 }
