@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:http/http.dart' as http;
+import 'package:ico_open/config/config.dart';
 import 'package:ico_open/model/model.dart';
 import 'package:ico_open/model/personal_info.dart';
 import 'package:ico_open/personal_info/page.dart';
@@ -13,7 +14,7 @@ Future<List<String>> getProvince() async {
 
   final url = Uri(
     scheme: "http",
-    host: "localhost",
+    host: host,
     port: 1323,
     path: "api/v1/all_provinces",
   );
@@ -43,7 +44,7 @@ Future<List<String>> getAmphure(String? province) async {
 
   final url = Uri(
     scheme: "http",
-    host: "localhost",
+    host: host,
     port: 1323,
     path: "api/v1/amphures/$province",
   );
@@ -69,7 +70,7 @@ Future<List<String>> getTambon(String? amphure) async {
 
   final url = Uri(
     scheme: "http",
-    host: "localhost",
+    host: host,
     port: 1323,
     path: "api/v1/tambons/$amphure",
   );
@@ -95,7 +96,7 @@ Future<String> getZipCode(String? zipname) async {
 
   final url = Uri(
     scheme: "http",
-    host: "localhost",
+    host: host,
     port: 1323,
     path: "api/v1/zipcode/$zipname",
   );
@@ -124,7 +125,7 @@ Future<String> postPersonalInfo(PersonalInformationModel personalInfo) async {
 
   final url = Uri(
     scheme: "http",
-    host: "localhost",
+    host: host,
     port: 1323,
     path: "api/v1/personalInformation",
   );

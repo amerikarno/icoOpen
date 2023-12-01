@@ -19,9 +19,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      // home:  MyHomePage()
+      home:  MyHomePage()
       // home: CustomerEvaluate(id: 'd555f123-231f-44e7-80bc-96422727e7e6')
-      home: PersonalInformation(id: 'd555f123-231f-44e7-80bc-96422727e7e6')
+      // home: PersonalInformation(id: 'd555f123-231f-44e7-80bc-96422727e7e6')
       // home: IDCardPage()
     );
   }

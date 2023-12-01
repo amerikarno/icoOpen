@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:http/http.dart' as http;
+import 'package:ico_open/config/config.dart';
 import 'package:ico_open/model/idcard.dart';
 
 // dynamic data;
@@ -11,7 +12,7 @@ Future<bool> getVerifiedIDCard(String idcard) async {
 
   final url = Uri(
     scheme: "http",
-    host: "localhost",
+    host: host,
     port: 1323,
     path: "api/v1/idcard/$idcard",
   );
@@ -37,7 +38,7 @@ Future<bool> getVerifiedIDCard(String idcard) async {
 Future<String> postIDCard(IDcardModel idCard) async {
   final url = Uri(
     scheme: "http",
-    host: "localhost",
+    host: host,
     port: 1323,
     path: "api/v1/idcard",
   );
@@ -83,7 +84,7 @@ Future<String> postIDCard(IDcardModel idCard) async {
 
 //   final url = Uri(
 //     scheme: "http",
-//     host: "localhost",
+//     host: host,
 //     port: 1323,
 //     path: "api/v1/tambons/$amphure",
 //   );
@@ -109,7 +110,7 @@ Future<String> postIDCard(IDcardModel idCard) async {
 
 //   final url = Uri(
 //     scheme: "http",
-//     host: "localhost",
+//     host: host,
 //     port: 1323,
 //     path: "api/v1/zipcode/$zipname",
 //   );

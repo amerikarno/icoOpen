@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ico_open/model/personal_agreement.dart';
 
-  bool _validatePersonalAgreement = false;
+  bool validatePersonalAgreement = false;
   bool isPersonalAgreementChecked = false;
 
 class CheckboxPersonalAggreement extends StatefulWidget {
@@ -34,7 +34,7 @@ class _CheckboxPersonalAggreementState
       value: isPersonalAgreementChecked,
       onChanged: (bool? value) {
         setState(() {
-          _validatePersonalAgreement = value!;
+          validatePersonalAgreement = value!;
           isPersonalAgreementChecked = value;
         });
       },
@@ -44,6 +44,8 @@ class _CheckboxPersonalAggreementState
 
 class PersonalAgreement extends StatelessWidget {
   const PersonalAgreement({super.key});
+
+  // final Function() func;
 
   @override
   Widget build(BuildContext context) {
@@ -61,14 +63,23 @@ class PersonalAgreement extends StatelessWidget {
           ),
           actionsAlignment: MainAxisAlignment.center,
           actions: <Widget>[
-            TextButton(
+            StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
+
+            return TextButton(
               onPressed: () {
+                print('1: $validatePersonalAgreement, $isPersonalAgreementChecked');
+                setState(() {
+                  validatePersonalAgreement = true;
+                  isPersonalAgreementChecked = true;
+                });
+                print('2: $validatePersonalAgreement, $isPersonalAgreementChecked');
                 Navigator.pop(context, 'OK');
               },
               child: const Text(
                 'OK',
               ),
-            ),
+            );
+            })
           ],
         ),
       ),
