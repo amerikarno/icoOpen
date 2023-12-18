@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:html';
 import 'dart:io';
 
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:ico_open/config/config.dart';
@@ -31,6 +33,8 @@ final TextEditingController email = TextEditingController();
 final TextEditingController mobileno = TextEditingController();
 
 class _MyHomePageState extends State<MyHomePage> {
+  late Future<String> futureAlbum;
+
   final hightspace = const SizedBox(
     height: 10,
   );
@@ -69,6 +73,32 @@ class _MyHomePageState extends State<MyHomePage> {
     email.dispose();
   }
 
+  void fetchEmail(String email) {
+    final response = ApiProvider().getEmail('verify/email/$email');
+    print('response: ${response}');
+  }
+
+  void getHttpClientForEmailChecked(String email) async{
+    try {
+      HttpClient httpClient = HttpClient();
+      httpClient.badCertificateCallback =
+          (X509Certificate cert, String host, int port) {
+        return true;
+      };
+      var url = "https://www.finansiada.com/verify/email/$email";
+      HttpClientRequest request = await httpClient.getUrl(Uri.parse(url));
+      HttpClientResponse response = await request.close();
+      String responseBody = await response.transform(utf8.decoder).join();
+      if (response.statusCode == HttpStatus.ok) {
+        print('success');
+        print(response.headers);
+        print(responseBody);
+      }
+    } catch (e) {
+      print("fail：$e");
+    }
+  }
+  
   Future<void> _verifyEmail(String email) async {
     if (email.isEmpty) {
       log('email is empty', name: _passedVeridateEmail.toString());
@@ -76,13 +106,19 @@ class _MyHomePageState extends State<MyHomePage> {
         _validateEmail = true;
       });
     } else {
+      try {
       final url = Uri(
-        scheme: 'http',
+        scheme: 'https',
         host: host,
         port: 1323,
         path: 'verify/email/$email',
       );
-      var response = await http.get(url).timeout(
+
+      var response = await http.get(url, headers: {
+        "Accept": "application/json",
+          "Access-Control_Allow_Origin": "*",
+          "upgrade-insecure-requests":"1"
+      }).timeout(
             const Duration(seconds: 1),
             onTimeout: () => http.Response('error', 408),
           );
@@ -90,7 +126,6 @@ class _MyHomePageState extends State<MyHomePage> {
         'url:',
         name: url.toString(),
       );
-
       final data = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -117,6 +152,9 @@ class _MyHomePageState extends State<MyHomePage> {
           // _loadingEmail = false;
           // isPassedEmailChecked = false;
         });
+      }
+      } catch (e) {
+        print('fail to verify email: $e');
       }
     }
     log('is passed email validate: $_passedVeridateEmail');
@@ -264,15 +302,7 @@ class _MyHomePageState extends State<MyHomePage> {
   // }
 
   void gotoNextPage() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) {
-          log('goto idcard page');
-          return const IDCardPage();
-        },
-      ),
-    );
+    Navigator.pushNamed(context, '/idcard');
   }
 
   final thList = [
@@ -513,6 +543,21 @@ class _MyHomePageState extends State<MyHomePage> {
                           filterPattern: RegExp(r'[a-zA-Z0-9@.]'),
                           onsubmittedFunction: (value) {
                             _verifyEmail(value);
+                            // getHttpClientForEmailChecked(value);
+  // fetchEmail(value);                            // FutureBuilder(
+                            //     future: fetchAlbum(),
+                            //     builder: (context, snapshot) {
+                            //       if (snapshot.hasData) {
+                            //         log('snapshot has data');
+                            //         return Text('${snapshot.data}');
+                            //       } else if (snapshot.hasError) {
+                            //         log('error: ${snapshot.error}');
+                            //         return Text('${snapshot.error}');
+                            //       }
+                            //       return const CircularProgressIndicator();
+                            //     });
+                            // futureAlbum = fetchAlbum();
+                            // print('album: ${futureAlbum}');
                             // final isPassed = await _verifyEmail(value);
                             // setState(() {
                             //   isPassedEmailChecked = isPassed;
@@ -621,29 +666,29 @@ class _MyHomePageState extends State<MyHomePage> {
                                     _validateEnSurName = true;
                                   }
                                   // isPassedEmailChecked =
-                                      await _verifyEmail(email.text);
+                                  await _verifyEmail(email.text);
 
-                                  // isPassedMobileChecked = 
-                                      await _verifyMobileNo(mobileno.text);
+                                  // isPassedMobileChecked =
+                                  await _verifyMobileNo(mobileno.text);
                                   // if (thValue!.isEmpty) {_validateTHTitle = true;}
                                   // if (engValue!.isEmpty) {_validateEnTitle = true;}
 
-                                  if (thname.text.trim().isNotEmpty &&
-                                      thsurname.text.trim().isNotEmpty &&
-                                      enname.text.trim().isNotEmpty &&
-                                      ensurname.text.trim().isNotEmpty &&
-                                      email.text.trim().isNotEmpty &&
-                                      mobileno.text.trim().isNotEmpty &&
-                                      // isPersonalAgreementChecked) {
-                                        isPersonalAgreementChecked &&
-                                    // _passedVeridateEmail && _passedVeridateMobile) {
-                                    isPassedEmailChecked && isPassedMobileChecked) {
-                                    log('''title: $thValue name: ${thname.text} surname: ${thsurname.text}
-                                    title: $engValue name: ${enname.text} surname: ${ensurname.text}
-                                    email: ${email.text}, mobile: ${mobileno.text}, agreement: $isPersonalAgreementChecked''');
+                                  // if (thname.text.trim().isNotEmpty &&
+                                  //     thsurname.text.trim().isNotEmpty &&
+                                  //     enname.text.trim().isNotEmpty &&
+                                  //     ensurname.text.trim().isNotEmpty &&
+                                  //     email.text.trim().isNotEmpty &&
+                                  //     mobileno.text.trim().isNotEmpty &&
+                                  //     // isPersonalAgreementChecked) {
+                                  //       isPersonalAgreementChecked &&
+                                  //   // _passedVeridateEmail && _passedVeridateMobile) {
+                                  //   isPassedEmailChecked && isPassedMobileChecked) {
+                                  //   log('''title: $thValue name: ${thname.text} surname: ${thsurname.text}
+                                  //   title: $engValue name: ${enname.text} surname: ${ensurname.text}
+                                  //   email: ${email.text}, mobile: ${mobileno.text}, agreement: $isPersonalAgreementChecked''');
 
-                                    gotoNextPage();
-                                  }
+                                  gotoNextPage();
+                                  // }
                                 },
                                 child: const Icon(
                                   Icons.arrow_right_alt,
@@ -663,4 +708,14 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+}
+
+class ApiProvider extends GetConnect {
+  @override
+  void onInit() {
+    httpClient.baseUrl = 'https://localhost';
+  }
+
+  @override
+  Future<Response> getEmail(String email) => get(email);
 }
